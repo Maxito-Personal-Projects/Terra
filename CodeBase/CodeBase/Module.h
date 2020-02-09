@@ -9,7 +9,7 @@ class Module
 {
 public:
 
-	Module();
+	Module(string _name, bool _active);
 	~Module();
 
 	//Init Module, Used to create Stuff

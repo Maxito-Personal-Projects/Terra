@@ -1,6 +1,10 @@
 #include <iostream>
 #include "Application.h"
 
+#include "SDL/include/SDL.h"
+#pragma comment(lib,"SDL/libx86/SDL2.lib")
+#pragma comment(lib,"SDL/libx86/SDL2main.lib")
+
 using namespace std;
 
 enum MainState 
@@ -14,7 +18,7 @@ enum MainState
 
 Application* myApp = nullptr;
 
-int main()
+int main(int argc, char** argv)
 {
 	MainState state = MAIN_INIT;
 
@@ -24,14 +28,12 @@ int main()
 		{
 
 		case MAIN_INIT:
-			
-			cout << "Creating MyApp ------------------------------" << endl;
-			
+						
 			myApp = new Application();
 
 			if (myApp)
 			{
-				cout << "Application Created Succesfully" << endl;
+				LOG("Application Created Succesfully");
 			}
 			
 			state = MAIN_START;
@@ -40,19 +42,25 @@ int main()
 
 		case MAIN_START:
 
-			cout << "Starting MyApp ------------------------------" << endl;
+			LOG("Starting MyApp ------------------------------");
 			
-			myApp = new Application();
-			
-			state = MAIN_UPDATE;
+			if (myApp->Init())
+			{
+				state = MAIN_UPDATE;
+			}
+			else
+			{
+				LOG("FATAL ERROR: Start Went Wrong")
+				state = MAIN_CLEAN;
+			}
 
 			break;
 
 		case MAIN_UPDATE:
 
-			cout << "Updating MyApp ------------------------------" << endl;
-			
-			myApp = new Application();
+			LOG("Updating MyApp ------------------------------");
+
+			system("pause");
 			
 			state = MAIN_CLEAN;
 
@@ -60,7 +68,12 @@ int main()
 
 		case MAIN_CLEAN:
 
-			cout << "Cleaning MyApp before closing ------------------------------" << endl;
+			LOG("Cleaning MyApp before closing ------------------------------");
+
+			if (!myApp->CleanUp())
+			{
+				LOG("FATAL ERROR: CleanUp Went Wrong")
+			}
 
 			state = MAIN_EXIT;
 
@@ -72,12 +85,10 @@ int main()
 	delete myApp;
 	myApp = nullptr;
 
-	cout << "Closing MyApp ------------------------------" << endl;
+	LOG("Closing MyApp ------------------------------");
 
-	cout << endl;
-	cout << "C YA!" << endl;
-
-
+	LOG("C YA!");
+	
 	system("pause");
 	return 0;
 }

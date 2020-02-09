@@ -1,12 +1,17 @@
 #include "Application.h"
 #include "Module.h"
-
+#include "ModuleWindow.h"
 
 
 Application::Application()
 {
-}
+	//Create Modules here
+	m_window = new ModuleWindow("Window");
 
+	//Add them to module list
+	modules.push_back(m_window);
+
+}
 
 Application::~Application()
 {
@@ -20,8 +25,20 @@ Application::~Application()
 bool Application::Init()
 {
 	bool ret = true;
-
 	string error = "";
+
+	int SDL_error = SDL_Init(SDL_INIT_EVERYTHING);
+	if (SDL_error != 0)
+	{
+		error = "Error Initializing SDL2" ;
+		LOG("%s",error);
+
+		ret = false;
+	}
+	else
+	{
+		LOG("SDL2 Initialized Correctly");
+	}
 
 	for (list<Module*>::iterator it_m = modules.begin(); it_m != modules.end() && ret; it_m++)
 	{
@@ -108,6 +125,8 @@ bool Application::CleanUp()
 			cout << error << endl;
 		}
 	}
+
+	SDL_Quit();
 
 	return ret;
 }

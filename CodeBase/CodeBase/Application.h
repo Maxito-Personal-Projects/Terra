@@ -3,8 +3,12 @@
 
 #include <list>
 #include <iostream>
+#include "Globals.h"
+
+#include "SDL/include/SDL.h"
 
 class Module;
+class ModuleWindow;
 
 using namespace std;
 
@@ -29,6 +33,8 @@ private:
 	list<Module*> modules;
 
 public:
+
+	ModuleWindow* m_window = nullptr;
 
 
 
