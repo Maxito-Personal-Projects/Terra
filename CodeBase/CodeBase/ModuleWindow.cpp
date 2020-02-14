@@ -7,9 +7,16 @@ bool ModuleWindow::Init()
 
 	LOG("Module Window Init!");
 
-	float version =CODEBASE_VERSION;
+	int sdlError = SDL_Init(SDL_INIT_VIDEO);
+	if (sdlError != 0)
+	{
+		LOG("Error initializing SDL video");
+		return false;
+	}
 
-	title += to_string(version);
+	char test[24] = "";
+	sprintf(test, "%.1f", CODEBASE_VERSION);
+	title += test;
 
 	window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
 	
@@ -26,8 +33,10 @@ bool ModuleWindow::CleanUp()
 {
 	bool ret = true;
 
-	SDL_DestroyWindow(window);
-	window = nullptr;
+	if (window != NULL)
+	{
+		SDL_DestroyWindow(window);
+	}
 
 	return ret;
 }

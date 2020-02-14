@@ -60,10 +60,12 @@ int main(int argc, char** argv)
 
 			LOG("Updating MyApp ------------------------------");
 
-			system("pause");
+			if (!myApp->Update())
+			{
+				LOG("FATAL ERROR: Start Went Wrong")
+					state = MAIN_CLEAN;
+			}
 			
-			state = MAIN_CLEAN;
-
 			break;
 
 		case MAIN_CLEAN:
@@ -89,6 +91,5 @@ int main(int argc, char** argv)
 
 	LOG("C YA!");
 	
-	system("pause");
 	return 0;
 }

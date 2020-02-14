@@ -9,6 +9,7 @@
 
 class Module;
 class ModuleWindow;
+class ModuleInput;
 
 using namespace std;
 
@@ -35,6 +36,7 @@ private:
 public:
 
 	ModuleWindow* m_window = nullptr;
+	ModuleInput* m_input = nullptr;
 
 
 

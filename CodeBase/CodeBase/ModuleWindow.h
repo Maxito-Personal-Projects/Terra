@@ -1,6 +1,7 @@
 #ifndef __MODULEWINDOW_H__
 #define __MODULEWINDOW_H__
 
+#include <iomanip> //for set precision
 #include "Module.h"
 
 class SDL_Window;
@@ -37,9 +38,6 @@ public:
 	int height = 500;
 
 	string title = "CodeBase v";
-
-
-
 
 };
 
