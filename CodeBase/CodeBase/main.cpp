@@ -58,12 +58,11 @@ int main(int argc, char** argv)
 
 		case MAIN_UPDATE:
 
-			LOG("Updating MyApp ------------------------------");
+			//LOG("Updating MyApp ------------------------------");
 
 			if (!myApp->Update())
 			{
-				LOG("FATAL ERROR: Start Went Wrong")
-					state = MAIN_CLEAN;
+				state = MAIN_CLEAN;
 			}
 			
 			break;

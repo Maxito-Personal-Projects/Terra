@@ -13,7 +13,7 @@ ModuleInput::~ModuleInput()
 
 bool ModuleInput::Init()
 {
-	LOG("Module Window Init!");
+	LOG("Module Input Init!");
 
 	int sdlError = SDL_InitSubSystem(SDL_INIT_EVENTS);
 	if (sdlError != 0)
@@ -32,7 +32,6 @@ bool ModuleInput::Init()
 
 bool ModuleInput::PreUpdate()
 {
-	LOG("Input PreUpdate!");
 	bool ret = true;
 
 	//Needed to get any type of event
@@ -70,7 +69,7 @@ bool ModuleInput::PreUpdate()
 
 	if (GetKey(SDL_SCANCODE_ESCAPE) == DOWN)
 	{
-		ret = false;
+		myApp->exit = true;
 	}
 
 	return ret;

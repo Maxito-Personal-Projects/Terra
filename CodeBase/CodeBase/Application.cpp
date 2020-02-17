@@ -2,18 +2,22 @@
 #include "Module.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
-
+#include "ModuleRenderer.h"
 
 Application::Application()
 {
 	//Create Modules here
 	m_window = new ModuleWindow("Window");
 	m_input = new ModuleInput("Input");
+	m_render = new ModuleRenderer("Render");
 
 
 	//Add them to module list
 	modules.push_back(m_window);
 	modules.push_back(m_input);
+
+	//Add rendere the last
+	modules.push_back(m_render);
 
 }
 
@@ -95,6 +99,11 @@ bool Application::Update()
 			error = "Error PostUpdating Module" + (*it_m)->name;
 			cout << error << endl;
 		}
+	}
+
+	if (exit)
+	{
+		ret = false;
 	}
 
 	return ret;

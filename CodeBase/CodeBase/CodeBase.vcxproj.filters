@@ -36,6 +36,9 @@
     <ClCompile Include="ModuleInput.cpp">
       <Filter>Source Files\Modules</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleRenderer.cpp">
+      <Filter>Source Files\Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -51,6 +54,9 @@
       <Filter>Source Files\Modules</Filter>
     </ClInclude>
     <ClInclude Include="ModuleInput.h">
+      <Filter>Source Files\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleRenderer.h">
       <Filter>Source Files\Modules</Filter>
     </ClInclude>
   </ItemGroup>
