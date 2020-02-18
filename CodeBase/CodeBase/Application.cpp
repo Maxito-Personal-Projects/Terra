@@ -3,6 +3,7 @@
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer.h"
+#include "ModuleUI.h"
 
 Application::Application()
 {
@@ -10,11 +11,13 @@ Application::Application()
 	m_window = new ModuleWindow("Window");
 	m_input = new ModuleInput("Input");
 	m_render = new ModuleRenderer("Render");
+	m_ui = new ModuleUI("UI");
 
 
 	//Add them to module list
 	modules.push_back(m_window);
 	modules.push_back(m_input);
+	modules.push_back(m_ui);
 
 	//Add rendere the last
 	modules.push_back(m_render);

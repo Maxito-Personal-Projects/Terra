@@ -15,6 +15,7 @@ class Module;
 class ModuleWindow;
 class ModuleInput;
 class ModuleRenderer;
+class ModuleUI;
 
 
 using namespace std;
@@ -44,6 +45,7 @@ public:
 	ModuleWindow* m_window = nullptr;
 	ModuleInput* m_input = nullptr;
 	ModuleRenderer* m_render = nullptr;
+	ModuleUI* m_ui = nullptr;
 
 	bool exit = false;
 

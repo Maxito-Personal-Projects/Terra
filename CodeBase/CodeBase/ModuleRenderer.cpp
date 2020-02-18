@@ -2,6 +2,7 @@
 #include "ModuleRenderer.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
+#include "ModuleUI.h"
 
 
 
@@ -63,6 +64,11 @@ bool ModuleRenderer::PosUpdate()
 	{
 		glClearColor(0, 1, 1, 1);
 	}
+
+	// Rendering
+	ImGui::Render();
+	glClear(GL_COLOR_BUFFER_BIT);
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	//Update the window with OpenGL rendering
 	SDL_GL_SwapWindow(myApp->m_window->window);
