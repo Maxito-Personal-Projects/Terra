@@ -25,7 +25,7 @@ bool ModuleUI::Init()
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
 	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
+	ImGui::StyleColorsLight();
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplSDL2_InitForOpenGL(myApp->m_window->window, myApp->m_render->context);

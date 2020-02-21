@@ -16,6 +16,7 @@ class ModuleWindow;
 class ModuleInput;
 class ModuleRenderer;
 class ModuleUI;
+class ModuleShader;
 
 
 using namespace std;
@@ -46,6 +47,7 @@ public:
 	ModuleInput* m_input = nullptr;
 	ModuleRenderer* m_render = nullptr;
 	ModuleUI* m_ui = nullptr;
+	ModuleShader* m_shader = nullptr;
 
 	bool exit = false;
 

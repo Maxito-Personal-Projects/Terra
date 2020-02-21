@@ -36,7 +36,11 @@ bool ModuleRenderer::Init()
 		ret = false;
 	}
 
-	glClearColor(1, 0, 1, 1);
+	//Telling OpenGL the size of the rendering window
+	glViewport(0, 0, myApp->m_window->width, myApp->m_window->height);
+	//TODO(max): A function that change the viewport when the window is modified (need sdl events!)
+
+	glClearColor(1, 0.55f, 0.48f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	return ret;
@@ -81,4 +85,14 @@ bool ModuleRenderer::CleanUp()
 	SDL_GL_DeleteContext(context);
 
 	return true;
+}
+
+void ModuleRenderer::ResizeWindow()
+{
+	//Change windo Size
+	SDL_GetWindowSize(myApp->m_window->window, &myApp->m_window->width, &myApp->m_window->height);
+
+	//Change Viewport Size
+	glViewport(0, 0, myApp->m_window->width, myApp->m_window->height);
+
 }

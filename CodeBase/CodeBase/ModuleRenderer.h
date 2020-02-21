@@ -28,6 +28,9 @@ public:
 	//Clean Module
 	bool CleanUp();
 
+	//Resize window & viewport
+	void ResizeWindow();
+
 public:
 
 	SDL_GLContext context;
