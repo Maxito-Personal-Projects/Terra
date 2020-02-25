@@ -10,9 +10,13 @@ public:
 	GameObject();
 	~GameObject();
 
+	bool Draw();
+
 public:
 
-	int shader;
+	int shader = 0;
+	float* vertices = nullptr;
+	int numVertices = 0;
 
 };
 

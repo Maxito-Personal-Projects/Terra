@@ -1,4 +1,7 @@
+#include "Application.h"
 #include "ModuleShader.h"
+#include "FileSystem.h"
+#include "Shader.h"
 
 
 
@@ -9,6 +12,7 @@ ModuleShader::ModuleShader(string _name, bool _active) : Module(_name,_active)
 
 ModuleShader::~ModuleShader()
 {
+	
 }
 
 bool ModuleShader::Init()
@@ -20,6 +24,9 @@ bool ModuleShader::Init()
 bool ModuleShader::Start()
 {
 	bool ret = true;
+
+	GenerateDefaultShaders();
+
 	return ret;
 }
 
@@ -38,5 +45,133 @@ bool ModuleShader::PosUpdate()
 bool ModuleShader::CleanUp()
 {
 	bool ret = true;
+
+	for (list<Shader*>::iterator s_it = shaders.begin(); s_it != shaders.end(); ++s_it)
+	{
+		if ((*s_it) != nullptr)
+		{
+			delete (*s_it);
+			(*s_it) = nullptr;
+		}
+	}
+
+	shaders.clear();
+	shadersNames.clear();
+
 	return ret;
+}
+
+void ModuleShader::GenerateDefaultShaders()
+{
+	//Creating default Vertex Shader
+	_Shader* defaultVertexSahder = new _Shader("Default Vertex Shader", VERTEX);
+	defaultVertexSahder->code = FileSystem::FileToString("Shaders/Default_Vertex_Shader.txt");
+	
+	if (CompileShader(defaultVertexSahder))
+	{
+		LOG("Default Vertex Shader Compiled Successfully");
+	}
+
+	//Creating default Fragment Shader
+	_Shader* defaultFragmentSahder = new _Shader("Default Vertex Shader", FRAGMENT);
+	defaultFragmentSahder->code = FileSystem::FileToString("Shaders/Default_Fragment_Shader.txt");
+	
+	if(CompileShader(defaultFragmentSahder))
+	{
+		LOG("Default Fragment Shader Compiled Successfully");
+	}
+
+	//Creating Default Shader Program
+	Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder);
+	if (CompileShaderProgram(defaultShader))
+	{
+		LOG("Default Shader Program Compiled Successfully");
+
+		shaders.push_back(defaultShader);
+		shadersNames.insert({ defaultShader->name, defaultShader->id });
+	}
+
+
+}
+
+bool ModuleShader::CompileShader(_Shader* shader)
+{
+	bool ret = true;
+
+	//Generating Shader object
+	if(shader->type== VERTEX)
+		shader->id = glCreateShader(GL_VERTEX_SHADER);
+	else if(shader->type==FRAGMENT)
+		shader->id = glCreateShader(GL_FRAGMENT_SHADER);
+	else
+		shader->id = glCreateShader(GL_GEOMETRY_SHADER);
+
+	//Attaching the shader source code to the shader object
+	const char *shaderCode = shader->code.c_str();
+	glShaderSource(shader->id, 1, &shaderCode, NULL);
+
+	//Compiling Shader
+	glCompileShader(shader->id);
+
+	//Chacking Compile Errors
+	int success;
+	char infoLog[512];
+	glGetShaderiv(shader->id, GL_COMPILE_STATUS, &success);
+
+	if (!success)
+	{
+		glGetShaderInfoLog(shader->id, 512, NULL, infoLog);
+		LOG("Compilation Shader Error: %s", infoLog);
+		ret = false;
+	}
+
+	return ret;
+}
+
+bool ModuleShader::CompileShaderProgram(Shader * shaderProgram)
+{
+	bool ret = true;
+
+	//Generating Shader Program object
+	shaderProgram->id = glCreateProgram();
+
+	//Attaching compiled shaders
+	glAttachShader(shaderProgram->id, shaderProgram->shaders[0]->id); //0 = Vertex
+
+	if (shaderProgram->shaders.size()==3)
+		glAttachShader(shaderProgram->id, shaderProgram->shaders[2]->id); //2 = Geometry
+
+	glAttachShader(shaderProgram->id, shaderProgram->shaders[1]->id); //1 = Vertex
+
+	//Compiling Shader Program
+	glLinkProgram(shaderProgram->id);
+
+	//Chacking Compile Errors
+	int success;
+	char infoLog[512];
+	glGetProgramiv(shaderProgram->id, GL_COMPILE_STATUS, &success);
+
+	if (!success)
+	{
+		glGetShaderInfoLog(shaderProgram->id, 512, NULL, infoLog);
+		LOG("Compilation Shader Program Error: %s", infoLog);
+		ret = false;
+	}
+
+	//Deleting Shaders
+	glDeleteShader(shaderProgram->shaders[0]->id);
+	
+	if (shaderProgram->shaders.size() == 3)
+	{
+		glDeleteShader(shaderProgram->shaders[2]->id);
+	}
+	
+	glDeleteShader(shaderProgram->shaders[1]->id);
+
+	return ret;
+}
+
+int ModuleShader::GetShader(string name)
+{
+	return shadersNames[name];
 }

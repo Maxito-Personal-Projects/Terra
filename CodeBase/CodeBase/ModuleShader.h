@@ -2,6 +2,12 @@
 #define __MODULESHADER_H__
 
 #include "Module.h"
+
+#include <map>
+
+class Shader;
+struct _Shader;
+
 class ModuleShader : public Module
 {
 public:
@@ -27,6 +33,18 @@ public:
 	//Clean Module
 	bool CleanUp();
 
+	void GenerateDefaultShaders();
+
+	bool CompileShader(_Shader* shader);
+	bool CompileShaderProgram(Shader* shaderProgram);
+
+	int GetShader(string name);
+
+public:
+
+	map<string, int> shadersNames;
+	list<Shader*> shaders;
+	
 };
 
 #endif // !__MODULESHADER_H__
