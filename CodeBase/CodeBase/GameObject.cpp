@@ -55,7 +55,7 @@ void GameObject::LoadToGPU()
 	//Copying the index data into the buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*numIndices, indices, GL_STATIC_DRAW);
 
-	//Telling OpenGL how to interprete our data
+	//Telling OpenGL how to interprete our data //Loading to GPU
 	//( layout loactaion = 0, size of shader var -> vec3, type of data, normalize or not, space between data, offset)  
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0); //layout loactaion = 0
