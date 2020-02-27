@@ -3,6 +3,8 @@
 
 #include "Module.h"
 
+class GameObject;
+
 class ModuleRenderer : public Module
 {
 public:
@@ -17,7 +19,7 @@ public:
 	bool Start() { return true; }
 
 	//PreUpdate Module
-	bool PreUpdate() { return true; }
+	bool PreUpdate();
 
 	//Update Module
 	bool Update() { return true; }
@@ -34,6 +36,8 @@ public:
 public:
 
 	SDL_GLContext context;
+	GameObject* firstGO = nullptr;
+
 };
 
 #endif // !__MODULERENDERER_H__

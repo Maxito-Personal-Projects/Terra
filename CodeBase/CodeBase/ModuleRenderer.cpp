@@ -4,6 +4,8 @@
 #include "ModuleInput.h"
 #include "ModuleUI.h"
 
+#include "GameObject.h"
+
 
 
 ModuleRenderer::ModuleRenderer(string _name, bool _active) :Module(_name, _active)
@@ -43,6 +45,36 @@ bool ModuleRenderer::Init()
 	glClearColor(1, 0.55f, 0.48f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	firstGO = new GameObject();
+	firstGO->LoadToGPU();
+
+	return ret;
+}
+
+bool ModuleRenderer::PreUpdate()
+{
+	bool ret = true;
+
+	//Clear the buffers before drawing!
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//Draw all game objects (now one)
+	firstGO->Draw();
+
+	//Unbinding all buffers
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	//Test!
+	if (myApp->m_input->GetKey(SDL_SCANCODE_SPACE) == DOWN)
+	{
+		glClearColor(0, 1, 1, 1);
+	}
+
+	// Rendering
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	return ret;
 }
 
@@ -51,28 +83,6 @@ bool ModuleRenderer::Init()
 bool ModuleRenderer::PosUpdate()
 {
 	bool ret = true;
-
-	//Clear the buffers before drawing!
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	/*
-	
-	
-	-------- Draw Stuff --------
-	
-	
-	*/
-
-	//Test!
-	if (myApp->m_input->GetKey(SDL_SCANCODE_SPACE)==DOWN)
-	{
-		glClearColor(0, 1, 1, 1);
-	}
-
-	// Rendering
-	ImGui::Render();
-	glClear(GL_COLOR_BUFFER_BIT);
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	//Update the window with OpenGL rendering
 	SDL_GL_SwapWindow(myApp->m_window->window);
@@ -83,6 +93,9 @@ bool ModuleRenderer::PosUpdate()
 bool ModuleRenderer::CleanUp()
 {
 	SDL_GL_DeleteContext(context);
+
+	delete firstGO;
+	firstGO = nullptr;
 
 	return true;
 }

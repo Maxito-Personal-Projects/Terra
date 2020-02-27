@@ -9,7 +9,6 @@ ModuleShader::ModuleShader(string _name, bool _active) : Module(_name,_active)
 {
 }
 
-
 ModuleShader::~ModuleShader()
 {
 	
