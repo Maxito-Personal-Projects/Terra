@@ -7,6 +7,7 @@
 #include "Glew/include/glew.h"
 
 #include "SDL/include/SDL.h"
+#include "MathGeoLib/MathGeoLib.h"
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 #pragma comment (lib, "Glew/libx86/glew32.lib") /* link Microsoft OpenGL lib   */

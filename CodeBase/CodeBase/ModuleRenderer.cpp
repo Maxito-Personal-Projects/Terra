@@ -46,7 +46,6 @@ bool ModuleRenderer::Init()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	firstGO = new GameObject();
-	firstGO->LoadToGPU();
 
 	return ret;
 }

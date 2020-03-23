@@ -85,11 +85,11 @@ bool ModuleInput::PreUpdate()
 			{
 			case SDL_WINDOWEVENT_RESIZED:
 				myApp->m_render->ResizeWindow();
-				LOG("Window size has changed!")
+				LOG("Window size has changed!");
 				break;
 			case SDL_WINDOWEVENT_MAXIMIZED:
 				//TODO(Max) Call resize viewport function
-				LOG("Window size changed!")
+				LOG("Window size changed!");
 				break;
 			default:
 				break;
