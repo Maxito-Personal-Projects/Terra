@@ -24,7 +24,7 @@ private:
 	float farPlane = 1000.f;
 	float aspectRatio = 0.0f;
 	float vFOV = 0.0f;
-	float speed = 1.0f;
+	float speed = 0.5f;
 
 	float4x4 mainTransform = float4x4::identity;
 };

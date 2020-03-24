@@ -10,7 +10,7 @@ public:
 
 public:
 
-	float3 position = { 0.0f,0.0f,1.0f };
+	float3 position = { 1.0f,1.0f,-4.0f };
 	float3 scale = float3::one;
 	Quat rotation = Quat::identity;
 

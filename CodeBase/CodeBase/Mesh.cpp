@@ -27,7 +27,7 @@ void Mesh::DrawMesh()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,IBO);
 
 	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
-	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->globalMatrix.Transposed().v);
+	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
 }
