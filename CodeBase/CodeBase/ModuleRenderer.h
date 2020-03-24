@@ -16,7 +16,7 @@ public:
 	bool Init();
 
 	//Starting Module, Used to init Stuff
-	bool Start() { return true; }
+	bool Start();
 
 	//PreUpdate Module
 	bool PreUpdate();

@@ -18,6 +18,7 @@ class ModuleInput;
 class ModuleRenderer;
 class ModuleUI;
 class ModuleShader;
+class ModuleCamera;
 
 
 using namespace std;
@@ -49,6 +50,7 @@ public:
 	ModuleRenderer* m_render = nullptr;
 	ModuleUI* m_ui = nullptr;
 	ModuleShader* m_shader = nullptr;
+	ModuleCamera* m_camera = nullptr;
 
 	bool exit = false;
 

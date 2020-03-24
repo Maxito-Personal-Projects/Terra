@@ -1,10 +1,14 @@
 #include "Application.h"
 #include "ModuleShader.h"
+#include "GameObject.h"
 #include "Mesh.h"
+#include "Transform.h"
 
 
-Mesh::Mesh()
+
+Mesh::Mesh(GameObject* _parent)
 {
+	parent = _parent;
 	LoadToGPU();
 }
 
@@ -13,12 +17,17 @@ Mesh::~Mesh()
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
+
+	parent = nullptr;
 }
 
 void Mesh::DrawMesh()
 {	
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,IBO);
+
+	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
+	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->globalMatrix.Transposed().v);
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
 }

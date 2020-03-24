@@ -1,13 +1,19 @@
 #include "Application.h"
 #include "GameObject.h"
-#include "Mesh.h"
 #include "ModuleShader.h"
+#include "ModuleCamera.h"
+#include "Camera.h"
 #include "Transform.h"
+#include "Mesh.h"
+
 
 GameObject::GameObject()
 {
 	transform = new Transform();
-	mesh = new Mesh();
+	mesh = new Mesh(this);
+
+	//Default Shader
+	shader = myApp->m_shader->GetShader("Default Shader");
 }
 
 
@@ -32,10 +38,23 @@ bool GameObject::Draw()
 	if (mesh)
 	{
 		//Using object shader
-		//glUseProgram(shader); should be like this but now
-		glUseProgram(myApp->m_shader->GetShader("Default Shader"));
+		glUseProgram(shader);
+		SendMatrixToGPU();
 		mesh->DrawMesh();
 	}
 
 	return ret;
+}
+
+void GameObject::SendMatrixToGPU()
+{
+	//Getting uniform from shader
+	int projMatrix = glGetUniformLocation(shader, "Projection");
+	//Sending info to the GPU
+	glUniformMatrix4fv(projMatrix, 1, GL_FALSE, myApp->m_camera->mainCamera->getProjectionMatrix());
+
+	//Getting uniform from shader
+	int viewMatrix = glGetUniformLocation(shader, "View");
+	//Sending info to the GPU
+	glUniformMatrix4fv(viewMatrix, 1, GL_FALSE, myApp->m_camera->mainCamera->getViewMatrix());
 }

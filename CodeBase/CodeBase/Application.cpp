@@ -5,6 +5,7 @@
 #include "ModuleRenderer.h"
 #include "ModuleUI.h"
 #include "ModuleShader.h"
+#include "ModuleCamera.h"
 
 Application::Application()
 {
@@ -14,13 +15,14 @@ Application::Application()
 	m_render = new ModuleRenderer("Render");
 	m_ui = new ModuleUI("UI");
 	m_shader = new ModuleShader("Shader");
-
+	m_camera = new ModuleCamera("Camera");
 
 	//Add them to module list
 	modules.push_back(m_window);
 	modules.push_back(m_input);
 	modules.push_back(m_ui);
 	modules.push_back(m_shader);
+	modules.push_back(m_camera);
 
 	//Add rendere the last
 	modules.push_back(m_render);

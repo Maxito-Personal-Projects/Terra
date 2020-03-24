@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -200,6 +201,7 @@
     <ClCompile Include="MathGeoLib\Time\Clock.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Module.cpp" />
+    <ClCompile Include="ModuleCamera.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModuleRenderer.cpp" />
     <ClCompile Include="ModuleShader.cpp" />
@@ -210,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Globals.h" />
@@ -297,6 +300,7 @@
     <ClInclude Include="MathGeoLib\Time\Clock.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Module.h" />
+    <ClInclude Include="ModuleCamera.h" />
     <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="ModuleRenderer.h" />
     <ClInclude Include="ModuleShader.h" />

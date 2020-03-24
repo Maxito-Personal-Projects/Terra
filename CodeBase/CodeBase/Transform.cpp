@@ -4,6 +4,7 @@
 
 Transform::Transform()
 {
+	localMatrix = localMatrix.Translate(position);
 }
 
 

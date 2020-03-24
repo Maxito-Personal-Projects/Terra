@@ -13,6 +13,7 @@ public:
 	~GameObject();
 
 	bool Draw();
+	void SendMatrixToGPU();
 	
 public:
 

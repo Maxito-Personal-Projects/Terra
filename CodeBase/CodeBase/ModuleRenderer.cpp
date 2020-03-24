@@ -45,6 +45,13 @@ bool ModuleRenderer::Init()
 	glClearColor(1, 0.55f, 0.48f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	return ret;
+}
+
+bool ModuleRenderer::Start()
+{
+	bool ret = true;
+
 	firstGO = new GameObject();
 
 	return ret;

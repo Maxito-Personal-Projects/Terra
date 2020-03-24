@@ -3,11 +3,13 @@
 
 #include <string>
 
+class GameObject;
+
 class Mesh
 {
 public:
 
-	Mesh();
+	Mesh(GameObject* _parent);
 	~Mesh();
 
 	void DrawMesh();
@@ -24,6 +26,8 @@ public:
 	uint VBO;
 	uint VAO;
 	uint IBO;
+
+	GameObject* parent = nullptr;
 
 };
 
