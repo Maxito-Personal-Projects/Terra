@@ -44,6 +44,7 @@ bool ModuleRenderer::Init()
 
 	glClearColor(1, 0.55f, 0.48f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);;
 
 	return ret;
 }
@@ -62,7 +63,7 @@ bool ModuleRenderer::PreUpdate()
 	bool ret = true;
 
 	//Clear the buffers before drawing!
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw all game objects (now one)
 	firstGO->Draw();

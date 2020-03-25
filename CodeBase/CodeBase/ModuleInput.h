@@ -40,10 +40,19 @@ public:
 	bool CleanUp();
 
 	KEY_STATE GetKey(int keyCode);
+	KEY_STATE GetMouseButton(int buttonCode);
 
 public:
 
 	KEY_STATE* keyboard;
+	KEY_STATE mouse[5];
+
+	int mouseX = 0;
+	int mouseY = 0;
+
+	int motionX = 0;
+	int motionY = 0;
+
 
 };
 

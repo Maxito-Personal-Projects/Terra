@@ -35,8 +35,6 @@ vec Camera::GetPos()
 void Camera::SetPos(vec newPos)
 {
 	frustum.SetPos(newPos);
-	
-	LOG(" Cam Pos(%f, %f, %f)", frustum.Pos().x, frustum.Pos().y, frustum.Pos().z);
 }
 
 float Camera::GetSpeed()

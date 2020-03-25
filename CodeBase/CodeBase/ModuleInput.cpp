@@ -28,6 +28,11 @@ bool ModuleInput::Init()
 		keyboard[i] = IDLE;
 	}
 
+	for (int i = 0; i < 5; ++i)
+	{
+		mouse[i] = IDLE;
+	}
+
 	return true;
 }
 
@@ -40,7 +45,9 @@ bool ModuleInput::PreUpdate()
 
 	//Getting the state of every key 
 	const Uint8* keyState = SDL_GetKeyboardState(NULL);
+	Uint8 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
+	//Keyboard inputs
 	for (int i = 0; i < MAX_KEYS; ++i)
 	{
 		//Check if the key is pressed(1) or not(0)
@@ -68,7 +75,39 @@ bool ModuleInput::PreUpdate()
 		}
 	}
 
+	//Mouse inputs
+
+	for (int i = 0; i < 5; ++i)
+	{
+		//Check if the key is pressed(1) or not(0)
+		if (mouseState & SDL_BUTTON(i))
+		{
+			if (mouse[i] == IDLE)
+			{
+				mouse[i] = DOWN;
+			}
+			else	//Already pressed
+			{
+				mouse[i] = REPEAT;
+			}
+		}
+		else
+		{
+			if (mouse[i] == DOWN || mouse[i] == REPEAT)
+			{
+				mouse[i] = UP;
+			}
+			else
+			{
+				mouse[i] = IDLE;
+			}
+		}
+	}
+
 	SDL_Event myEvent;
+
+	//Reset motion every frame
+	motionX = motionY = 0;
 
 	//Getting all events
 	while (SDL_PollEvent(&myEvent))
@@ -94,6 +133,16 @@ bool ModuleInput::PreUpdate()
 			default:
 				break;
 			}
+		case SDL_MOUSEMOTION:
+			//new mouse pos because of moving
+			mouseX = myEvent.motion.x;
+			mouseY = myEvent.motion.y;
+
+			//relative position to detect movement
+			motionX = myEvent.motion.xrel;
+			motionY = myEvent.motion.yrel;
+
+			break;
 		
 		default:
 			break;
@@ -120,4 +169,9 @@ bool ModuleInput::CleanUp()
 KEY_STATE ModuleInput::GetKey(int keyCode)
 {
 	return keyboard[keyCode];
+}
+
+KEY_STATE ModuleInput::GetMouseButton(int buttonCode)
+{
+	return mouse[buttonCode];
 }
