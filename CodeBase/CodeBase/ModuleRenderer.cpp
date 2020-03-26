@@ -62,6 +62,17 @@ bool ModuleRenderer::PreUpdate()
 {
 	bool ret = true;
 
+
+
+	return ret;
+}
+
+
+
+bool ModuleRenderer::PosUpdate()
+{
+	bool ret = true;
+
 	//Clear the buffers before drawing!
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -69,7 +80,6 @@ bool ModuleRenderer::PreUpdate()
 	firstGO->Draw();
 
 	//Unbinding all buffers
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 	//Test!
@@ -81,15 +91,6 @@ bool ModuleRenderer::PreUpdate()
 	// Rendering
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	return ret;
-}
-
-
-
-bool ModuleRenderer::PosUpdate()
-{
-	bool ret = true;
 
 	//Update the window with OpenGL rendering
 	SDL_GL_SwapWindow(myApp->m_window->window);

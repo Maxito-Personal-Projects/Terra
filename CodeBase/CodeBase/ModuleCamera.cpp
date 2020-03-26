@@ -60,13 +60,25 @@ bool ModuleCamera::Update()
 		camPos += camFront *speed;
 	}
 
+	if (myApp->m_input->GetMouseButton(SDL_BUTTON_MIDDLE) == REPEAT)
+	{
+		if (abs(myApp->m_input->motionX) > 1)
+		{
+			camPos -= camRight.Normalized()*myApp->m_input->motionX*0.016f;
+		}
+		if (abs(myApp->m_input->motionY) > 1 )
+		{
+			camPos += camUp.Normalized()*myApp->m_input->motionY*0.016f;
+		}
+	}
+
 	if (myApp->m_input->GetMouseButton(SDL_BUTTON_LEFT)==REPEAT)
 	{
 		if (myApp->m_input->motionX != 0)
 		{
-			Quat rotation = Quat::RotateAxisAngle(camUp,myApp->m_input->motionX*0.016f);
+			Quat rotation = Quat::RotateY(myApp->m_input->motionX*0.016f);
 			camFront = rotation.Mul(camFront).Normalized();
-			//camUp = rotation.Mul(camUp).Normalized();
+			camUp = rotation.Mul(camUp).Normalized();
 		}
 
 		if (myApp->m_input->motionY != 0)
@@ -76,14 +88,9 @@ bool ModuleCamera::Update()
 			if (rotation.Mul(mainCamera->frustum.Up()).Normalized().y > 0.0f)
 			{
 				camUp = rotation.Mul(camUp).Normalized();
-				//camFront = rotation.Mul(camFront).Normalized();
+				camFront = rotation.Mul(camFront).Normalized();
 			}
 		}
-	}
-
-	if (myApp->m_input->GetMouseButton(SDL_BUTTON_RIGHT) == DOWN)
-	{
-		LOG("MOUSEEEEEEEE RIIIIIGGGHHHHTTTTTT!!!!!!!!!!!!!");
 	}
 
 	mainCamera->SetPos(camPos);
