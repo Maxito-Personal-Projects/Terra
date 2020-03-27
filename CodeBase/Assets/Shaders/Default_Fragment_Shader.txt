@@ -2,8 +2,25 @@
 out vec4 FragColor;
 
 in vec3 vecColor;
+in vec3 normal;
+in vec3 fragPos;
+
+uniform vec3 lightPos;
 
 void main()
 {
-    FragColor = vec4(vecColor, 1.0f);
+    vec3 lightColor = vec3(1.0);
+
+    // ambient
+    float ambientStrength = 0.9;
+    vec3 ambient = ambientStrength * lightColor;
+  	
+    // diffuse 
+    vec3 norm = normalize(normal);
+    vec3 lightDir = normalize(lightPos - fragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+            
+    vec3 result = (ambient + diffuse) * vecColor;
+    FragColor = vec4(result, 1.0);
 } 

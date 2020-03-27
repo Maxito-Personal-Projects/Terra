@@ -2,6 +2,7 @@
 #define _MESH_H__
 
 #include <string>
+#include <map>
 
 class GameObject;
 
@@ -15,7 +16,8 @@ public:
 	void DrawMesh();
 	void GenerateFlatMesh();
 	void LoadToGPU();
-	void CalculateNormals();
+	//void CalculateNormals();
+	void CalculateVertexNormals();
 	void FillInfoGPU();
 
 public:
@@ -39,12 +41,14 @@ public:
 		 0.5f, 0.5f, -0.5f,
 		 0.5f, -0.5f, -0.5f };
 
-	float colors[24] = { 0.0f,0.0f,0.0f,0.0f,0.0f,0.0f, 0.0f,0.0f,0.0f,
-					  0.0f,0.0f,0.0f, 0.0f,0.0f,0.0f, 0.0f,0.0f,0.0f,
-					  0.0f,0.0f,0.0f, 0.0f,0.0f,0.0f};
+	float colors[24] = { 0.5f,0.0f,0.0f,0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f,
+					  0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f,
+					  0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f};
 
-	float* normals = nullptr;
+	//float* faceNormals = nullptr;
 	float* infoGPU = nullptr;
+
+	std::map<int, vec> vertexNormals;
 
 	int indices[36] = { 0,1,2,1,3,2,1,7,3,7,6,3,7,5,6,5,4,6,2,3,4,3,6,4,5,0,4,0,2,4,5,7,0,7,1,0 };
 	int numVertices = 8;

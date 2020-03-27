@@ -9,7 +9,8 @@
 Mesh::Mesh(GameObject* _parent)
 {
 	parent = _parent;
-	CalculateNormals();
+	//CalculateNormals();
+	CalculateVertexNormals();
 	FillInfoGPU();
 	LoadToGPU();
 }
@@ -20,11 +21,11 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
 
-	if (normals)
+	/*if (faceNormals)
 	{
-		delete[] normals;
-		normals = nullptr;
-	}
+		delete[] faceNormals;
+		faceNormals = nullptr;
+	}*/
 
 	if (infoGPU)
 	{
@@ -32,15 +33,20 @@ Mesh::~Mesh()
 		infoGPU = nullptr;
 	}
 
+	vertexNormals.clear();
+
 	parent = nullptr;
 }
 
 void Mesh::DrawMesh()
-{	
+{
+	float lightPos[3] = { 0,10,-10 };
 	glBindVertexArray(VAO);
 
 	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
 	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
+	int light = glGetUniformLocation(parent->shader, "lightPos");
+	glUniform3f(light, lightPos[0], lightPos[1], lightPos[2]);
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
 }
@@ -86,16 +92,37 @@ void Mesh::LoadToGPU()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::CalculateNormals()
-{
-	if (normals)
-	{
-		delete[] normals;
-		normals = nullptr;
-	}
+//void Mesh::CalculateNormals()
+//{
+//	if (faceNormals)
+//	{
+//		delete[] faceNormals;
+//		faceNormals = nullptr;
+//	}
+//
+//	faceNormals = new float[numIndices * 2];
+//	
+//	for (int i = 0; i < numIndices; i = i + 3)
+//	{
+//		vec A = { verticesTest[indices[i] * 3],verticesTest[indices[i] * 3 + 1],verticesTest[indices[i] * 3 + 2] };
+//		vec B = { verticesTest[indices[i + 1] * 3],verticesTest[indices[i + 1] * 3 + 1],verticesTest[indices[i + 1] * 3 + 2] };
+//		vec C = { verticesTest[indices[i + 2] * 3],verticesTest[indices[i + 2] * 3 + 1],verticesTest[indices[i + 2] * 3 + 2] };
+//
+//		vec BA = A - B;
+//		vec BC = C - B;
+//
+//		vec normal = BC.Cross(BA).Normalized();
+//		
+//		faceNormals[i] = normal.x;
+//		faceNormals[i+1] = normal.y;
+//		faceNormals[i+2] = normal.z;
+//	}
+//}
 
-	normals = new float[numIndices * 2];
-	
+void Mesh::CalculateVertexNormals()
+{
+	vertexNormals.clear();
+
 	for (int i = 0; i < numIndices; i = i + 3)
 	{
 		vec A = { verticesTest[indices[i] * 3],verticesTest[indices[i] * 3 + 1],verticesTest[indices[i] * 3 + 2] };
@@ -106,10 +133,32 @@ void Mesh::CalculateNormals()
 		vec BC = C - B;
 
 		vec normal = BC.Cross(BA).Normalized();
-		
-		normals[i] = normal.x;
-		normals[i+1] = normal.y;
-		normals[i+2] = normal.z;
+
+		std::map<int, vec>::iterator it;
+
+		for (int j = 0; j < 3; ++j)
+		{
+			int key = indices[i + j];
+			it = vertexNormals.find(key);
+
+			if (it != vertexNormals.end())
+			{
+				vertexNormals[key] += normal;
+			}
+			else
+			{
+				vertexNormals[key] = normal;
+			}
+		}
+	}
+
+	std::map<int, vec>::iterator it = vertexNormals.begin();
+
+	// Iterate over the map using Iterator till end.
+	while (it != vertexNormals.end())
+	{
+		it->second = it->second.Normalized();
+		it++;
 	}
 }
 
@@ -139,9 +188,9 @@ void Mesh::FillInfoGPU()
 		infoGPU[it + 5] = colors[o_it + 2];
 		
 		//coping Normals
-		infoGPU[it + 6] = normals[o_it];
-		infoGPU[it + 7] = normals[o_it];
-		infoGPU[it + 8] = normals[o_it];
+		infoGPU[it + 6] = vertexNormals[i].x;
+		infoGPU[it + 7] = vertexNormals[i].y;
+		infoGPU[it + 8] = vertexNormals[i].z;
 	}
 
 
