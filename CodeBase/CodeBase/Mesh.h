@@ -24,6 +24,7 @@ public:
 
 	float* vertices = nullptr;
 	int* testIndices = nullptr;
+	int* tileCoords = nullptr;
 
 	float verticesTest[24] = { -0.5f, -0.5f, 0.5f,
 		 0.5f, -0.5f, 0.5f,
@@ -54,7 +55,7 @@ public:
 
 	GameObject* parent = nullptr;
 
-	int size = 100;
+	int size = 50;
 	float width = 0.5f;
 	float height = 0.5f;
 

@@ -2,6 +2,7 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
 layout (location = 2) in vec3 aNormal;
+layout (location = 3) in vec2 aTileCoords;
 
 out vec3 vecColor;
 out vec3 normal;
@@ -11,10 +12,71 @@ uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 Projection;
 
+float size = 100;
+in int gl_VertexID;
+
+float rand(vec2 n) 
+{ 
+    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
+
+float noise(vec2 vertexCoords)
+{
+    vec2 tile = vec2(vertexCoords/100.0);
+    vec2 tileMax = floor(tile);
+    
+    vec2 tile_right = vec2(tileMax.x+1.0,tileMax.y);
+    vec2 tile_up = vec2(tileMax.x,tileMax.y+1.0);
+    vec2 tile_diag = vec2(tileMax.x+1.0,tileMax.y+1.0);
+
+    float tileColor_1 = rand(tileMax);
+    float tileColor_2 = rand(tile_right);
+    float tileColor_3 = rand(tile_up);
+    float tileColor_4 = rand(tile_diag);
+    
+    float mixFactor_x=smoothstep(0.0,1.0,fract(vertexCoords/100.0).x);
+    
+    float mix_1=mix(tileColor_1,tileColor_2,mixFactor_x);
+    float mix_2=mix(tileColor_3,tileColor_4,mixFactor_x);
+    
+    float mixFactor_y = smoothstep(0.0,1.0,fract(vertexCoords/100.0).y);
+
+    float finalMix=mix(mix_1,mix_2,mixFactor_y);
+    
+    return finalMix;
+}
+
+float BrownianNoise(int vertexID)
+{
+    float y = 0.0;
+    float a =0.5;
+    float f=1.0;
+    
+    for(int i=0; i<8;i++)
+    {
+        y += a*noise(f*aTileCoords);
+        a*=0.5;
+        f*=2.0;
+    }
+    
+    return y;
+}
+
+float Test(int vertexID)
+{
+    vec2 tile = vec2(aTileCoords/10.0);
+    vec2 tileMax = floor(tile);
+    
+    return tileMax.y/10.0;
+}
+
 void main()
 {
+    float color = BrownianNoise(gl_VertexID);
     fragPos=vec3(Model*vec4(aPos,1.0));
-    gl_Position = Projection * View * Model * vec4(aPos.x, aPos.y, aPos.z, 1.0);
-    vecColor = aColor;
+    gl_Position = Projection * View * Model * vec4(aPos.x, color*50, aPos.z, 1.0);
+    //vecColor = aColor;
+    vecColor = vec3(color)+vec3(0.0,0.1,0.0);
+    
     normal = mat3(transpose(inverse(Model)))*aNormal;
 }

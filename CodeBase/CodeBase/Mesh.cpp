@@ -77,7 +77,7 @@ void Mesh::LoadToGPU()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 	//Copying the vertex data into the buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*numVertices * 9, infoGPU, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*numVertices * 11, infoGPU, GL_STATIC_DRAW);
 
 	//bind IB as element array buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -87,12 +87,14 @@ void Mesh::LoadToGPU()
 
 	//Telling OpenGL how to interprete our data //Loading to GPU
 	//( layout loactaion = 0, size of shader var -> vec3, type of data, normalize or not, space between data, offset)  
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0); //Position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0); //Position
 	glEnableVertexAttribArray(0); //layout loactaion = 0
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3*sizeof(float))); //Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3*sizeof(float))); //Color
 	glEnableVertexAttribArray(1); //layout loactaion = 1	
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6*sizeof(float))); //Normals
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6*sizeof(float))); //Normals
 	glEnableVertexAttribArray(2); //layout loactaion = 2
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(9 * sizeof(float))); //Tile Coords
+	glEnableVertexAttribArray(3); //layout loactaion = 2
 
 	//safely unbind
 	glBindVertexArray(0);
@@ -181,13 +183,16 @@ void Mesh::FillInfoGPU()
 		delete[] infoGPU;
 		infoGPU = nullptr;
 	}
+	
+	int size = numVertices * 9 + numVertices * 2;
 
-	infoGPU = new float[numVertices*numProperties * 3];
+	infoGPU = new float[size];
 
 	for (int i = 0; i < numVertices; i++)
 	{
-		int it = i * 9;
+		int it = i * 11;
 		int o_it = i * 3;
+		int t_it = i * 2;
 
 		//coping vertices
 		infoGPU[it] = vertices[o_it];
@@ -203,8 +208,11 @@ void Mesh::FillInfoGPU()
 		infoGPU[it + 6] = vertexNormals[i].x;
 		infoGPU[it + 7] = vertexNormals[i].y;
 		infoGPU[it + 8] = vertexNormals[i].z;
-	}
 
+		//Tile coords
+		infoGPU[it + 9] = (float)tileCoords[t_it];
+		infoGPU[it + 10] = (float)tileCoords[t_it+1];
+	}
 }
 
 void Mesh::GenerateFlatMesh()
@@ -214,6 +222,7 @@ void Mesh::GenerateFlatMesh()
 
 	vertices = new float[numVertices*3];
 	testIndices = new int[numIndices];
+	tileCoords = new int[numVertices * 2];
 
 	int indice_it= 0;
 
@@ -227,8 +236,11 @@ void Mesh::GenerateFlatMesh()
 
 			//vertex position
 			vertices[index * 3] = j * width;
-			vertices[index * 3 + 1] = sin(index)*cos(index);				//TODO let0s try to make this random :D
+			vertices[index * 3 + 1] = 0.0f;				//TODO let0s try to make this random :D
 			vertices[index * 3 + 2] = -(i * height);
+
+			tileCoords[index * 2] = j;
+			tileCoords[index * 2 + 1] = i;
 			
 			if (j < size - 1 && i < size - 1)
 			{
