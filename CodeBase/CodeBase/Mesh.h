@@ -22,15 +22,8 @@ public:
 
 public:
 
-	float vertices[48] = 
-	{ -0.5f, -0.5f, 0.5f,0.0f,0.0f,0.0f,
-		 0.5f, -0.5f, 0.5f,0.0f,0.0f,0.0f,
-		-0.5f, 0.5f, 0.5f,0.0f,0.0f,0.0f,
-		 0.5f, 0.5f, 0.5f,0.0f,0.0f,0.0f,
-		-0.5f, 0.5f, -0.5f,0.0f,0.0f,0.0f,
-		-0.5f, -0.5f, -0.5f,0.0f,0.0f,0.0f,
-		 0.5f, 0.5f, -0.5f,0.0f,0.0f,0.0f,
-		 0.5f, -0.5f, -0.5f,0.0f,0.0f,0.0f};
+	float* vertices = nullptr;
+	int* testIndices = nullptr;
 
 	float verticesTest[24] = { -0.5f, -0.5f, 0.5f,
 		 0.5f, -0.5f, 0.5f,
@@ -41,9 +34,9 @@ public:
 		 0.5f, 0.5f, -0.5f,
 		 0.5f, -0.5f, -0.5f };
 
-	float colors[24] = { 0.5f,0.0f,0.0f,0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f,
-					  0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f,
-					  0.5f,0.0f,0.0f, 0.5f,0.0f,0.0f};
+	float colors[24] = { 0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f,
+					     0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f,
+					     0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f};
 
 	//float* faceNormals = nullptr;
 	float* infoGPU = nullptr;
@@ -60,6 +53,10 @@ public:
 	uint IBO;
 
 	GameObject* parent = nullptr;
+
+	int size = 100;
+	float width = 0.5f;
+	float height = 0.5f;
 
 };
 

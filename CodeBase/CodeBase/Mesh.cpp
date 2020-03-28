@@ -9,7 +9,7 @@
 Mesh::Mesh(GameObject* _parent)
 {
 	parent = _parent;
-	//CalculateNormals();
+	GenerateFlatMesh();
 	CalculateVertexNormals();
 	FillInfoGPU();
 	LoadToGPU();
@@ -26,6 +26,18 @@ Mesh::~Mesh()
 		delete[] faceNormals;
 		faceNormals = nullptr;
 	}*/
+
+	if (vertices)
+	{
+		delete[] vertices;
+		vertices = nullptr;
+	}
+
+	if (testIndices)
+	{
+		delete[] testIndices;
+		testIndices = nullptr;
+	}
 
 	if (infoGPU)
 	{
@@ -51,10 +63,6 @@ void Mesh::DrawMesh()
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
 }
 
-void Mesh::GenerateFlatMesh()
-{
-}
-
 void Mesh::LoadToGPU()
 {
 	//Generating Vertex Array, Vertex buffer, Index buffer ids
@@ -75,7 +83,7 @@ void Mesh::LoadToGPU()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
 	//Copying the index data into the buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*numIndices, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*numIndices, testIndices, GL_STATIC_DRAW);
 
 	//Telling OpenGL how to interprete our data //Loading to GPU
 	//( layout loactaion = 0, size of shader var -> vec3, type of data, normalize or not, space between data, offset)  
@@ -125,9 +133,13 @@ void Mesh::CalculateVertexNormals()
 
 	for (int i = 0; i < numIndices; i = i + 3)
 	{
-		vec A = { verticesTest[indices[i] * 3],verticesTest[indices[i] * 3 + 1],verticesTest[indices[i] * 3 + 2] };
-		vec B = { verticesTest[indices[i + 1] * 3],verticesTest[indices[i + 1] * 3 + 1],verticesTest[indices[i + 1] * 3 + 2] };
-		vec C = { verticesTest[indices[i + 2] * 3],verticesTest[indices[i + 2] * 3 + 1],verticesTest[indices[i + 2] * 3 + 2] };
+		int index = testIndices[i];
+		int index_1 = testIndices[i+1];
+		int index_2 = testIndices[i+2];
+
+		vec A = { vertices[testIndices[i] * 3],	   vertices[testIndices[i] * 3 + 1],    vertices[testIndices[i] * 3 + 2] };
+		vec B = { vertices[testIndices[i + 1] * 3],vertices[testIndices[i + 1] * 3 + 1],vertices[testIndices[i + 1] * 3 + 2] };
+		vec C = { vertices[testIndices[i + 2] * 3],vertices[testIndices[i + 2] * 3 + 1],vertices[testIndices[i + 2] * 3 + 2] };
 
 		vec BA = A - B;
 		vec BC = C - B;
@@ -138,7 +150,7 @@ void Mesh::CalculateVertexNormals()
 
 		for (int j = 0; j < 3; ++j)
 		{
-			int key = indices[i + j];
+			int key = testIndices[i + j];
 			it = vertexNormals.find(key);
 
 			if (it != vertexNormals.end())
@@ -178,14 +190,14 @@ void Mesh::FillInfoGPU()
 		int o_it = i * 3;
 
 		//coping vertices
-		infoGPU[it] = verticesTest[o_it];
-		infoGPU[it + 1] = verticesTest[o_it+1];
-		infoGPU[it + 2] = verticesTest[o_it+2];
+		infoGPU[it] = vertices[o_it];
+		infoGPU[it + 1] = vertices[o_it+1];
+		infoGPU[it + 2] = vertices[o_it+2];
 		
 		//coping Colors
-		infoGPU[it + 3] = colors[o_it];
-		infoGPU[it + 4] = colors[o_it + 1];
-		infoGPU[it + 5] = colors[o_it + 2];
+		infoGPU[it + 3] = 0.5f;
+		infoGPU[it + 4] = 0.5f;
+		infoGPU[it + 5] = 0.5f;
 		
 		//coping Normals
 		infoGPU[it + 6] = vertexNormals[i].x;
@@ -193,5 +205,41 @@ void Mesh::FillInfoGPU()
 		infoGPU[it + 8] = vertexNormals[i].z;
 	}
 
+}
 
+void Mesh::GenerateFlatMesh()
+{
+	numVertices = size * size;
+	numIndices = (size - 1)*(size - 1) * 6;
+
+	vertices = new float[numVertices*3];
+	testIndices = new int[numIndices];
+
+	int indice_it= 0;
+
+
+	for (int i = 0; i < size; ++i)
+	{
+		for (int j = 0; j < size; ++j)
+		{
+			//vertex index;
+			int index = (i * size + j);
+
+			//vertex position
+			vertices[index * 3] = j * width;
+			vertices[index * 3 + 1] = sin(index)*cos(index);				//TODO let0s try to make this random :D
+			vertices[index * 3 + 2] = -(i * height);
+			
+			if (j < size - 1 && i < size - 1)
+			{
+				testIndices[indice_it * 6] = index;
+				testIndices[(indice_it * 6) + 1] = index + 1;
+				testIndices[(indice_it * 6) + 2] = size + index;
+				testIndices[(indice_it * 6) + 3] = index + 1;
+				testIndices[(indice_it * 6) + 4] = size + index + 1;
+				testIndices[(indice_it * 6) + 5] = size + index;
+				indice_it++;
+			}
+		}
+	}
 }
