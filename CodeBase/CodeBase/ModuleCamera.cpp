@@ -83,8 +83,9 @@ bool ModuleCamera::Update()
 
 		if (myApp->m_input->motionY != 0)
 		{
-			Quat rotation = Quat::RotateAxisAngle(mainCamera->frustum.WorldRight(),myApp->m_input->motionY*0.016f);
-
+			vec ortoCamYcamZ = camUp.Cross(camFront);
+			Quat rotation = Quat::RotateAxisAngle(ortoCamYcamZ,myApp->m_input->motionY*0.016f);
+			
 			if (rotation.Mul(mainCamera->frustum.Up()).Normalized().y > 0.0f)
 			{
 				camUp = rotation.Mul(camUp).Normalized();
