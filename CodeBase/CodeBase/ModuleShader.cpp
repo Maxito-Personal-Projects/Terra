@@ -71,6 +71,15 @@ void ModuleShader::GenerateDefaultShaders()
 		LOG("Default Vertex Shader Compiled Successfully");
 	}
 
+	//Creating default Geometry Shader
+	_Shader* defaultGeometrySahder = new _Shader("Default Vertex Shader", GEOMETRY);
+	defaultGeometrySahder->code = FileSystem::FileToString("Shaders/Default_Geometry_Shader.txt");
+
+	if (CompileShader(defaultGeometrySahder))
+	{
+		LOG("Default Geometry Shader Compiled Successfully");
+	}
+
 	//Creating default Fragment Shader
 	_Shader* defaultFragmentSahder = new _Shader("Default Vertex Shader", FRAGMENT);
 	defaultFragmentSahder->code = FileSystem::FileToString("Shaders/Default_Fragment_Shader.txt");
@@ -81,7 +90,7 @@ void ModuleShader::GenerateDefaultShaders()
 	}
 
 	//Creating Default Shader Program
-	Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder);
+	Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder, defaultGeometrySahder);
 	if (CompileShaderProgram(defaultShader))
 	{
 		LOG("Default Shader Program Compiled Successfully");

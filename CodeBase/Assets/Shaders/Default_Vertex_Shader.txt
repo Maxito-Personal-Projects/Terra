@@ -4,9 +4,10 @@ layout (location = 1) in vec3 aColor;
 layout (location = 2) in vec3 aNormal;
 layout (location = 3) in vec2 aTileCoords;
 
-out vec3 vecColor;
-out vec3 normal;
-out vec3 fragPos;
+out VS_OUT{
+    vec3 gvecColor;
+    vec3 gfragPos;
+}vs_out;
 
 uniform mat4 Model;
 uniform mat4 View;
@@ -73,10 +74,10 @@ float Test(int vertexID)
 void main()
 {
     float color = BrownianNoise(gl_VertexID);
-    fragPos=vec3(Model*vec4(aPos,1.0));
+    vs_out.gfragPos=vec3(Model*vec4(aPos,1.0));
     gl_Position = Projection * View * Model * vec4(aPos.x, color*50, aPos.z, 1.0);
     //vecColor = aColor;
-    vecColor = vec3(color)+vec3(0.0,0.1,0.0);
+    vs_out.gvecColor = vec3(color)+vec3(0.0,0.1,0.0);
     
-    normal = mat3(transpose(inverse(Model)))*aNormal;
+    //normal = mat3(transpose(inverse(Model)))*aNormal;
 }

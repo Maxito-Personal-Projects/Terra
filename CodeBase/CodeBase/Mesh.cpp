@@ -10,7 +10,7 @@ Mesh::Mesh(GameObject* _parent)
 {
 	parent = _parent;
 	GenerateFlatMesh();
-	CalculateVertexNormals();
+	//CalculateVertexNormals();
 	FillInfoGPU();
 	LoadToGPU();
 }
@@ -52,7 +52,7 @@ Mesh::~Mesh()
 
 void Mesh::DrawMesh()
 {
-	float lightPos[3] = { 0,10,-10 };
+	float lightPos[3] = { 0,10,100 };
 	glBindVertexArray(VAO);
 
 	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
@@ -205,9 +205,9 @@ void Mesh::FillInfoGPU()
 		infoGPU[it + 5] = 0.5f;
 		
 		//coping Normals
-		infoGPU[it + 6] = vertexNormals[i].x;
-		infoGPU[it + 7] = vertexNormals[i].y;
-		infoGPU[it + 8] = vertexNormals[i].z;
+		infoGPU[it + 6] = 0.0f;
+		infoGPU[it + 7] = 0.0f;
+		infoGPU[it + 8] = 0.0f;
 
 		//Tile coords
 		infoGPU[it + 9] = (float)tileCoords[t_it];
