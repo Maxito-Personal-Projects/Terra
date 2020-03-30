@@ -7,6 +7,11 @@
 #include "ImGui/imgui_impl_sdl.h"
 #include "ImGui/imgui_impl_opengl3.h"
 
+#include <list>
+
+class UIWindow;
+class UITest;
+
 class ModuleUI : public Module
 {
 public:
@@ -31,6 +36,16 @@ public:
 
 	//Clean Module
 	bool CleanUp();
+
+	void DrawUI();
+
+private:
+
+	std::list<UIWindow*> windows;
+
+	UITest* testWindow = nullptr;
+
+
 };
 
 #endif // !__MODULEUI_H__

@@ -3,6 +3,9 @@
 #include "ModuleWindow.h"
 #include "ModuleRenderer.h"
 
+#include "UIWindow.h"
+#include "UITest.h"
+
 
 ModuleUI::ModuleUI(string _name, bool _active) : Module(_name,_active)
 {
@@ -11,6 +14,11 @@ ModuleUI::ModuleUI(string _name, bool _active) : Module(_name,_active)
 
 ModuleUI::~ModuleUI()
 {
+	for (std::list<UIWindow*>::iterator w_it = windows.begin(); w_it != windows.end(); w_it++)
+	{
+		delete (*w_it);
+		(*w_it) = nullptr;
+	}
 }
 
 bool ModuleUI::Init()
@@ -33,6 +41,10 @@ bool ModuleUI::Init()
 	const char* glsl_version = "#version 130";
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
+	testWindow = new UITest("Test Window");
+
+	windows.push_back(testWindow);
+
 	return ret;
 }
 
@@ -45,8 +57,19 @@ bool ModuleUI::PreUpdate()
 	ImGui_ImplSDL2_NewFrame(myApp->m_window->window);
 	ImGui::NewFrame();
 
-	bool test = true;
-	ImGui::ShowDemoWindow(&test);
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Exit", "ESC"))
+			{
+				myApp->exit = true;
+			}
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
 
 	return ret;
 }
@@ -67,4 +90,12 @@ bool ModuleUI::CleanUp()
 	ImGui::DestroyContext();
 
 	return ret;
+}
+
+void ModuleUI::DrawUI()
+{
+	for (std::list<UIWindow*>::iterator w_it = windows.begin(); w_it != windows.end(); w_it++)
+	{
+		(*w_it)->Draw();
+	}
 }

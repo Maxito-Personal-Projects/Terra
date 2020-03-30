@@ -209,6 +209,8 @@
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="UITest.cpp" />
+    <ClCompile Include="UIWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -308,6 +310,8 @@
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="UITest.h" />
+    <ClInclude Include="UIWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\Geometry\KDTree.inl" />

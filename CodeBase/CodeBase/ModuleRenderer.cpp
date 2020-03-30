@@ -89,6 +89,7 @@ bool ModuleRenderer::PosUpdate()
 	}
 
 	// Rendering
+	myApp->m_ui->DrawUI();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

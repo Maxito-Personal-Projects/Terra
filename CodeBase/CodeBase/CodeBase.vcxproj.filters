@@ -25,6 +25,9 @@
     <Filter Include="Resource Files\MathGeoLib">
       <UniqueIdentifier>{4a03b0db-9190-423e-b620-3dbc0a9a68ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UIWindows">
+      <UniqueIdentifier>{0a320240-828d-428c-aaf4-0a40ac29e101}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -218,6 +221,12 @@
     </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UIWindow.cpp">
+      <Filter>Source Files\UIWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="UITest.cpp">
+      <Filter>Source Files\UIWindows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -511,6 +520,12 @@
     </ClInclude>
     <ClInclude Include="ModuleCamera.h">
       <Filter>Source Files\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="UIWindow.h">
+      <Filter>Source Files\UIWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="UITest.h">
+      <Filter>Source Files\UIWindows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
