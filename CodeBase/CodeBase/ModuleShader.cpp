@@ -72,7 +72,7 @@ void ModuleShader::GenerateDefaultShaders()
 	}
 
 	//Creating default Geometry Shader
-	_Shader* defaultGeometrySahder = new _Shader("Default Vertex Shader", GEOMETRY);
+	_Shader* defaultGeometrySahder = new _Shader("Default Geometry Shader", GEOMETRY);
 	defaultGeometrySahder->code = FileSystem::FileToString("Shaders/Default_Geometry_Shader.txt");
 
 	if (CompileShader(defaultGeometrySahder))
@@ -80,8 +80,26 @@ void ModuleShader::GenerateDefaultShaders()
 		LOG("Default Geometry Shader Compiled Successfully");
 	}
 
+	//Creating default Tessellation Control Shader
+	_Shader* defaultTCSahder = new _Shader("Default Tessellation Control Shader", TESSELLATION_CS);
+	defaultTCSahder->code = FileSystem::FileToString("Shaders/Default_Control_Shader.txt");
+
+	if (CompileShader(defaultTCSahder))
+	{
+		LOG("Default Tessellation Control Shader Compiled Successfully");
+	}
+
+	//Creating default Tessellation Evaluation Shader
+	_Shader* defaultTESahder = new _Shader("Default Tessellation Evaluation Shader", TESSELLATION_ES);
+	defaultTESahder->code = FileSystem::FileToString("Shaders/Default_Evaluation_Shader.txt");
+
+	if (CompileShader(defaultTESahder))
+	{
+		LOG("Default Tessellation Evaluation Shader Compiled Successfully");
+	}
+
 	//Creating default Fragment Shader
-	_Shader* defaultFragmentSahder = new _Shader("Default Vertex Shader", FRAGMENT);
+	_Shader* defaultFragmentSahder = new _Shader("Default Fragment Shader", FRAGMENT);
 	defaultFragmentSahder->code = FileSystem::FileToString("Shaders/Default_Fragment_Shader.txt");
 	
 	if(CompileShader(defaultFragmentSahder))
@@ -89,8 +107,18 @@ void ModuleShader::GenerateDefaultShaders()
 		LOG("Default Fragment Shader Compiled Successfully");
 	}
 
+	////Creating Default Shader Program
+	//Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder, defaultGeometrySahder);
+	//if (CompileShaderProgram(defaultShader))
+	//{
+	//	LOG("Default Shader Program Compiled Successfully");
+
+	//	shaders.push_back(defaultShader);
+	//	shadersNames.insert({ defaultShader->name, defaultShader->id });
+	//}
+
 	//Creating Default Shader Program
-	Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder, defaultGeometrySahder);
+	Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder, nullptr, defaultTCSahder,defaultTESahder);
 	if (CompileShaderProgram(defaultShader))
 	{
 		LOG("Default Shader Program Compiled Successfully");
@@ -98,7 +126,6 @@ void ModuleShader::GenerateDefaultShaders()
 		shaders.push_back(defaultShader);
 		shadersNames.insert({ defaultShader->name, defaultShader->id });
 	}
-
 
 }
 
@@ -111,6 +138,10 @@ bool ModuleShader::CompileShader(_Shader* shader)
 		shader->id = glCreateShader(GL_VERTEX_SHADER);
 	else if(shader->type==FRAGMENT)
 		shader->id = glCreateShader(GL_FRAGMENT_SHADER);
+	else if (shader->type == TESSELLATION_CS)
+		shader->id = glCreateShader(GL_TESS_CONTROL_SHADER);
+	else if (shader->type == TESSELLATION_ES)
+		shader->id = glCreateShader(GL_TESS_EVALUATION_SHADER);
 	else
 		shader->id = glCreateShader(GL_GEOMETRY_SHADER);
 
@@ -144,12 +175,10 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram)
 	shaderProgram->id = glCreateProgram();
 
 	//Attaching compiled shaders
-	glAttachShader(shaderProgram->id, shaderProgram->shaders[0]->id); //0 = Vertex
-
-	if (shaderProgram->shaders.size()==3)
-		glAttachShader(shaderProgram->id, shaderProgram->shaders[2]->id); //2 = Geometry
-
-	glAttachShader(shaderProgram->id, shaderProgram->shaders[1]->id); //1 = Vertex
+	for (int i = 0; i < shaderProgram->shaders.size(); ++i)
+	{
+		glAttachShader(shaderProgram->id, shaderProgram->shaders[i]->id);
+	}
 
 	//Compiling Shader Program
 	glLinkProgram(shaderProgram->id);
@@ -167,14 +196,10 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram)
 	}
 
 	//Deleting Shaders
-	glDeleteShader(shaderProgram->shaders[0]->id);
-	
-	if (shaderProgram->shaders.size() == 3)
+	for (int i = 0; i < shaderProgram->shaders.size(); ++i)
 	{
-		glDeleteShader(shaderProgram->shaders[2]->id);
+		glDeleteShader(shaderProgram->shaders[i]->id);
 	}
-	
-	glDeleteShader(shaderProgram->shaders[1]->id);
 
 	return ret;
 }

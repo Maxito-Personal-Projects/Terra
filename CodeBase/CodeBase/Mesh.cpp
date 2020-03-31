@@ -60,7 +60,7 @@ void Mesh::DrawMesh()
 	int light = glGetUniformLocation(parent->shader, "lightPos");
 	glUniform3f(light, lightPos[0], lightPos[1], lightPos[2]);
 
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
 }
 
 void Mesh::LoadToGPU()
@@ -206,7 +206,7 @@ void Mesh::FillInfoGPU()
 		
 		//coping Normals
 		infoGPU[it + 6] = 0.0f;
-		infoGPU[it + 7] = 0.0f;
+		infoGPU[it + 7] = 1.0f;
 		infoGPU[it + 8] = 0.0f;
 
 		//Tile coords

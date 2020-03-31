@@ -38,6 +38,8 @@ public:
 	SDL_GLContext context;
 	GameObject* firstGO = nullptr;
 
+	bool wired = false;
+
 };
 
 #endif // !__MODULERENDERER_H__

@@ -18,10 +18,6 @@ bool UITest::Draw()
 	bool ret = true;
 
 	ImGui::Begin(name.c_str(), &active);
-	if (GL_VERSION_4_5)
-	{
-		ImGui::Text("OpenGL %d supported!!!!", GL_VERSION);
-	}
 	ImGui::Text("Que paxa!!!");
 	ImGui::End();
 

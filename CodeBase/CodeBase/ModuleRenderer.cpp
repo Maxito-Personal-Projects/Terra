@@ -42,6 +42,11 @@ bool ModuleRenderer::Init()
 	glViewport(0, 0, myApp->m_window->width, myApp->m_window->height);
 	//TODO(max): A function that change the viewport when the window is modified (need sdl events!)
 
+	int MaxPatchVertices = 0;
+	glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+	LOG("Max supported patch vertices %d\n", MaxPatchVertices);
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
+
 	glClearColor(1, 0.55f, 0.48f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);;
@@ -62,16 +67,25 @@ bool ModuleRenderer::PreUpdate()
 {
 	bool ret = true;
 
-
-
 	return ret;
 }
-
-
 
 bool ModuleRenderer::PosUpdate()
 {
 	bool ret = true;
+	
+	if (myApp->m_input->GetKey(SDL_SCANCODE_F) == DOWN) 
+	{
+		wired = !wired;
+		if (wired)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+	}
 
 	//Clear the buffers before drawing!
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

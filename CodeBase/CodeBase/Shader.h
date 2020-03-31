@@ -10,6 +10,8 @@ enum ShaderType
 	VERTEX,
 	FRAGMENT,
 	GEOMETRY,
+	TESSELLATION_CS,
+	TESSELLATION_ES,
 	NONE
 };
 
@@ -33,7 +35,8 @@ class Shader
 {
 public:
 
-	Shader(std::string _name,_Shader* vertex, _Shader* fragment, _Shader* geometry=nullptr);
+	Shader(std::string _name,_Shader* vertex, _Shader* fragment, _Shader* geometry=nullptr, 
+		_Shader* tessControl = nullptr, _Shader* tessEvaluation = nullptr);
 	~Shader();
 
 public:

@@ -1,14 +1,18 @@
 #version 410 core
 out vec4 FragColor;
 
-in vec3 vecColor;
-in vec3 normal;
-in vec3 fragPos;
+in vec3 WorldPos_FS_in;
+in vec3 Normal_FS_in;
+in vec3 Color_FS_in;
 
 uniform vec3 lightPos;
 
 void main()
 {
+	vec3 vecColor = Color_FS_in;
+	vec3 normal = Normal_FS_in;
+	vec3 fragPos = WorldPos_FS_in;
+
     vec3 lightColor = vec3(1.0);
 
     // ambient

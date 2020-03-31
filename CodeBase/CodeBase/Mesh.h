@@ -55,9 +55,9 @@ public:
 
 	GameObject* parent = nullptr;
 
-	int size = 1000;
-	float width = 0.5f;
-	float height = 0.5f;
+	int size = 2;
+	float width = 500.0f;
+	float height = 500.0f;
 
 };
 
