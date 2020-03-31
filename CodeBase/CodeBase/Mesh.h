@@ -59,6 +59,8 @@ public:
 	float width = 500.0f;
 	float height = 500.0f;
 
+	float time = 0.0f;
+
 };
 
 #endif //!_MESH_H__

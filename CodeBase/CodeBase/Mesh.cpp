@@ -60,7 +60,12 @@ void Mesh::DrawMesh()
 	int light = glGetUniformLocation(parent->shader, "lightPos");
 	glUniform3f(light, lightPos[0], lightPos[1], lightPos[2]);
 
+	/*int testtime = glGetUniformLocation(parent->shader, "time");
+	glUniform1f(testtime, time);*/
+
 	glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
+
+	time += 0.016;
 }
 
 void Mesh::LoadToGPU()

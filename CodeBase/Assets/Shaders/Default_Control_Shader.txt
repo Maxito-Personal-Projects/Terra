@@ -20,10 +20,10 @@ void main()
     Color_ES_in[gl_InvocationID] = Color_CS_in[gl_InvocationID];
 	
 	//Num segment divisions
-    gl_TessLevelOuter[0] = 11;
-    gl_TessLevelOuter[1] = 11;
-    gl_TessLevelOuter[2] = 11;
+    gl_TessLevelOuter[0] = 32;
+    gl_TessLevelOuter[1] = 32;
+    gl_TessLevelOuter[2] = 32;
 	
 	//Num Rings
-    gl_TessLevelInner[0] = 5;
+    gl_TessLevelInner[0] = 32;
 } 
