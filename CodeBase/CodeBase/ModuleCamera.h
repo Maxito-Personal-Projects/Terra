@@ -33,6 +33,7 @@ public:
 public:
 
 	Camera* mainCamera = nullptr;
+	float camBoost = 1.0f;
 };
 
 #endif // !__MODULECAMERA_H__

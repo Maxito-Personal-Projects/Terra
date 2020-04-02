@@ -3,7 +3,7 @@
 
 #include "Module.h"
 
-#define MAX_KEYS 100
+#define MAX_KEYS 283
 
 enum KEY_STATE
 {

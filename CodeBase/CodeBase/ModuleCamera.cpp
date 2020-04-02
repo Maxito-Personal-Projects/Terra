@@ -30,6 +30,11 @@ bool ModuleCamera::Update()
 	float3 camUp = mainCamera->frustum.Up();
 	float3 camRight = mainCamera->frustum.WorldRight();
 
+	if (myApp->m_input->GetKey(SDL_SCANCODE_LSHIFT)==REPEAT)
+	{
+  		speed += camBoost;
+	}
+
 	//X Axis transform
 	if (myApp->m_input->GetKey(SDL_SCANCODE_A) == REPEAT)
 	{

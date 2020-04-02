@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "ModuleCamera.h"
 #include "ModuleUI.h"
 #include "UITest.h"
 
@@ -18,7 +19,11 @@ bool UITest::Draw()
 	bool ret = true;
 
 	ImGui::Begin(name.c_str(), &active);
-	ImGui::Text("Que paxa!!!");
+	ImGui::Text("Cam Boost:");
+	ImGui::SameLine();
+	ImGui::PushID("Speed Boost");
+	ImGui::InputFloat("", &myApp->m_camera->camBoost, 0.1f,NULL,"%0.1f");
+	ImGui::PopID();
 	ImGui::End();
 
 	return ret;

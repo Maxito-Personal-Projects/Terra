@@ -67,9 +67,20 @@ bool ModuleUI::PreUpdate()
 			}
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Settings"))
+		{
+			if (ImGui::MenuItem("Configuration"))
+			{
+				testWindow->active=true;
+			}
+			ImGui::EndMenu();
+		}
 
 		ImGui::EndMainMenuBar();
 	}
+
+	bool debug = true;
+	ImGui::ShowDemoWindow(&debug);
 
 	return ret;
 }
@@ -96,6 +107,9 @@ void ModuleUI::DrawUI()
 {
 	for (std::list<UIWindow*>::iterator w_it = windows.begin(); w_it != windows.end(); w_it++)
 	{
-		(*w_it)->Draw();
+		if ((*w_it)->active)
+		{
+			(*w_it)->Draw();
+		}
 	}
 }

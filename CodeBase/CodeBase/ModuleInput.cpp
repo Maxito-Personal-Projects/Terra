@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer.h"
+#include "ModuleUI.h"
 
 
 ModuleInput::ModuleInput(string _name, bool _active) : Module(_name, _active)
@@ -39,6 +40,7 @@ bool ModuleInput::Init()
 bool ModuleInput::PreUpdate()
 {
 	bool ret = true;
+	ImGuiIO& io = ImGui::GetIO();
 
 	//Needed to get any type of event
 	SDL_PumpEvents();
@@ -48,7 +50,7 @@ bool ModuleInput::PreUpdate()
 	Uint8 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
 	//Keyboard inputs
-	for (int i = 0; i < MAX_KEYS; ++i)
+	for (int i = 0; i < MAX_KEYS && io.WantCaptureKeyboard == false; ++i)
 	{
 		//Check if the key is pressed(1) or not(0)
 		if (keyState[i] == 1)
@@ -77,7 +79,7 @@ bool ModuleInput::PreUpdate()
 
 	//Mouse inputs
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 5 && io.WantCaptureMouse==false; ++i)
 	{
 		//Check if the key is pressed(1) or not(0)
 		if (mouseState & SDL_BUTTON(i))
@@ -93,7 +95,7 @@ bool ModuleInput::PreUpdate()
 		}
 		else
 		{
-			if (mouse[i] == DOWN || mouse[i] == REPEAT)
+			if ((mouse[i] == DOWN || mouse[i] == REPEAT) )
 			{
 				mouse[i] = UP;
 			}
@@ -112,6 +114,8 @@ bool ModuleInput::PreUpdate()
 	//Getting all events
 	while (SDL_PollEvent(&myEvent))
 	{
+		ImGui_ImplSDL2_ProcessEvent(&myEvent);
+
 		switch (myEvent.type)
 		{
 		case SDL_QUIT:
