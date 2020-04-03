@@ -79,9 +79,6 @@ bool ModuleUI::PreUpdate()
 		ImGui::EndMainMenuBar();
 	}
 
-	bool debug = true;
-	ImGui::ShowDemoWindow(&debug);
-
 	return ret;
 }
 

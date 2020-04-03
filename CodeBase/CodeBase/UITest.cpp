@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "ModuleRenderer.h"
 #include "ModuleCamera.h"
 #include "ModuleUI.h"
 #include "UITest.h"
@@ -23,6 +24,24 @@ bool UITest::Draw()
 	ImGui::SameLine();
 	ImGui::PushID("Speed Boost");
 	ImGui::InputFloat("", &myApp->m_camera->camBoost, 0.1f,NULL,"%0.1f");
+	ImGui::PopID();
+
+	ImGui::Text("Mesh Divisions:");
+	ImGui::SameLine();
+	ImGui::PushID("Divisions");
+	ImGui::DragFloat("", &myApp->m_render->divisions, 1.0f,1.0f);
+	ImGui::PopID();
+
+	ImGui::Text("Mesh Height:");
+	ImGui::SameLine();
+	ImGui::PushID("Height");
+	ImGui::DragFloat("", &myApp->m_render->maxHeight, 1.0f,0.0f);
+	ImGui::PopID();
+	
+	ImGui::Text("Mesh Seed:");
+	ImGui::SameLine();
+	ImGui::PushID("Seed");
+	ImGui::DragFloat("", &myApp->m_render->seed, 0.01f);
 	ImGui::PopID();
 	ImGui::End();
 

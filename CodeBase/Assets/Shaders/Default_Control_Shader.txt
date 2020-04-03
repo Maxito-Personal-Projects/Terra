@@ -1,7 +1,7 @@
 #version 410 core
 
 //define the number of CPs in the output patch
-layout(vertices=3) out;
+layout(vertices=4) out;
 
 // attributes of the input CPs
 in vec3 WorldPos_CS_in[];
@@ -13,6 +13,8 @@ out vec3 WorldPos_ES_in[];
 out vec3 Normal_ES_in[];
 out vec3 Color_ES_in[];
 
+uniform float divisions;
+
 void main()
 {
     Normal_ES_in[gl_InvocationID] = Normal_CS_in[gl_InvocationID];
@@ -20,10 +22,12 @@ void main()
     Color_ES_in[gl_InvocationID] = Color_CS_in[gl_InvocationID];
 	
 	//Num segment divisions
-    gl_TessLevelOuter[0] = 32;
-    gl_TessLevelOuter[1] = 32;
-    gl_TessLevelOuter[2] = 32;
+	gl_TessLevelOuter[0] = divisions;
+	gl_TessLevelOuter[1] = divisions;
+	gl_TessLevelOuter[2] = divisions;
+	gl_TessLevelOuter[3] = divisions;
 	
 	//Num Rings
-    gl_TessLevelInner[0] = 32;
+    gl_TessLevelInner[0] = divisions;
+	gl_TessLevelInner[1] = divisions;
 } 
