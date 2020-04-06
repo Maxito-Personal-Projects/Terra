@@ -49,7 +49,8 @@ bool ModuleRenderer::Init()
 
 	glClearColor(1, 0.55f, 0.48f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);;
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	return ret;
 }

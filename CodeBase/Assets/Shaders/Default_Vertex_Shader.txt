@@ -11,7 +11,8 @@ out vec3 Color_CS_in;
 
 void main()
 {
-    WorldPos_CS_in = vec3(Model*vec4(aPos,1.0));
+    //WorldPos_CS_in = vec3(Model*vec4(aPos,1.0));
+    WorldPos_CS_in = aPos;
 	Normal_CS_in = vec3(Model*vec4(aNormal,1.0));
     Color_CS_in = aColor;
 }

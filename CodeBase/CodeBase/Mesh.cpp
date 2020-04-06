@@ -54,19 +54,21 @@ Mesh::~Mesh()
 
 void Mesh::DrawMesh()
 {
-	float lightPos[3] = { 0,10,100 };
+	float lightPos[3] = { 0.1f,-1.0f,0.1f };
 	glBindVertexArray(VAO);
 
 	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
 	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
 	int light = glGetUniformLocation(parent->shader, "lightPos");
-	glUniform3f(light, lightPos[0], lightPos[1], lightPos[2]);
+	glUniform3f(light, myApp->m_render->lightDirection[0], myApp->m_render->lightDirection[1], myApp->m_render->lightDirection[2]);
 	int divisions = glGetUniformLocation(parent->shader, "divisions");
 	glUniform1f(divisions, myApp->m_render->divisions);
 	int height = glGetUniformLocation(parent->shader, "maxHeight");
 	glUniform1f(height, myApp->m_render->maxHeight);
 	int seed = glGetUniformLocation(parent->shader, "seed");
 	glUniform1f(seed, myApp->m_render->seed);
+	int delta = glGetUniformLocation(parent->shader, "delta");
+	glUniform1f(delta, myApp->m_render->delta);
 	int grid = glGetUniformLocation(parent->shader, "gridSize");
 	glUniform1i(grid, size-1);
 
@@ -250,7 +252,7 @@ void Mesh::GenerateFlatMesh_tris()
 			//vertex position
 			vertices[index * 3] = j * width;
 			vertices[index * 3 + 1] = 0.0f;				//TODO let0s try to make this random :D
-			vertices[index * 3 + 2] = -(i * height);
+			vertices[index * 3 + 2] = (i * height);
 
 			tileCoords[index * 2] = j;
 			tileCoords[index * 2 + 1] = i;
@@ -289,7 +291,7 @@ void Mesh::GenerateFlatMesh_quads()
 			//vertex position
 			vertices[index * 3] = j * width;
 			vertices[index * 3 + 1] = 0.0f;				
-			vertices[index * 3 + 2] = -(i * height);
+			vertices[index * 3 + 2] = (i * height);
 
 			if (j < size - 1 && i < size - 1)
 			{

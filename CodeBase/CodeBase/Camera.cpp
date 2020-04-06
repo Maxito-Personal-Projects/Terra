@@ -10,9 +10,9 @@ Camera::Camera()
 	frustum.SetKind(FrustumSpaceGL, FrustumLeftHanded);
 
 	frustum.SetViewPlaneDistances(nearPlane, farPlane);
-	frustum.SetPos(float3(0.0f, 0.0f, -2.0f));
+	frustum.SetPos(float3(0.0f, 5.0f, -2.0f));
 	frustum.SetUp(float3::unitY);
-	frustum.SetFront(-float3::unitZ);
+	frustum.SetFront(float3::unitZ);
 
 	//this is the fov that we are goping to calculate
 	vFOV = DEGTORAD * 90.0f;

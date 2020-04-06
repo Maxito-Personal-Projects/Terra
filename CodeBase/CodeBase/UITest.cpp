@@ -43,6 +43,19 @@ bool UITest::Draw()
 	ImGui::PushID("Seed");
 	ImGui::DragFloat("", &myApp->m_render->seed, 0.01f);
 	ImGui::PopID();
+
+	ImGui::Text("Heightmap delta:");
+	ImGui::SameLine();
+	ImGui::PushID("delta");
+	ImGui::DragFloat("", &myApp->m_render->delta, 0.00001f);
+	ImGui::PopID();
+
+	ImGui::Text("Light Direction:");
+	ImGui::SameLine();
+	ImGui::PushID("Light Dir");
+	ImGui::DragFloat3("", myApp->m_render->lightDirection, 0.1f, -1.0f, 1.0f,"%.1f");
+	ImGui::PopID();
+
 	ImGui::End();
 
 	return ret;
