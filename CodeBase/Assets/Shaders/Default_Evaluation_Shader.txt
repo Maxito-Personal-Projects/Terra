@@ -145,7 +145,29 @@ void main()
 	float height = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y);
 		
 	WorldPos_FS_in.y = height*maxHeight;
+	
 	Color_FS_in = vec3(0.5);
 	
+	if(height <=0.3)
+	{
+		Color_FS_in = vec3(0.25,0.88,0.82);
+	}
+	else if(height > 0.3 && height <= 0.4)
+	{
+		Color_FS_in = vec3(0.94,0.81,0.42);
+	}
+	else if(height > 0.4 && height <= 0.6)
+	{
+		Color_FS_in = vec3(0.49,0.78,0.31);
+	}
+	else if(height >0.6 && height <= 0.8)
+	{
+		Color_FS_in = vec3(0.72,0.69,0.61);
+	}
+	else
+	{
+		Color_FS_in = vec3(1.0);
+	}
+		
 	gl_Position = Projection * View * vec4(WorldPos_FS_in, 1.0);
 }
