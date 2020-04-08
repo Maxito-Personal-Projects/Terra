@@ -2,6 +2,7 @@
 #include "ModuleInput.h"
 #include "ModuleRenderer.h"
 #include "ModuleUI.h"
+#include "FileSystem.h"
 
 
 ModuleInput::ModuleInput(string _name, bool _active) : Module(_name, _active)
@@ -115,6 +116,7 @@ bool ModuleInput::PreUpdate()
 	while (SDL_PollEvent(&myEvent))
 	{
 		ImGui_ImplSDL2_ProcessEvent(&myEvent);
+		std::string path;
 
 		switch (myEvent.type)
 		{
@@ -147,6 +149,14 @@ bool ModuleInput::PreUpdate()
 			motionY = myEvent.motion.yrel;
 
 			break;
+
+		case SDL_DROPFILE:
+			path = myEvent.drop.file;
+
+			//TODO Check extensions
+			delete myApp->m_ui->textTest;
+			myApp->m_ui->textTest = nullptr;
+			myApp->m_ui->textTest = myApp->fileSystem->LoadImagePNG(path);
 		
 		default:
 			break;

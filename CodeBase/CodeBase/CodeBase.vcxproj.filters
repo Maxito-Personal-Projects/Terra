@@ -219,14 +219,17 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UIWindow.cpp">
       <Filter>Source Files\UIWindows</Filter>
     </ClCompile>
     <ClCompile Include="UITest.cpp">
       <Filter>Source Files\UIWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -526,6 +529,9 @@
     </ClInclude>
     <ClInclude Include="UITest.h">
       <Filter>Source Files\UIWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

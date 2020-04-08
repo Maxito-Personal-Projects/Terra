@@ -6,6 +6,7 @@
 #include "ModuleUI.h"
 #include "ModuleShader.h"
 #include "ModuleCamera.h"
+#include "FileSystem.h"
 
 Application::Application()
 {
@@ -26,6 +27,9 @@ Application::Application()
 
 	//Add rendere the last
 	modules.push_back(m_render);
+
+	//Generate File System
+	fileSystem = new FileSystem();
 
 }
 
@@ -53,6 +57,8 @@ bool Application::Init()
 			cout << error << endl;
 		}
 	}
+
+	fileSystem->InitDevIL();
 
 	for (list<Module*>::iterator it_m = modules.begin(); it_m != modules.end() && ret; it_m++)
 	{

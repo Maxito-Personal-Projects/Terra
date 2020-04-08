@@ -20,6 +20,8 @@ class ModuleUI;
 class ModuleShader;
 class ModuleCamera;
 
+class FileSystem;
+
 
 using namespace std;
 
@@ -51,6 +53,8 @@ public:
 	ModuleUI* m_ui = nullptr;
 	ModuleShader* m_shader = nullptr;
 	ModuleCamera* m_camera = nullptr;
+
+	FileSystem* fileSystem = nullptr;
 
 	bool exit = false;
 

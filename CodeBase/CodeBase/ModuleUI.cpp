@@ -2,6 +2,8 @@
 #include "ModuleUI.h"
 #include "ModuleWindow.h"
 #include "ModuleRenderer.h"
+#include "Texture.h"
+#include "FileSystem.h"
 
 #include "UIWindow.h"
 #include "UITest.h"
@@ -44,6 +46,15 @@ bool ModuleUI::Init()
 	testWindow = new UITest("Test Window");
 
 	windows.push_back(testWindow);
+
+	return ret;
+}
+
+bool ModuleUI::Start()
+{
+	bool ret = true;
+
+	textTest = myApp->fileSystem->LoadImagePNG("Images/image_82566.png");
 
 	return ret;
 }

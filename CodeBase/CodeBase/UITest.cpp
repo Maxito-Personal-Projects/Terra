@@ -3,6 +3,7 @@
 #include "ModuleCamera.h"
 #include "ModuleUI.h"
 #include "UITest.h"
+#include "Texture.h"
 
 
 
@@ -20,6 +21,7 @@ bool UITest::Draw()
 	bool ret = true;
 
 	ImGui::Begin(name.c_str(), &active);
+	
 	ImGui::Text("Cam Boost:");
 	ImGui::SameLine();
 	ImGui::PushID("Speed Boost");
@@ -55,6 +57,9 @@ bool UITest::Draw()
 	ImGui::PushID("Light Dir");
 	ImGui::DragFloat3("", myApp->m_render->lightDirection, 0.1f, -1.0f, 1.0f,"%.1f");
 	ImGui::PopID();
+
+	ImGui::Text("size = %d x %d", myApp->m_ui->textTest->width, myApp->m_ui->textTest->height);
+	ImGui::Image((void*)(intptr_t)myApp->m_ui->textTest->imageID, ImVec2(500, 500));
 
 	ImGui::End();
 

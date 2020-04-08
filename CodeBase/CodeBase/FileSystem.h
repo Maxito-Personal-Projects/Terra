@@ -8,6 +8,8 @@
 
 using namespace std;
 
+class Texture;
+
 class FileSystem
 {
 public:
@@ -17,8 +19,11 @@ public:
 
 public:
 
-	//Static to avoid an instance of ther class FileSystem
-	static string FileToString(string path);
+	void InitDevIL();
+
+	string FileToString(string path);
+
+	Texture* LoadImagePNG(string path);
 
 };
 

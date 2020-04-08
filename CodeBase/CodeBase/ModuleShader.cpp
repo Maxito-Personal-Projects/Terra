@@ -64,7 +64,7 @@ void ModuleShader::GenerateDefaultShaders()
 {
 	//Creating default Vertex Shader
 	_Shader* defaultVertexSahder = new _Shader("Default Vertex Shader", VERTEX);
-	defaultVertexSahder->code = FileSystem::FileToString("Shaders/Default_Vertex_Shader.txt");
+	defaultVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Vertex_Shader.txt");
 	
 	if (CompileShader(defaultVertexSahder))
 	{
@@ -73,7 +73,7 @@ void ModuleShader::GenerateDefaultShaders()
 
 	//Creating default Geometry Shader
 	_Shader* defaultGeometrySahder = new _Shader("Default Geometry Shader", GEOMETRY);
-	defaultGeometrySahder->code = FileSystem::FileToString("Shaders/Default_Geometry_Shader.txt");
+	defaultGeometrySahder->code = myApp->fileSystem->FileToString("Shaders/Default_Geometry_Shader.txt");
 
 	if (CompileShader(defaultGeometrySahder))
 	{
@@ -82,7 +82,7 @@ void ModuleShader::GenerateDefaultShaders()
 
 	//Creating default Tessellation Control Shader
 	_Shader* defaultTCSahder = new _Shader("Default Tessellation Control Shader", TESSELLATION_CS);
-	defaultTCSahder->code = FileSystem::FileToString("Shaders/Default_Control_Shader.txt");
+	defaultTCSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Control_Shader.txt");
 
 	if (CompileShader(defaultTCSahder))
 	{
@@ -91,7 +91,7 @@ void ModuleShader::GenerateDefaultShaders()
 
 	//Creating default Tessellation Evaluation Shader
 	_Shader* defaultTESahder = new _Shader("Default Tessellation Evaluation Shader", TESSELLATION_ES);
-	defaultTESahder->code = FileSystem::FileToString("Shaders/Default_Evaluation_Shader.txt");
+	defaultTESahder->code = myApp->fileSystem->FileToString("Shaders/Default_Evaluation_Shader.txt");
 
 	if (CompileShader(defaultTESahder))
 	{
@@ -100,7 +100,7 @@ void ModuleShader::GenerateDefaultShaders()
 
 	//Creating default Fragment Shader
 	_Shader* defaultFragmentSahder = new _Shader("Default Fragment Shader", FRAGMENT);
-	defaultFragmentSahder->code = FileSystem::FileToString("Shaders/Default_Fragment_Shader.txt");
+	defaultFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Fragment_Shader.txt");
 	
 	if(CompileShader(defaultFragmentSahder))
 	{

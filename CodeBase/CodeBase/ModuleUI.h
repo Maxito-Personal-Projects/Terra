@@ -11,6 +11,7 @@
 
 class UIWindow;
 class UITest;
+class Texture;
 
 class ModuleUI : public Module
 {
@@ -23,7 +24,7 @@ public:
 	bool Init();
 
 	//Starting Module, Used to init Stuff
-	bool Start() { return true; }
+	bool Start();
 
 	//PreUpdate Module
 	bool PreUpdate();
@@ -43,8 +44,10 @@ private:
 
 	std::list<UIWindow*> windows;
 
-	UITest* testWindow = nullptr;
+public:
 
+	UITest* testWindow = nullptr;
+	Texture* textTest = nullptr;
 
 };
 
