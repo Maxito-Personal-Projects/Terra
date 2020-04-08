@@ -56,7 +56,7 @@ Texture* FileSystem::LoadImagePNG(string path)
 	ilBindImage(imageName);
 
 	//Loading the image as PNG format
-	ilLoadImage(path.c_str());
+	ilLoad(IL_PNG,path.c_str());
 
 	ILenum Error;
 	bool errors = false;

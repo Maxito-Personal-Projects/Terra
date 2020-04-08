@@ -43,10 +43,11 @@ public:
 private:
 
 	std::list<UIWindow*> windows;
+	UITest* testWindow = nullptr;
 
 public:
 
-	UITest* testWindow = nullptr;
+	Texture* errorImage = nullptr;
 	Texture* textTest = nullptr;
 
 };

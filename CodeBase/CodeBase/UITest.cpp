@@ -58,8 +58,16 @@ bool UITest::Draw()
 	ImGui::DragFloat3("", myApp->m_render->lightDirection, 0.1f, -1.0f, 1.0f,"%.1f");
 	ImGui::PopID();
 
-	ImGui::Text("size = %d x %d", myApp->m_ui->textTest->width, myApp->m_ui->textTest->height);
-	ImGui::Image((void*)(intptr_t)myApp->m_ui->textTest->imageID, ImVec2(500, 500));
+	if (myApp->m_ui->textTest)
+	{
+		ImGui::Text("size = %d x %d", myApp->m_ui->textTest->width, myApp->m_ui->textTest->height);
+		ImGui::Image((void*)(intptr_t)myApp->m_ui->textTest->imageID, ImVec2(500, 500));
+	}
+	else
+	{
+		ImGui::Text("Error Reading the Image");
+		ImGui::Image((void*)(intptr_t)myApp->m_ui->errorImage->imageID, ImVec2(100, 100));
+	}
 
 	ImGui::End();
 
