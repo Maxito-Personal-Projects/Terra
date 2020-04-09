@@ -1,9 +1,11 @@
 #include "Application.h"
 #include "ModuleRenderer.h"
 #include "ModuleShader.h"
+#include "ModuleUI.h"
 #include "GameObject.h"
 #include "Mesh.h"
 #include "Transform.h"
+#include "Texture.h"
 
 
 
@@ -54,6 +56,10 @@ Mesh::~Mesh()
 
 void Mesh::DrawMesh()
 {
+	//GL_TEXTURE_0 is activate by default
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, myApp->m_ui->textTest->imageID);
+
 	float lightPos[3] = { 0.1f,-1.0f,0.1f };
 	glBindVertexArray(VAO);
 
