@@ -4,6 +4,7 @@
 class Shader;
 class Mesh;
 class Transform;
+class Terrain;
 
 class GameObject
 {
@@ -21,7 +22,8 @@ public:
 	
 	Mesh* mesh = nullptr;
 	Transform* transform = nullptr;
-
+	Terrain* terrain = nullptr;
+	
 };
 
 #endif // !__GAMEOBJECT_H__

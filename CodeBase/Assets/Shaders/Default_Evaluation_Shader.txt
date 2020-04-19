@@ -17,8 +17,13 @@ out vec3 Color_FS_in;
 
 uniform float delta;
 uniform sampler2D heightmap;
-uniform int freq;
+uniform float freq;
 uniform int octaves;
+
+uniform bool brownian_b;
+uniform bool perlin_b;
+uniform bool heightmap_b;
+uniform bool voronoi_b;
 
 vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2,vec3 v3)
 {
@@ -287,6 +292,7 @@ vec3 GetVertex(float deltaX, float deltaY)
 vec3 GetVertexNormal()
 {
 	vec3 ret=vec3(0.0);
+	float tl,l,bl,t,b,tr,r,br;
 	
 	// vec3 z0 = GetVertex(0.0,delta);
 	// z0.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+delta)*maxHeight;
@@ -305,14 +311,50 @@ vec3 GetVertexNormal()
 	
 	// ret = normalize(cross(A,B));
 	
-	float tl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
-	float l = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
-	float bl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
-	float t = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
-	float b = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
-	float tr = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
-	float r = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
-	float br = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+	if(brownian_b)
+	{
+		tl = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		l = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
+		bl = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		t = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
+		b = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
+		tr = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		r = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
+		br = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+	}
+	if(perlin_b)
+	{
+		tl = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		l = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
+		bl = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		t = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
+		b = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
+		tr = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		r = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
+		br = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+	}
+	if(voronoi_b)
+	{
+		tl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		l = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
+		bl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		t = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
+		b = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
+		tr = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		r = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
+		br = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+	}
+	if(heightmap_b)
+	{
+		tl = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		l = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y);
+		bl = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		t = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y+delta);
+		b = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y-delta);
+		tr = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		r = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y);
+		br = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+	}
 	
 	// sobel filter
 	float dX = (tl + 2.0 * l + bl) - (tr + 2.0 * r + br);
@@ -331,8 +373,24 @@ void main()
 	WorldPos_FS_in = GetVertex(0.0,0.0);
 	
     Normal_FS_in = GetVertexNormal();
-	//Normal_FS_in = vec3(0.0,1.0,0.0);
-	float height = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y);
+	float height=0.0;
+	
+	if(brownian_b)
+	{
+		height = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y);
+	}
+	if(perlin_b)
+	{
+		height = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y);
+	}
+	if(voronoi_b)
+	{
+		height = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y);
+	}
+	if(heightmap_b)
+	{
+		height = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y);
+	}
 		
 	WorldPos_FS_in.y = height*maxHeight;
 	//WorldPos_FS_in.y = 0.0;

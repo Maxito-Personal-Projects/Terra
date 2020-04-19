@@ -208,6 +208,7 @@
     <ClCompile Include="ModuleUI.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UITest.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="ModuleUI.h" />
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UITest.h" />

@@ -231,6 +231,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -532,6 +535,9 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Source Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

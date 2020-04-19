@@ -39,13 +39,9 @@ public:
 	GameObject* firstGO = nullptr;
 
 	bool wired = false;
-	float divisions = 100.0f;
-	float maxHeight = 10.0f;
-	float seed = 1.0f;
+
 	float delta = 0.01f;
 	float lightDirection[3] = { 1.0f,0.5f,1.0f };
-	int size = 10;
-	int octaves = 8;
 
 };
 

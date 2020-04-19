@@ -5,12 +5,14 @@
 #include "Camera.h"
 #include "Transform.h"
 #include "Mesh.h"
+#include "Terrain.h"
 
 
 GameObject::GameObject()
 {
 	transform = new Transform();
 	mesh = new Mesh(this);
+	terrain = new Terrain(this);
 
 	//Default Shader
 	shader = myApp->m_shader->GetShader("Default Shader");
@@ -23,6 +25,16 @@ GameObject::~GameObject()
 	{
 		delete mesh;
 		mesh = nullptr;
+	}
+	if (transform)
+	{
+		delete transform;
+		transform = nullptr;
+	}
+	if (terrain)
+	{
+		delete terrain;
+		terrain = nullptr;
 	}
 }
 

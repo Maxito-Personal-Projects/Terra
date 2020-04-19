@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Transform.h"
 #include "Texture.h"
+#include "Terrain.h"
 
 
 
@@ -60,29 +61,42 @@ void Mesh::DrawMesh()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, myApp->m_ui->textTest->imageID);
 
-	float lightPos[3] = { 0.1f,-1.0f,0.1f };
 	glBindVertexArray(VAO);
 
+	// Render Info 
 	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
 	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
 	int light = glGetUniformLocation(parent->shader, "lightPos");
 	glUniform3f(light, myApp->m_render->lightDirection[0], myApp->m_render->lightDirection[1], myApp->m_render->lightDirection[2]);
-	int divisions = glGetUniformLocation(parent->shader, "divisions");
-	glUniform1f(divisions, myApp->m_render->divisions);
-	int height = glGetUniformLocation(parent->shader, "maxHeight");
-	glUniform1f(height, myApp->m_render->maxHeight);
-	int seed = glGetUniformLocation(parent->shader, "seed");
-	glUniform1f(seed, myApp->m_render->seed);
 	int delta = glGetUniformLocation(parent->shader, "delta");
 	glUniform1f(delta, myApp->m_render->delta);
+	
+	// Terrain info 
+	int height = glGetUniformLocation(parent->shader, "maxHeight");
+	glUniform1f(height, parent->terrain->maxHeight);
+	int seed = glGetUniformLocation(parent->shader, "seed");
+	glUniform1f(seed, parent->terrain->seed);
+	int frequency = glGetUniformLocation(parent->shader, "freq");
+	glUniform1f(frequency, parent->terrain->frequency);
+	int octaves = glGetUniformLocation(parent->shader, "octaves");
+	glUniform1i(octaves, parent->terrain->octaves);
+
+	int brownian = glGetUniformLocation(parent->shader,"brownian_b");
+	glUniform1i(brownian, parent->terrain->brownian);
+	int perlin = glGetUniformLocation(parent->shader, "perlin_b");
+	glUniform1i(perlin, parent->terrain->perlin);
+	int heightmap = glGetUniformLocation(parent->shader, "heightmap_b");
+	glUniform1i(heightmap, parent->terrain->heightmap);
+	int voronoi = glGetUniformLocation(parent->shader, "voronoi_b");
+	glUniform1i(voronoi, parent->terrain->voronoi);
+
+	// Mesh info
 	int grid = glGetUniformLocation(parent->shader, "gridSize");
 	glUniform1i(grid, size-1);
+	int div = glGetUniformLocation(parent->shader, "divisions");
+	glUniform1f(div, divisions);
 
-	int size = glGetUniformLocation(parent->shader, "freq");
-	glUniform1i(size,myApp->m_render->size);
-	int octaves = glGetUniformLocation(parent->shader, "octaves");
-	glUniform1i(octaves, myApp->m_render->octaves);
-
+	// Other
 	/*int testtime = glGetUniformLocation(parent->shader, "time");
 	glUniform1f(testtime, time);*/
 

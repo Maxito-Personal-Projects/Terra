@@ -51,6 +51,7 @@ public:
 	int size = 10;
 	float width = 50.0f;
 	float height = 50.0f;
+	float divisions = 64.0f;
 
 	float time = 0.0f;
 

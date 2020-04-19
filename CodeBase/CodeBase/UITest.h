@@ -5,6 +5,9 @@
 
 #include <string>
 
+class Terrain;
+class Mesh;
+
 class UITest :	public UIWindow
 {
 public:
@@ -14,8 +17,12 @@ public:
 
 	bool Draw();
 
+public:
 
-
+	GameObject* curr = nullptr;
+	Terrain* terrain = nullptr;
+	Mesh* mesh = nullptr;
+	
 };
 
 #endif // !__UITEST_H__
