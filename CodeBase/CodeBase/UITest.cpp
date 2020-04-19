@@ -31,7 +31,7 @@ bool UITest::Draw()
 	ImGui::Text("Mesh Divisions:");
 	ImGui::SameLine();
 	ImGui::PushID("Divisions");
-	ImGui::DragFloat("", &myApp->m_render->divisions, 1.0f,1.0f);
+	ImGui::DragFloat("", &myApp->m_render->divisions, 1.0f,1.0f,64.0f,"%.0f");
 	ImGui::PopID();
 
 	ImGui::Text("Mesh Height:");
@@ -49,7 +49,19 @@ bool UITest::Draw()
 	ImGui::Text("Heightmap delta:");
 	ImGui::SameLine();
 	ImGui::PushID("delta");
-	ImGui::DragFloat("", &myApp->m_render->delta, 0.00001f);
+	ImGui::DragFloat("", &myApp->m_render->delta, 0.00001f,0.0000000001f,1.0f,"%.7f");
+	ImGui::PopID();
+
+	ImGui::Text("Map Size:");
+	ImGui::SameLine();
+	ImGui::PushID("Frequency");
+	ImGui::DragInt("", &myApp->m_render->size, 0.1,1.0f, 1000.0f, "%.0f");
+	ImGui::PopID();
+
+	ImGui::Text("Octaves:");
+	ImGui::SameLine();
+	ImGui::PushID("Octaves");
+	ImGui::DragInt("", &myApp->m_render->octaves, 0.1f, 1,8, "%.0f");
 	ImGui::PopID();
 
 	ImGui::Text("Light Direction:");

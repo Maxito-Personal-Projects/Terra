@@ -78,6 +78,11 @@ void Mesh::DrawMesh()
 	int grid = glGetUniformLocation(parent->shader, "gridSize");
 	glUniform1i(grid, size-1);
 
+	int size = glGetUniformLocation(parent->shader, "freq");
+	glUniform1i(size,myApp->m_render->size);
+	int octaves = glGetUniformLocation(parent->shader, "octaves");
+	glUniform1i(octaves, myApp->m_render->octaves);
+
 	/*int testtime = glGetUniformLocation(parent->shader, "time");
 	glUniform1f(testtime, time);*/
 
