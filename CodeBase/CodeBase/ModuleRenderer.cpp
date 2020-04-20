@@ -61,6 +61,18 @@ bool ModuleRenderer::Start()
 
 	firstGO = new GameObject();
 
+	glGenTextures(1, &exportTexture);
+	glBindTexture(GL_TEXTURE_2D, exportTexture);
+
+	glTexStorage2D(GL_TEXTURE_2D,1, GL_RGBA8,100,100);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	glBindImageTexture(0, exportTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	return ret;
 }
 

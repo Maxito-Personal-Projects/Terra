@@ -1,5 +1,7 @@
-#version 410 core
+#version 440 core
 layout(quads, equal_spacing, ccw) in;
+layout (binding = 0, rgba8) uniform coherent image2D exportTexture;
+
 
 uniform mat4 View;
 uniform mat4 Projection;
@@ -14,9 +16,12 @@ in vec3 Color_ES_in[];
 out vec3 WorldPos_FS_in;
 out vec3 Normal_FS_in;
 out vec3 Color_FS_in;
+vec3 texColor_FS_in;
+
+uniform sampler2D heightmap;
+uniform sampler2D outputTexture;
 
 uniform float delta;
-uniform sampler2D heightmap;
 uniform float freq;
 uniform int octaves;
 
@@ -372,6 +377,13 @@ void main()
 {		
 	WorldPos_FS_in = GetVertex(0.0,0.0);
 	
+	int pX = gl_PrimitiveID/gridSize;
+	int pY = gl_PrimitiveID%gridSize;
+	
+	vec2 patchCoords = vec2(pX,pY);
+	
+	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+patchCoords.yx)/gridSize)*100);
+
     Normal_FS_in = GetVertexNormal();
 	float height=0.0;
 	
@@ -420,6 +432,10 @@ void main()
 	
 	//Color_FS_in = vec3(height);
 	//Color_FS_in =texture(heightmap,gl_TessCoord.xy).xyz;
+	
+	texColor_FS_in = vec3(height);
+	
+	imageStore(exportTexture, pix_coord, vec4(texColor_FS_in, 1.0));
 
 
 	gl_Position = Projection * View * vec4(WorldPos_FS_in, 1.0);

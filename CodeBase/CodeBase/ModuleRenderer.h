@@ -42,6 +42,8 @@ public:
 
 	float delta = 0.01f;
 	float lightDirection[3] = { 1.0f,0.5f,1.0f };
+	
+	uint exportTexture = 0;
 
 };
 

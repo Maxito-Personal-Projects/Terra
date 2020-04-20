@@ -61,6 +61,9 @@ void Mesh::DrawMesh()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, myApp->m_ui->textTest->imageID);
 
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, myApp->m_render->exportTexture);
+
 	glBindVertexArray(VAO);
 
 	// Render Info 
