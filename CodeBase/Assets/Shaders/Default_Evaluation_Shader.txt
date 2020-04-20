@@ -183,60 +183,86 @@ float PerlinNoise(float x, float y)
 float Vnoise(vec2 fragCoord,float frequency)
 {
     // Normalized pixel coordinates (from 0 to 1)
-    vec2 uv = fragCoord;
-    uv = uv*freq*frequency;
+    //vec2 uv = fragCoord;
+    //uv = uv*freq*frequency;
+    //
+    //vec2 tile = floor(uv);
+    //float centerDistance = 100.0;
+    //float borderDistance = 100.0;
+    //vec2 center = vec2(0.0);
+	//
+    //
+    ////Searching the distance to the nearest center
+    //for(int i=-1; i<2 ; ++i)
+    //{
+    //    for(int j=-1;j<2;++j)
+    //    {
+    //        vec2 tempTile=tile+vec2(i,j);
+    //        vec2 tempCenter = tempTile+Random(tempTile);
+    //        float tempDist = length(tempCenter-uv);
+    //        
+    //        if(tempDist<centerDistance)
+    //        {
+    //            centerDistance=tempDist;
+    //            center = tempCenter;
+    //        }
+    //    }
+    //}
+    //
+    ////Searching the distance to the nearest border
+    //for(int i=-1; i<2 ; ++i)
+    //{
+    //    for(int j=-1;j<2;++j)
+    //    {
+    //        vec2 tempTile=tile+vec2(i,j);
+    //        vec2 tempCenter = tempTile+Random(tempTile);
+    //        
+    //        vec2 tempDist = tempCenter-uv;
+    //        vec2 closeDiff = center-uv;
+    //    	
+    //        float check = length(tempCenter - center);
+    //        
+    //        if(check>0.0001)
+    //        {
+    //            vec2 toCenter = (closeDiff + tempDist)/2.0;
+    //            vec2 cellDiff = normalize(tempDist-closeDiff);
+    //            float edgeDistance = dot(toCenter,cellDiff);
+    //            
+    //            if(borderDistance>edgeDistance)
+    //            {
+    //            	borderDistance=edgeDistance;
+    //            }
+    //        }
+    //    }
+    //}
+    //        
+    //return borderDistance;
+	
+	vec2 uv = fragCoord;
+    uv = uv * freq * frequency;
     
-    vec2 tile = floor(uv);
-    float centerDistance = 100.0;
-    float borderDistance = 100.0;
-    vec2 center = vec2(0.0);
-
+    vec2 g = floor(uv), tile; uv -= g;
+	
+	vec3 d = vec3(10); // 1.4, etc. "d.z" holds the distance comparison value.
     
-    //Searching the distance to the nearest center
-    for(int i=-1; i<2 ; ++i)
-    {
-        for(int j=-1;j<2;++j)
-        {
-            vec2 tempTile=tile+vec2(i,j);
-            vec2 tempCenter = tempTile+Random(tempTile);
-            float tempDist = length(tempCenter-uv);
+	for(int y = -1; y <= 1; y++){
+		for(int x = -1; x <= 1; x++){
             
-            if(tempDist<centerDistance)
-            {
-                centerDistance=tempDist;
-                center = tempCenter;
-            }
-        }
-    }
-    
-    //Searching the distance to the nearest border
-    for(int i=-1; i<2 ; ++i)
-    {
-        for(int j=-1;j<2;++j)
-        {
-            vec2 tempTile=tile+vec2(i,j);
-            vec2 tempCenter = tempTile+Random(tempTile);
+            //Position
+			tile = vec2(x, y);
             
-            vec2 tempDist = tempCenter-uv;
-            vec2 closeDiff = center-uv;
-        	
-            float check = length(tempCenter - center);
+            // Distance to random center
+            tile += Random(g + tile) - uv;
             
-            if(check>0.0001)
-            {
-                vec2 toCenter = (closeDiff + tempDist)/2.0;
-                vec2 cellDiff = normalize(tempDist-closeDiff);
-                float edgeDistance = dot(toCenter,cellDiff);
-                
-                if(borderDistance>edgeDistance)
-                {
-                	borderDistance=edgeDistance;
-                }
-            }
-        }
-    }
+            //Absolute ditsnce
+			d.z = dot(tile,tile); 
             
-    return borderDistance;
+            d.y = max(d.x, min(d.y, d.z));
+            d.x = min(d.x, d.z); 
+		}
+	}
+	
+    return max(d.y/1.2 - d.x*1., 0.)/1.2;; 
 }
 
 //Accumulative noise
