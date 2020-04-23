@@ -119,7 +119,7 @@ void ModuleShader::GenerateDefaultShaders()
 
 	//Creating Default Shader Program
 	Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder, nullptr, defaultTCSahder,defaultTESahder);
-	if (CompileShaderProgram(defaultShader))
+	if (CompileShaderProgram(defaultShader,true))
 	{
 		LOG("Default Shader Program Compiled Successfully");
 
@@ -167,7 +167,7 @@ bool ModuleShader::CompileShader(_Shader* shader)
 	return ret;
 }
 
-bool ModuleShader::CompileShaderProgram(Shader * shaderProgram)
+bool ModuleShader::CompileShaderProgram(Shader * shaderProgram, bool isDefault)
 {
 	bool ret = true;
 
@@ -178,6 +178,15 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram)
 	for (int i = 0; i < shaderProgram->shaders.size(); ++i)
 	{
 		glAttachShader(shaderProgram->id, shaderProgram->shaders[i]->id);
+	}
+
+	//Telling the program which var/s we want to capture
+	if (isDefault)
+	{
+		const GLchar* captureVars[] = { "TFPosition" };
+
+		//We want everything in the same buffer!
+		glTransformFeedbackVaryings(shaderProgram->id, 1, captureVars, GL_INTERLEAVED_ATTRIBS);
 	}
 
 	//Compiling Shader Program

@@ -9,8 +9,8 @@ class ModuleRenderer : public Module
 {
 public:
 
-	ModuleRenderer(string _name, bool _active = true);
-	~ModuleRenderer();
+	ModuleRenderer(string _name, bool _active = true) :Module(_name, _active) {}
+	~ModuleRenderer() {}
 
 	//Init Module, Used to create Stuff
 	bool Init();

@@ -42,15 +42,16 @@ public:
 	int numIndices = 36;
 	int numProperties = 3; //pos,color,normal
 
-	uint VBO;
-	uint VAO;
-	uint IBO;
+	uint VBO;	//Vertex Buffer Object
+	uint VAO;	//Vertex Array Object
+	uint IBO;	//Index Buffer Object
+	uint TBO;	//Transform Feedback Buffer Object
 
 	GameObject* parent = nullptr;
 
-	int size = 10;
-	float width = 50.0f;
-	float height = 50.0f;
+	int size = 2;
+	float width = 64.0f;
+	float height = 64.0f;
 	float divisions = 64.0f;
 
 	float time = 0.0f;

@@ -7,15 +7,6 @@
 #include "GameObject.h"
 
 
-
-ModuleRenderer::ModuleRenderer(string _name, bool _active) :Module(_name, _active)
-{
-}
-
-ModuleRenderer::~ModuleRenderer()
-{
-}
-
 bool ModuleRenderer::Init()
 {
 	bool ret = true;

@@ -13,10 +13,10 @@ public:
 
 	GameObject* parent = nullptr;
 
-	float maxHeight = 10.0f;
+	float maxHeight = 20.0f;
 	float seed = 1.0f;
 	float delta = 0.01f;
-	float frequency = 10.0f;
+	float frequency = 1.0f;
 	int octaves = 8;
 
 	bool heightmap = false;

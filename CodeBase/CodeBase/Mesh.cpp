@@ -2,6 +2,7 @@
 #include "ModuleRenderer.h"
 #include "ModuleShader.h"
 #include "ModuleUI.h"
+#include "ModuleInput.h"
 #include "GameObject.h"
 #include "Mesh.h"
 #include "Transform.h"
@@ -25,6 +26,7 @@ Mesh::~Mesh()
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
+	glDeleteBuffers(1, &TBO);
 
 	/*if (faceNormals)
 	{
@@ -103,7 +105,24 @@ void Mesh::DrawMesh()
 	/*int testtime = glGetUniformLocation(parent->shader, "time");
 	glUniform1f(testtime, time);*/
 
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER,0,TBO);
+	glBeginTransformFeedback(GL_TRIANGLES);
+	
 	glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
+
+	glEndTransformFeedback();
+
+	if (myApp->m_input->GetKey(SDL_SCANCODE_R) == DOWN)
+	{
+		GLfloat feedback[73728];
+		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+
+		for (int i = 0; i < 73728; i+=3)
+		{
+			LOG("%f,%f,%f", feedback[i], feedback[i+1], feedback[i+2]);
+		}
+		LOG("---------------------------------------");
+	}
 
 	time += 0.016;
 }
@@ -114,6 +133,7 @@ void Mesh::LoadToGPU()
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &IBO);
+	glGenBuffers(1, &TBO);
 
 	//bind VA as array buffer first
 	glBindVertexArray(VAO);
@@ -123,6 +143,15 @@ void Mesh::LoadToGPU()
 
 	//Copying the vertex data into the buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*numVertices * 9, infoGPU, GL_STATIC_DRAW);
+
+	//Binding the buffer to create it
+	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, TBO);
+
+	//Allocating data for the Transform buffer //GL_DYNAMIC_COPY because we are going to change often and copy the data from the GPU
+	//Size = division*division*numTris*numVertex*numFloats
+	//If we want normals x2 (TODO)
+	//If we want more tiles x(Tiles-1)^2 (TODO)
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3, nullptr, GL_DYNAMIC_COPY);
 
 	//bind IB as element array buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);

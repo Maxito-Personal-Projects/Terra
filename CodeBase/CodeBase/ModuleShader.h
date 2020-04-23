@@ -36,7 +36,7 @@ public:
 	void GenerateDefaultShaders();
 
 	bool CompileShader(_Shader* shader);
-	bool CompileShaderProgram(Shader* shaderProgram);
+	bool CompileShaderProgram(Shader* shaderProgram, bool isDefault = false);
 
 	int GetShader(string name);
 
