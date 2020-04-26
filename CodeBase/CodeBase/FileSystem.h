@@ -25,6 +25,8 @@ public:
 
 	Texture* LoadImagePNG(string path);
 
+	bool ExportOBJ(float* vertexBuffer, int sizeBuffer);
+
 };
 
 #endif //!__FILESYSTEM_H__

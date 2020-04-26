@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "Texture.h"
 #include "Terrain.h"
+#include "FileSystem.h"
 
 
 
@@ -38,6 +39,12 @@ Mesh::~Mesh()
 	{
 		delete[] vertices;
 		vertices = nullptr;
+	}
+
+	if (vertexBuffer)
+	{
+		delete[] vertexBuffer;
+		vertexBuffer = nullptr;
 	}
 
 	if (testIndices)
@@ -114,14 +121,18 @@ void Mesh::DrawMesh()
 
 	if (myApp->m_input->GetKey(SDL_SCANCODE_R) == DOWN)
 	{
-		GLfloat feedback[73728];
-		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
-
-		for (int i = 0; i < 73728; i+=3)
+		if (vertexBuffer)
 		{
-			LOG("%f,%f,%f", feedback[i], feedback[i+1], feedback[i+2]);
+			glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(float)*buffSize, vertexBuffer);
+
+			/*for (int i = 0; i < buffSize; i += 3)
+			{
+				LOG("%f,%f,%f", vertexBuffer[i], vertexBuffer[i + 1], vertexBuffer[i + 2]);
+			}
+			LOG("---------------------------------------");*/
+
+			myApp->fileSystem->ExportOBJ(vertexBuffer, buffSize);
 		}
-		LOG("---------------------------------------");
 	}
 
 	time += 0.016;
@@ -151,7 +162,9 @@ void Mesh::LoadToGPU()
 	//Size = division*division*numTris*numVertex*numFloats
 	//If we want normals x2 (TODO)
 	//If we want more tiles x(Tiles-1)^2 (TODO)
+	buffSize = 64 * 64 * 2 * 3 * 3;
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3, nullptr, GL_DYNAMIC_COPY);
+	vertexBuffer = new float[buffSize];
 
 	//bind IB as element array buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);

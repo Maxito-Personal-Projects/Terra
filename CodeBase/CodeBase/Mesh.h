@@ -47,6 +47,9 @@ public:
 	uint IBO;	//Index Buffer Object
 	uint TBO;	//Transform Feedback Buffer Object
 
+	float* vertexBuffer = nullptr;
+	int buffSize = 0;
+
 	GameObject* parent = nullptr;
 
 	int size = 2;
