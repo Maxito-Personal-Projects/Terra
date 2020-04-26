@@ -10,6 +10,7 @@
 #include "Assimp/include/assimp/cimport.h"
 #include "Assimp/include/assimp/scene.h"
 #include "Assimp/include/assimp/Exporter.hpp"
+#include "Assimp/include/assimp/postprocess.h"
 
 #pragma comment (lib, "DevIL/lib/DevIL.lib")
 #pragma comment (lib, "DevIL/lib/ILU.lib")
@@ -148,6 +149,14 @@ bool FileSystem::ExportOBJ(float* vertexBuffer, int sizeBuffer)
 
 	//Initializing Root
 	scene->mRootNode = new aiNode();
+	scene->mRootNode->mName = "Terrain";
+
+	//Initializing Material
+	scene->mMaterials = new aiMaterial*[1];
+	scene->mMaterials[0] = nullptr;
+	scene->mNumMaterials = 1;
+		 
+	scene->mMaterials[0] = new aiMaterial();
 
 	//Initializing Mesh
 	scene->mMeshes = new aiMesh*[1];		//Adding one mesh poiter
@@ -155,11 +164,18 @@ bool FileSystem::ExportOBJ(float* vertexBuffer, int sizeBuffer)
 	scene->mNumMeshes = 1;					//Setting number of meshes
 
 	scene->mMeshes[0] = new aiMesh();		//setting mesh info
+	scene->mMeshes[0]->mMaterialIndex = 0;
+	
+	//Setting mesh to rootNode
+	scene->mRootNode->mMeshes = new uint[1];
+	scene->mRootNode->mMeshes[0] = 0;
+	scene->mRootNode->mNumMeshes = 1;
 
 	aiMesh* mesh = scene->mMeshes[0];		//Getting mesh pointer
+	mesh->mName = "Terrain";
 	
 	//Now we are just taking the vertex info so the size is:
-	int size = sizeBuffer / 3;
+	int size = sizeBuffer / 6;
 
 	//Setting mesh info
 	mesh->mVertices = new aiVector3D[size];
@@ -174,10 +190,10 @@ bool FileSystem::ExportOBJ(float* vertexBuffer, int sizeBuffer)
 
 	for (int i = 0; i < size; ++i)
 	{
-		mesh->mVertices[i] = aiVector3D(vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 1]);
-		mesh->mNormals[i] = aiVector3D(0.0f, 1.0f, 0.0f);
+		mesh->mVertices[i] = aiVector3D(vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
+		mesh->mNormals[i] = aiVector3D(vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], vertexBuffer[buffIndx + 5]);
 		mesh->mTextureCoords[0][i] = aiVector3D(1.0f, 1.0f, 0.0f);
-		buffIndx += 3;
+		buffIndx += 6;
 	}
 
 	int fSize = size / 3;
@@ -188,22 +204,23 @@ bool FileSystem::ExportOBJ(float* vertexBuffer, int sizeBuffer)
 	
 	for (int i = 0; i < fSize; ++i)
 	{
-		mesh->mFaces[i].mIndices = new uint[3];
-		mesh->mFaces[i].mNumIndices = 3;
+		aiFace &face = mesh->mFaces[i];
+		face.mIndices = new uint[3];
+		face.mNumIndices = 3;
 	
-		mesh->mFaces[i].mIndices[0] = vertIndx;
-		mesh->mFaces[i].mIndices[1] = vertIndx + 1;
-		mesh->mFaces[i].mIndices[2] = vertIndx + 2;
+		face.mIndices[0] = vertIndx;
+		face.mIndices[1] = vertIndx + 1;
+		face.mIndices[2] = vertIndx + 2;
 
 		vertIndx += 3;	
 	}
 
-	const aiExportFormatDesc* formatDescription = aiGetExportFormatDescription(17);
+	const aiExportFormatDesc* formatDescription = aiGetExportFormatDescription(3);
 	LOG("%s", formatDescription->description);
 
-	if (exporter->Export(scene,formatDescription->id, "test_3.fbx") == AI_SUCCESS)
+	if (exporter->Export(scene,formatDescription->id, "Exports/Terrain.obj", aiProcess_MakeLeftHanded) == AI_SUCCESS)
 	{
-		LOG("Success exporting obj");
+		LOG("Success exporting obj: %s", exporter->GetErrorString());
 		ret = true;
 	}
 	else

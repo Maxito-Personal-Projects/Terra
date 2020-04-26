@@ -52,7 +52,7 @@ public:
 
 	GameObject* parent = nullptr;
 
-	int size = 2;
+	int size = 10;
 	float width = 64.0f;
 	float height = 64.0f;
 	float divisions = 64.0f;

@@ -183,10 +183,10 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram, bool isDefault)
 	//Telling the program which var/s we want to capture
 	if (isDefault)
 	{
-		const GLchar* captureVars[] = { "TFPosition" };
+		const GLchar* captureVars[] = { "TFPosition","TFNormal" };
 
 		//We want everything in the same buffer!
-		glTransformFeedbackVaryings(shaderProgram->id, 1, captureVars, GL_INTERLEAVED_ATTRIBS);
+		glTransformFeedbackVaryings(shaderProgram->id, 2, captureVars, GL_INTERLEAVED_ATTRIBS);
 	}
 
 	//Compiling Shader Program

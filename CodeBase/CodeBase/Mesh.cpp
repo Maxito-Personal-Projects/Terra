@@ -160,10 +160,10 @@ void Mesh::LoadToGPU()
 
 	//Allocating data for the Transform buffer //GL_DYNAMIC_COPY because we are going to change often and copy the data from the GPU
 	//Size = division*division*numTris*numVertex*numFloats
-	//If we want normals x2 (TODO)
+	//If we want normals x2 (TODO) Done
 	//If we want more tiles x(Tiles-1)^2 (TODO)
-	buffSize = 64 * 64 * 2 * 3 * 3;
-	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3, nullptr, GL_DYNAMIC_COPY);
+	buffSize = 64 * 64 * 2 * 3 * 3 * 2 * (size - 1) * (size - 1);
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3 * 2 * (size-1) * (size-1), nullptr, GL_DYNAMIC_COPY);
 	vertexBuffer = new float[buffSize];
 
 	//bind IB as element array buffer
