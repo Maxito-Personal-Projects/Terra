@@ -11,6 +11,7 @@
 
 class UIWindow;
 class UITest;
+class UIExport;
 class Texture;
 
 class ModuleUI : public Module
@@ -44,6 +45,7 @@ private:
 
 	std::list<UIWindow*> windows;
 	UITest* testWindow = nullptr;
+	UIExport* exportWindow = nullptr;
 
 public:
 

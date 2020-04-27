@@ -211,6 +211,7 @@
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="UIExport.cpp" />
     <ClCompile Include="UITest.cpp" />
     <ClCompile Include="UIWindow.cpp" />
   </ItemGroup>
@@ -314,6 +315,7 @@
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="UIExport.h" />
     <ClInclude Include="UITest.h" />
     <ClInclude Include="UIWindow.h" />
   </ItemGroup>

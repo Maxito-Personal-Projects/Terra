@@ -3,7 +3,9 @@
 #include "ModuleShader.h"
 #include "ModuleUI.h"
 #include "ModuleInput.h"
+#include "ModuleCamera.h"
 #include "GameObject.h"
+#include "Camera.h"
 #include "Mesh.h"
 #include "Transform.h"
 #include "Texture.h"
@@ -78,10 +80,12 @@ void Mesh::DrawMesh()
 	// Render Info 
 	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
 	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
-	int light = glGetUniformLocation(parent->shader, "lightPos");
+	int light = glGetUniformLocation(parent->shader, "lDirection");
 	glUniform3f(light, myApp->m_render->lightDirection[0], myApp->m_render->lightDirection[1], myApp->m_render->lightDirection[2]);
 	int delta = glGetUniformLocation(parent->shader, "delta");
 	glUniform1f(delta, myApp->m_render->delta);
+	int cam = glGetUniformLocation(parent->shader, "camPos");
+	glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
 	
 	// Terrain info 
 	int height = glGetUniformLocation(parent->shader, "maxHeight");
@@ -118,22 +122,6 @@ void Mesh::DrawMesh()
 	glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
 
 	glEndTransformFeedback();
-
-	if (myApp->m_input->GetKey(SDL_SCANCODE_R) == DOWN)
-	{
-		if (vertexBuffer)
-		{
-			glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(float)*buffSize, vertexBuffer);
-
-			/*for (int i = 0; i < buffSize; i += 3)
-			{
-				LOG("%f,%f,%f", vertexBuffer[i], vertexBuffer[i + 1], vertexBuffer[i + 2]);
-			}
-			LOG("---------------------------------------");*/
-
-			myApp->fileSystem->ExportOBJ(vertexBuffer, buffSize);
-		}
-	}
 
 	time += 0.016;
 }
@@ -298,6 +286,14 @@ void Mesh::FillInfoGPU()
 		//Tile coords
 		//infoGPU[it + 9] = (float)tileCoords[t_it];
 		//infoGPU[it + 10] = (float)tileCoords[t_it+1];
+	}
+}
+
+void Mesh::GenerateVertexBuffer()
+{
+	if (vertexBuffer)
+	{
+		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(float)*buffSize, vertexBuffer);
 	}
 }
 

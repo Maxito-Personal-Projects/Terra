@@ -21,6 +21,8 @@ public:
 	void CalculateVertexNormals();
 	void FillInfoGPU();
 
+	void GenerateVertexBuffer();
+
 public:
 
 	float* vertices = nullptr;
@@ -52,7 +54,7 @@ public:
 
 	GameObject* parent = nullptr;
 
-	int size = 10;
+	int size = 2;
 	float width = 64.0f;
 	float height = 64.0f;
 	float divisions = 64.0f;

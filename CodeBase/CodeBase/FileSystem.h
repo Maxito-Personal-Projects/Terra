@@ -10,6 +10,13 @@ using namespace std;
 
 class Texture;
 
+enum ExportFormat {
+	DAE = 0,
+	OBJ_MAT = 3,
+	OBJ = 4,
+	FBX = 17
+};
+
 class FileSystem
 {
 public:
@@ -25,7 +32,9 @@ public:
 
 	Texture* LoadImagePNG(string path);
 
-	bool ExportOBJ(float* vertexBuffer, int sizeBuffer);
+	string AddExtension(string folder, string name, ExportFormat extension);
+
+	bool Export(float* vertexBuffer, int sizeBuffer, string name, ExportFormat format, string& message);
 
 };
 

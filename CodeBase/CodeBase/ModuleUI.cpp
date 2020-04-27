@@ -7,6 +7,7 @@
 
 #include "UIWindow.h"
 #include "UITest.h"
+#include "UIExport.h"
 
 
 ModuleUI::ModuleUI(string _name, bool _active) : Module(_name,_active)
@@ -44,8 +45,10 @@ bool ModuleUI::Init()
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	testWindow = new UITest("Test Window");
+	exportWindow = new UIExport("Export",false);
 
 	windows.push_back(testWindow);
+	windows.push_back(exportWindow);
 
 	return ret;
 }
@@ -73,6 +76,11 @@ bool ModuleUI::PreUpdate()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("Export Terrain"))
+			{
+				exportWindow->active = true;
+				exportWindow->exportMessage = "";
+			}
 			if (ImGui::MenuItem("Exit", "ESC"))
 			{
 				myApp->exit = true;

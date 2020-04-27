@@ -122,7 +122,31 @@ Texture* FileSystem::LoadImagePNG(string path)
 	return ret;
 }
 
-bool FileSystem::ExportOBJ(float* vertexBuffer, int sizeBuffer)
+string FileSystem::AddExtension(string folder, string name, ExportFormat extension)
+{
+	string file = "";
+
+	switch (extension)
+	{
+	case DAE:
+		file = folder +"/" + name + (".dae");
+		break;
+	case OBJ_MAT:
+		file = folder + "/" + name + (".obj");
+		break;
+	case OBJ:
+		file = folder + "/" + name + (".obj");
+		break;
+	case FBX:
+		file = folder + "/" + name + (".fbx");
+		break;
+	default:
+		break;
+	}
+	return file;
+}
+
+bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, ExportFormat format, string& message)
 {
 	bool ret = false;
 
@@ -215,17 +239,21 @@ bool FileSystem::ExportOBJ(float* vertexBuffer, int sizeBuffer)
 		vertIndx += 3;	
 	}
 
-	const aiExportFormatDesc* formatDescription = aiGetExportFormatDescription(3);
+	const aiExportFormatDesc* formatDescription = aiGetExportFormatDescription(int(format));
 	LOG("%s", formatDescription->description);
 
-	if (exporter->Export(scene,formatDescription->id, "Exports/Terrain.obj", aiProcess_MakeLeftHanded) == AI_SUCCESS)
+	if (exporter->Export(scene,formatDescription->id, AddExtension("Exports",name,format).c_str(), aiProcess_MakeLeftHanded) == AI_SUCCESS)
 	{
-		LOG("Success exporting obj: %s", exporter->GetErrorString());
+		string exprt = formatDescription->fileExtension;
+		message = "Success exporting Terrain in "+exprt+" format";
+		LOG("%s", message.c_str());
 		ret = true;
 	}
 	else
 	{
-		LOG("Eror exporting obj");
+		string error = exporter->GetErrorString();
+		message = "Error exporting Terrarin: " + error;
+		LOG("%s", message.c_str());
 	}
 
 	return ret;

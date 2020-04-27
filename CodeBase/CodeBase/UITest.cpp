@@ -10,7 +10,6 @@
 
 UITest::UITest(std::string name, bool active):UIWindow(name,active)
 {
-
 }
 
 
