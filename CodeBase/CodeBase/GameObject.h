@@ -20,7 +20,6 @@ public:
 
 	int shader = 0;
 	
-	Mesh* mesh = nullptr;
 	Transform* transform = nullptr;
 	Terrain* terrain = nullptr;
 	

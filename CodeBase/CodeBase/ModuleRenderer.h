@@ -41,7 +41,7 @@ public:
 	bool wired = false;
 
 	float delta = 0.001f;
-	float lightDirection[3] = { 1.0f,0.5f,1.0f };
+	float lightDirection[3] = { 1.0f,-0.5f,1.0f };
 	
 	uint exportTexture = 0;
 

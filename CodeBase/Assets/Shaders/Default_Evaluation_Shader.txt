@@ -32,6 +32,8 @@ uniform bool perlin_b;
 uniform bool heightmap_b;
 uniform bool voronoi_b;
 
+uniform vec2 chunkCoords;
+
 vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2,vec3 v3)
 {
     return vec3(gl_TessCoord.x) * v0 + vec3(gl_TessCoord.y) * v1 + vec3(gl_TessCoord.z) * v2;
@@ -97,13 +99,10 @@ float Bnoise(vec2 vertexCoords, float frequency)
 
 float BrownianNoise(float x, float y)
 {
-	int pX = gl_PrimitiveID/gridSize;
-	int pY = gl_PrimitiveID%gridSize;
-	vec2 patchCoords = vec2(pX,pY);
     float height = 0.0;
     float a =0.5;
     float f=1.0;
-	vec2 coords = vec2(x,y)+patchCoords.yx;
+	vec2 coords = vec2(x,y)+chunkCoords;
     
     for(int i=0; i<octaves;i++)
     {
@@ -164,13 +163,10 @@ float Pnoise(vec2 fragCoord, float frequency)
 //Different Levels of Detail 
 float PerlinNoise(float x, float y)
 {
-	int pX = gl_PrimitiveID/gridSize;
-	int pY = gl_PrimitiveID%gridSize;
-	vec2 patchCoords = vec2(pX,pY);
     float height = 0.0;
     float a =0.5;
     float f=1.0;
-	vec2 coords = vec2(x,y)+patchCoords.yx;
+	vec2 coords = vec2(x,y)+chunkCoords;
     
    	for(int i=0; i<octaves;i++)
    	{
@@ -273,12 +269,8 @@ float VoronoiNoise(float x, float y)
 	float height = 0.0;
     float a =0.5;
     float f=1.0;
-	
-	int pX = gl_PrimitiveID/gridSize;
-	int pY = gl_PrimitiveID%gridSize;
-	vec2 patchCoords = vec2(pX,pY);
 
-	vec2 coords = vec2(x,y)+patchCoords.yx;
+	vec2 coords = vec2(x,y)+chunkCoords;
     
    	for(int i=0; i<octaves;i++)
    	{
@@ -291,13 +283,8 @@ float VoronoiNoise(float x, float y)
 }
 
 float ReadHeightmap(float x, float y)
-{
-	int pX = gl_PrimitiveID/gridSize;
-	int pY = gl_PrimitiveID%gridSize;
-	
-	vec2 patchCoords = vec2(pX,pY);
-	
-	return texture(heightmap,(vec2(x,y)+patchCoords.yx)/gridSize).x;
+{	
+	return texture(heightmap,(vec2(x,y)+chunkCoords)/gridSize).x;
 }
 
 //      z0 
@@ -405,12 +392,7 @@ void main()
 {		
 	WorldPos_FS_in = GetVertex(0.0,0.0);
 	
-	int pX = gl_PrimitiveID/gridSize;
-	int pY = gl_PrimitiveID%gridSize;
-	
-	vec2 patchCoords = vec2(pX,pY);
-	
-	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+patchCoords.yx)/gridSize)*100);
+	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+chunkCoords)/gridSize)*100);
 
     Normal_FS_in = GetVertexNormal();
 	float height=0.0;

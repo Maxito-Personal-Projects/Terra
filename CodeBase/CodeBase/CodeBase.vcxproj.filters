@@ -237,6 +237,9 @@
     <ClCompile Include="UIExport.cpp">
       <Filter>Source Files\UIWindows</Filter>
     </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -544,6 +547,9 @@
     </ClInclude>
     <ClInclude Include="UIExport.h">
       <Filter>Source Files\UIWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>Source Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

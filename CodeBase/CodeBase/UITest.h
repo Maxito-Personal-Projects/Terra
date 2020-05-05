@@ -21,7 +21,6 @@ public:
 
 	GameObject* curr = nullptr;
 	Terrain* terrain = nullptr;
-	Mesh* mesh = nullptr;
 	
 };
 

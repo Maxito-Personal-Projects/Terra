@@ -11,8 +11,7 @@
 GameObject::GameObject()
 {
 	transform = new Transform();
-	mesh = new Mesh(this);
-	terrain = new Terrain(this);
+	terrain = new Terrain(this,2);
 
 	//Default Shader
 	shader = myApp->m_shader->GetShader("Default Shader");
@@ -21,11 +20,6 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
-	if (mesh)
-	{
-		delete mesh;
-		mesh = nullptr;
-	}
 	if (transform)
 	{
 		delete transform;
@@ -42,17 +36,12 @@ bool GameObject::Draw()
 {
 	bool ret = true;
 
-	if (transform)
-	{
-		
-	}
-
-	if (mesh)
+	if (terrain)
 	{
 		//Using object shader
 		glUseProgram(shader);
 		SendMatrixToGPU();
-		mesh->DrawMesh();
+		terrain->DrawChunks();
 	}
 
 	return ret;

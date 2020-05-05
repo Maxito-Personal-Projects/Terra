@@ -22,10 +22,9 @@ bool UITest::Draw()
 {
 	bool ret = true;
 
-	if (!terrain && !mesh && myApp->m_render->firstGO)
+	if (!terrain && myApp->m_render->firstGO)
 	{
 		terrain = myApp->m_render->firstGO->terrain;
-		mesh = myApp->m_render->firstGO->mesh;
 	}
 
 	ImGui::Begin(name.c_str(), &active);
@@ -64,14 +63,14 @@ bool UITest::Draw()
 
 
 	// Mesh setting
-	ImGui::Text("Mesh Settings:");
-	ImGui::Text("Mesh Divisions:");
-	ImGui::SameLine();
-	ImGui::PushID("Divisions");
-	ImGui::PushItemWidth(100.0f);
-	ImGui::DragFloat("", &mesh->divisions, 0.25f, 1.0f, 64.0f, "%.0f");
-	ImGui::PopItemWidth();
-	ImGui::PopID();
+	//ImGui::Text("Mesh Settings:");
+	//ImGui::Text("Mesh Divisions:");
+	//ImGui::SameLine();
+	//ImGui::PushID("Divisions");
+	//ImGui::PushItemWidth(100.0f);
+	//ImGui::DragFloat("", &mesh->divisions, 0.25f, 1.0f, 64.0f, "%.0f");
+	//ImGui::PopItemWidth();
+	//ImGui::PopID();
 
 	ImGui::Text("-------------------------");
 

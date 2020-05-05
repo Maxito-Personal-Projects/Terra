@@ -14,12 +14,13 @@
 
 
 
-Mesh::Mesh(GameObject* _parent)
+Mesh::Mesh(GameObject* _parent, int x, int y)
 {
 	parent = _parent;
-	//GenerateFlatMesh_tris();
-	GenerateFlatMesh_quads();
-	//CalculateVertexNormals();
+	chunkX = x;
+	chunkY = y;
+
+	GenerateFlatMesh_quads(x,y);
 	FillInfoGPU();
 	LoadToGPU();
 }
@@ -30,12 +31,6 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
 	glDeleteBuffers(1, &TBO);
-
-	/*if (faceNormals)
-	{
-		delete[] faceNormals;
-		faceNormals = nullptr;
-	}*/
 
 	if (vertices)
 	{
@@ -60,8 +55,6 @@ Mesh::~Mesh()
 		delete[] infoGPU;
 		infoGPU = nullptr;
 	}
-
-	vertexNormals.clear();
 
 	parent = nullptr;
 }
@@ -108,9 +101,11 @@ void Mesh::DrawMesh()
 
 	// Mesh info
 	int grid = glGetUniformLocation(parent->shader, "gridSize");
-	glUniform1i(grid, size-1);
+	glUniform1i(grid, parent->terrain->numChunks);
 	int div = glGetUniformLocation(parent->shader, "divisions");
 	glUniform1f(div, divisions);
+	int chunkCoords = glGetUniformLocation(parent->shader, "chunkCoords");
+	glUniform2f(chunkCoords, chunkX, chunkY);
 
 	// Other
 	/*int testtime = glGetUniformLocation(parent->shader, "time");
@@ -122,6 +117,8 @@ void Mesh::DrawMesh()
 	glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
 
 	glEndTransformFeedback();
+
+	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(float)*buffSize, vertexBuffer);
 
 	time += 0.016;
 }
@@ -150,8 +147,8 @@ void Mesh::LoadToGPU()
 	//Size = division*division*numTris*numVertex*numFloats
 	//If we want normals x2 (TODO) Done
 	//If we want more tiles x(Tiles-1)^2 (TODO)
-	buffSize = 64 * 64 * 2 * 3 * 3 * 2 * (size - 1) * (size - 1);
-	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3 * 2 * (size-1) * (size-1), nullptr, GL_DYNAMIC_COPY);
+	buffSize = 64 * 64 * 2 * 3 * 3 * 2;
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3 * 2, nullptr, GL_DYNAMIC_COPY);
 	vertexBuffer = new float[buffSize];
 
 	//bind IB as element array buffer
@@ -174,80 +171,6 @@ void Mesh::LoadToGPU()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-//void Mesh::CalculateNormals()
-//{
-//	if (faceNormals)
-//	{
-//		delete[] faceNormals;
-//		faceNormals = nullptr;
-//	}
-//
-//	faceNormals = new float[numIndices * 2];
-//	
-//	for (int i = 0; i < numIndices; i = i + 3)
-//	{
-//		vec A = { verticesTest[indices[i] * 3],verticesTest[indices[i] * 3 + 1],verticesTest[indices[i] * 3 + 2] };
-//		vec B = { verticesTest[indices[i + 1] * 3],verticesTest[indices[i + 1] * 3 + 1],verticesTest[indices[i + 1] * 3 + 2] };
-//		vec C = { verticesTest[indices[i + 2] * 3],verticesTest[indices[i + 2] * 3 + 1],verticesTest[indices[i + 2] * 3 + 2] };
-//
-//		vec BA = A - B;
-//		vec BC = C - B;
-//
-//		vec normal = BC.Cross(BA).Normalized();
-//		
-//		faceNormals[i] = normal.x;
-//		faceNormals[i+1] = normal.y;
-//		faceNormals[i+2] = normal.z;
-//	}
-//}
-
-void Mesh::CalculateVertexNormals()
-{
-	vertexNormals.clear();
-
-	for (int i = 0; i < numIndices; i = i + 3)
-	{
-		int index = testIndices[i];
-		int index_1 = testIndices[i+1];
-		int index_2 = testIndices[i+2];
-
-		vec A = { vertices[testIndices[i] * 3],	   vertices[testIndices[i] * 3 + 1],    vertices[testIndices[i] * 3 + 2] };
-		vec B = { vertices[testIndices[i + 1] * 3],vertices[testIndices[i + 1] * 3 + 1],vertices[testIndices[i + 1] * 3 + 2] };
-		vec C = { vertices[testIndices[i + 2] * 3],vertices[testIndices[i + 2] * 3 + 1],vertices[testIndices[i + 2] * 3 + 2] };
-
-		vec BA = A - B;
-		vec BC = C - B;
-
-		vec normal = BC.Cross(BA).Normalized();
-
-		std::map<int, vec>::iterator it;
-
-		for (int j = 0; j < 3; ++j)
-		{
-			int key = testIndices[i + j];
-			it = vertexNormals.find(key);
-
-			if (it != vertexNormals.end())
-			{
-				vertexNormals[key] += normal;
-			}
-			else
-			{
-				vertexNormals[key] = normal;
-			}
-		}
-	}
-
-	std::map<int, vec>::iterator it = vertexNormals.begin();
-
-	// Iterate over the map using Iterator till end.
-	while (it != vertexNormals.end())
-	{
-		it->second = it->second.Normalized();
-		it++;
-	}
 }
 
 void Mesh::FillInfoGPU()
@@ -297,47 +220,7 @@ void Mesh::GenerateVertexBuffer()
 	}
 }
 
-void Mesh::GenerateFlatMesh_tris()
-{
-	numVertices = size * size;
-	numIndices = (size - 1)*(size - 1) * 6;
-
-	vertices = new float[numVertices*3];
-	testIndices = new int[numIndices];
-	tileCoords = new int[numVertices * 2];
-
-	int indice_it= 0;
-
-	for (int i = 0; i < size; ++i)
-	{
-		for (int j = 0; j < size; ++j)
-		{
-			//vertex index;
-			int index = (i * size + j);
-
-			//vertex position
-			vertices[index * 3] = j * width;
-			vertices[index * 3 + 1] = 0.0f;				//TODO let0s try to make this random :D
-			vertices[index * 3 + 2] = (i * height);
-
-			tileCoords[index * 2] = j;
-			tileCoords[index * 2 + 1] = i;
-			
-			if (j < size - 1 && i < size - 1)
-			{
-				testIndices[indice_it * 6] = index;
-				testIndices[(indice_it * 6) + 1] = index + 1;
-				testIndices[(indice_it * 6) + 2] = size + index;
-				testIndices[(indice_it * 6) + 3] = index + 1;
-				testIndices[(indice_it * 6) + 4] = size + index + 1;
-				testIndices[(indice_it * 6) + 5] = size + index;
-				indice_it++;
-			}
-		}
-	}
-}
-
-void Mesh::GenerateFlatMesh_quads()
+void Mesh::GenerateFlatMesh_quads(int x, int y)
 {
 	numVertices = size * size;
 	numIndices = (size - 1)*(size - 1) * 4;
@@ -355,9 +238,9 @@ void Mesh::GenerateFlatMesh_quads()
 			int index = (i * size + j);
 
 			//vertex position
-			vertices[index * 3] = j * width;
+			vertices[index * 3] = j * width + width*x;
 			vertices[index * 3 + 1] = 0.0f;				
-			vertices[index * 3 + 2] = (i * height);
+			vertices[index * 3 + 2] = (i * height) + height*y;
 
 			if (j < size - 1 && i < size - 1)
 			{

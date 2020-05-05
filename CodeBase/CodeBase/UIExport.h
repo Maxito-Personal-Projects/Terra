@@ -29,7 +29,6 @@ private:
 
 	GameObject* curr = nullptr;
 	Terrain* terrain = nullptr;
-	Mesh* mesh = nullptr;
 
 	std::string fileName = "";
 

@@ -6,6 +6,7 @@
 
 #include "GameObject.h"
 #include "Terrain.h"
+#include "Chunk.h"
 #include "Mesh.h"
 
 
@@ -22,10 +23,9 @@ UIExport::~UIExport()
 
 bool UIExport::Draw()
 {
-	if (!terrain && !mesh && myApp->m_render->firstGO)
+	if (!terrain && myApp->m_render->firstGO)
 	{
 		terrain = myApp->m_render->firstGO->terrain;
-		mesh = myApp->m_render->firstGO->mesh;
 	}
 
 	bool ret = true;
@@ -94,10 +94,14 @@ bool UIExport::Draw()
 	{
 		if (fileName.length() > 0)
 		{
-			if (mesh->vertexBuffer)
+			for (int i = 0; i < terrain->totalkChunks; ++i)
 			{
-				mesh->GenerateVertexBuffer();
-				myApp->fileSystem->Export(mesh->vertexBuffer, mesh->buffSize, fileName, format, exportMessage);
+				Mesh* mesh = terrain->chunks[i]->mesh;
+				if (mesh->vertexBuffer)
+				{
+					//mesh->GenerateVertexBuffer();
+					myApp->fileSystem->Export(mesh->vertexBuffer, mesh->buffSize, fileName + std::to_string(i), format,exportMessage);
+				}
 			}
 		}
 		else
