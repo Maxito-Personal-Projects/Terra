@@ -99,7 +99,7 @@ bool UIExport::Draw()
 				Mesh* mesh = terrain->chunks[i]->mesh;
 				if (mesh->vertexBuffer)
 				{
-					//mesh->GenerateVertexBuffer();
+					mesh->GenerateVertexBuffer();
 					myApp->fileSystem->Export(mesh->vertexBuffer, mesh->buffSize, fileName + std::to_string(i), format,exportMessage);
 				}
 			}

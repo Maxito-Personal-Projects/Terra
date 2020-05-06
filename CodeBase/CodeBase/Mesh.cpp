@@ -111,21 +111,24 @@ void Mesh::DrawMesh()
 	/*int testtime = glGetUniformLocation(parent->shader, "time");
 	glUniform1f(testtime, time);*/
 
+	//Binding transform feedback buffer
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER,0,TBO);
+
+	//Start Capturing shader output
 	glBeginTransformFeedback(GL_TRIANGLES);
 	
+	//Drawing mesh
 	glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
 
+	//Stop Capturing shader output
 	glEndTransformFeedback();
-
-	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(float)*buffSize, vertexBuffer);
 
 	time += 0.016;
 }
 
 void Mesh::LoadToGPU()
 {
-	//Generating Vertex Array, Vertex buffer, Index buffer ids
+	//Generating Vertex Array, Vertex buffer, Index buffer & transform feedback buffer ids or names 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &IBO);
@@ -205,10 +208,6 @@ void Mesh::FillInfoGPU()
 		infoGPU[it + 6] = 0.0f;
 		infoGPU[it + 7] = 1.0f;
 		infoGPU[it + 8] = 0.0f;
-
-		//Tile coords
-		//infoGPU[it + 9] = (float)tileCoords[t_it];
-		//infoGPU[it + 10] = (float)tileCoords[t_it+1];
 	}
 }
 
@@ -216,7 +215,7 @@ void Mesh::GenerateVertexBuffer()
 {
 	if (vertexBuffer)
 	{
-		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(float)*buffSize, vertexBuffer);
+		glGetNamedBufferSubData(TBO, 0, sizeof(float)*buffSize, vertexBuffer);
 	}
 }
 
