@@ -8,6 +8,7 @@
 #include "UIWindow.h"
 #include "UITest.h"
 #include "UIExport.h"
+#include "UIGeneration.h"
 
 
 ModuleUI::ModuleUI(string _name, bool _active) : Module(_name,_active)
@@ -46,9 +47,11 @@ bool ModuleUI::Init()
 
 	testWindow = new UITest("Test Window");
 	exportWindow = new UIExport("Export",false);
+	generationWindow = new UIGeneration("Generate");
 
 	windows.push_back(testWindow);
 	windows.push_back(exportWindow);
+	windows.push_back(generationWindow);
 
 	return ret;
 }

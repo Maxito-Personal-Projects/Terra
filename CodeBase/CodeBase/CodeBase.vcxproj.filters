@@ -240,6 +240,9 @@
     <ClCompile Include="Chunk.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="UIGeneration.cpp">
+      <Filter>Source Files\UIWindows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -550,6 +553,9 @@
     </ClInclude>
     <ClInclude Include="Chunk.h">
       <Filter>Source Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UIGeneration.h">
+      <Filter>Source Files\UIWindows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
