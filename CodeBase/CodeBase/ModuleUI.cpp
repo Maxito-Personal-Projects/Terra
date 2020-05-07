@@ -33,6 +33,9 @@ bool ModuleUI::Init()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -45,6 +48,7 @@ bool ModuleUI::Init()
 	const char* glsl_version = "#version 130";
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
+	//Windows 
 	testWindow = new UITest("Test Window");
 	exportWindow = new UIExport("Export",false);
 	generationWindow = new UIGeneration("Generate");
@@ -52,6 +56,14 @@ bool ModuleUI::Init()
 	windows.push_back(testWindow);
 	windows.push_back(exportWindow);
 	windows.push_back(generationWindow);
+
+	//Fonts 
+	defaultFont = io.Fonts->AddFontDefault();
+	arial = io.Fonts->AddFontFromFileTTF("Fonts/Arial.ttf", 16.0f);
+	boldKei = io.Fonts->AddFontFromFileTTF("Fonts/BoldKei.ttf", 15.0f);
+	boldTestament = io.Fonts->AddFontFromFileTTF("Fonts/BoldTestament.ttf", 20.0f);
+	montserrat = io.Fonts->AddFontFromFileTTF("Fonts/Montserrat-Regular.ttf", 15.0f);
+	montserratBold = io.Fonts->AddFontFromFileTTF("Fonts/Montserrat-Bold.ttf", 22.0f);
 
 	return ret;
 }

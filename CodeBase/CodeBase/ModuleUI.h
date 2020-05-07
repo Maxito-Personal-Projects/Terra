@@ -56,6 +56,14 @@ public:
 	Texture* errorImage = nullptr;
 	Texture* textTest = nullptr;
 
+	ImFont* defaultFont = nullptr;
+	ImFont* arial = nullptr;
+	ImFont* boldKei = nullptr;
+	ImFont* boldTestament = nullptr;
+	ImFont* montserrat = nullptr;
+	ImFont* montserratBold = nullptr;
+
+
 };
 
 #endif // !__MODULEUI_H__
