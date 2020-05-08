@@ -1,7 +1,10 @@
 #include "Application.h"
 #include "ModuleRenderer.h"
 #include "ModuleUI.h"
+#include "FileSystem.h"
 #include "UIGeneration.h"
+#include "Texture.h"
+#include <Windows.h>
 
 UIGeneration::UIGeneration(std::string name, bool active) : UIWindow(name, active)
 {
@@ -115,7 +118,73 @@ bool UIGeneration::Draw()
 			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.8f, 0.1f, 0.8f, 1.0f));
 
-			ImGui::Spacing();
+			ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+			ImGui::PushFont(myApp->m_ui->arial);
+			ImGui::Text("Primitive:");
+
+			ImGui::SameLine();
+
+			char* primitives[] = { "Flat","Perlin","Voronoi", "Random","Heightmap" };
+			
+			if (ImGui::BeginCombo("None", currPrimitive))
+			{
+				for (int i = 0; i < 5; ++i)
+				{
+					bool isSelected = (currPrimitive == primitives[i]);
+					if (ImGui::Selectable(primitives[i], isSelected))
+					{
+						currPrimitive=primitives[i];
+					}
+
+				}
+
+				ImGui::EndCombo();
+			}
+			ImGui::PopFont();
+
+			if (currPrimitive == primitives[4])
+			{
+				char buff[256];
+				strcpy_s(buff, 256, fileName.c_str());
+
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text("File:");
+				ImGui::PopFont();
+				
+				ImGui::SameLine();
+
+				ImGui::PushID("Heightmapfile");
+				ImGui::InputText("", buff, 256,ImGuiInputTextFlags_ReadOnly);
+				ImGui::PopID();
+
+				char buff2[256];
+
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
+				if (ImGui::Button("...",ImVec2(50.0f,25.0f)))
+				{
+					string ret = myApp->fileSystem->GetFileNameAt(myApp->fileSystem->GetFolderPath("Images").c_str());
+					if (ret!="")
+					{
+						if (heightmap)
+						{
+							glDeleteTextures(1, &(heightmap->imageID));
+							delete heightmap;
+							heightmap = nullptr;
+						}
+
+						fileName = myApp->fileSystem->GetFileNameFromPath(ret);
+						heightmap = myApp->fileSystem->LoadImagePNG(ret);
+					}
+				}
+				ImGui::PopStyleColor(2);
+
+				if (heightmap)
+				{
+					ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(windowSizes.x, windowSizes.x));
+				}
+			}
 		}
 		ImGui::EndChild();
 

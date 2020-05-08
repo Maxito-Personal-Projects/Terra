@@ -36,6 +36,10 @@ public:
 
 	bool Export(float* vertexBuffer, int sizeBuffer, string name, ExportFormat format, string& message);
 
+	string GetFolderPath(string folder);
+	string GetFileNameFromPath(string path);
+
+	string GetFileNameAt(const char* path);
 };
 
 #endif //!__FILESYSTEM_H__

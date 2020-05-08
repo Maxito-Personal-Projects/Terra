@@ -3,6 +3,9 @@
 
 #include "UIWindow.h"
 
+class Texture;
+
+
 class UIGeneration : public UIWindow
 {
 public:
@@ -11,6 +14,13 @@ public:
 	~UIGeneration();
 
 	bool Draw();
+
+private:
+
+	char* currPrimitive = nullptr;
+	string fileName;
+
+	Texture* heightmap = nullptr;
 
 };
 

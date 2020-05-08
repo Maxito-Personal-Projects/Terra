@@ -22,7 +22,7 @@ public:
 	int width = 0;
 	int height = 0;
 
-	int imageID = 0;
+	uint imageID = 0;
 
 	ImageFormat format = NONE;
 	

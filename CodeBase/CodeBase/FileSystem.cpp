@@ -2,6 +2,9 @@
 #include "FileSystem.h"
 #include "Texture.h"
 
+#include <direct.h>
+#include <Windows.h>
+
 #include "DevIL/include/IL/il.h"
 #include "DevIL/include/IL/ilu.h"
 #include "DevIL/include/IL/ilut.h"
@@ -254,6 +257,54 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 		string error = exporter->GetErrorString();
 		message = "Error exporting Terrarin: " + error;
 		LOG("%s", message.c_str());
+	}
+
+	return ret;
+}
+
+string FileSystem::GetFolderPath(string folder)
+{
+	char buffer[MAX_PATH];
+	getcwd(buffer, MAX_PATH);
+	string path = buffer;
+	path += "\\"+folder;
+
+	return path;
+}
+
+string FileSystem::GetFileNameFromPath(string path)
+{
+	string ret = path;
+	int length = ret.find_last_of("\\");
+	ret.erase(0, length+1);
+
+	return ret;
+}
+
+string FileSystem::GetFileNameAt(const char * path)
+{
+	char buff[256];
+	string ret = "";
+
+	OPENFILENAME arg1;
+
+	ZeroMemory(&arg1, sizeof(arg1));
+	arg1.lStructSize = sizeof(arg1);
+	arg1.hwndOwner = NULL;
+	arg1.lpstrFile = buff;
+	arg1.lpstrFile[0] = '\0';
+	arg1.nMaxFile = sizeof(buff);
+	arg1.lpstrFilter = "*.PNG\0*.png\0";
+	arg1.nFilterIndex = 1;
+	arg1.lpstrFileTitle = NULL;
+	arg1.nMaxFileTitle = 0;
+	arg1.lpstrInitialDir = path;
+	arg1.lpstrTitle = "Select Heightmap";
+	arg1.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameA(&arg1))
+	{
+		ret = buff;
 	}
 
 	return ret;

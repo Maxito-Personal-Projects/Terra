@@ -3,6 +3,7 @@
 
 #include <list>
 #include <iostream>
+#include <string>
 #include "Globals.h"
 #include "Glew/include/glew.h"
 
