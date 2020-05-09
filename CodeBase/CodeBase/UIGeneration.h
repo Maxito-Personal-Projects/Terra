@@ -18,6 +18,11 @@ public:
 private:
 
 	char* currPrimitive = nullptr;
+	char* currFunction = nullptr;
+	char* currNumLayer = nullptr;
+
+	int numLayers = 1;
+
 	string fileName;
 
 	Texture* heightmap = nullptr;

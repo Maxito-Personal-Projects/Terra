@@ -8,6 +8,9 @@
 
 UIGeneration::UIGeneration(std::string name, bool active) : UIWindow(name, active)
 {
+	currPrimitive = "None";
+	currFunction = "None";
+	currNumLayer = "1";
 }
 
 
@@ -26,7 +29,7 @@ bool UIGeneration::Draw()
 
 		ImVec4 titleColor = ImVec4(0.2f, 0.2f, 0.2f, 0.8f);
 
-
+		//--------------------------- Mesh Editor ------------------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.8f, 0.5f));
 		ImGui::BeginChild("Mesh Editor", windowSizes, true);
 		{
@@ -100,6 +103,7 @@ bool UIGeneration::Draw()
 
 		ImGui::SameLine();
 		
+		//--------------------------- Primitive Editor ------------------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.8f, 0.5f));
 		ImGui::BeginChild("Primitive Selector", windowSizes, true);
 		{
@@ -119,15 +123,19 @@ bool UIGeneration::Draw()
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.8f, 0.1f, 0.8f, 1.0f));
 
 			ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
+			
+			ImGui::BeginGroup();
+			ImGui::Dummy(ImVec2(0.0f, 0.25f));
 			ImGui::PushFont(myApp->m_ui->arial);
 			ImGui::Text("Primitive:");
+			ImGui::EndGroup();
 
 			ImGui::SameLine();
 
 			char* primitives[] = { "Flat","Perlin","Voronoi", "Random","Heightmap" };
 			
-			if (ImGui::BeginCombo("None", currPrimitive))
+			ImGui::PushID("None Primitive");
+			if (ImGui::BeginCombo("", currPrimitive))
 			{
 				for (int i = 0; i < 5; ++i)
 				{
@@ -136,12 +144,12 @@ bool UIGeneration::Draw()
 					{
 						currPrimitive=primitives[i];
 					}
-
 				}
 
 				ImGui::EndCombo();
 			}
 			ImGui::PopFont();
+			ImGui::PopID();
 
 			if (currPrimitive == primitives[4])
 			{
@@ -182,7 +190,9 @@ bool UIGeneration::Draw()
 
 				if (heightmap)
 				{
-					ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(windowSizes.x, windowSizes.x));
+					ImVec2 imageSize = {windowSizes.x-25.0f,windowSizes.x - 25.0f };
+					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
+					ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(imageSize));
 				}
 			}
 		}
@@ -190,6 +200,7 @@ bool UIGeneration::Draw()
 
 		ImGui::SameLine();
 
+		//--------------------------- Function Editor ------------------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
 		ImGui::BeginChild("Function Selector", windowSizes, true);
 		{
@@ -208,12 +219,41 @@ bool UIGeneration::Draw()
 			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
 
-			ImGui::Spacing();
+
+			ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+			ImGui::BeginGroup();
+			ImGui::Dummy(ImVec2(0.0f, 0.25f));
+			ImGui::PushFont(myApp->m_ui->arial);
+			ImGui::Text("Function:");
+			ImGui::EndGroup();
+
+			ImGui::SameLine();
+
+			char* functions[] = { "Brownian Motion","Fraction","Module", "Sinus"};
+
+			ImGui::PushID("None Function");
+			if (ImGui::BeginCombo("", currFunction))
+			{
+				for (int i = 0; i < 4; ++i)
+				{
+					bool isSelected = (currFunction == functions[i]);
+					if (ImGui::Selectable(functions[i], isSelected))
+					{
+						currFunction = functions[i];
+					}
+				}
+				ImGui::EndCombo();
+			}
+			ImGui::PopFont();
+			ImGui::PopID();
+
 		}
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
+		//----------------------- Layer Editor -----------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.8f, 0.1f, 0.5f));
 		ImGui::BeginChild("Layer Editor", windowSizes, true);
 		{
@@ -232,7 +272,49 @@ bool UIGeneration::Draw()
 			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.6f, 0.0f, 1.0f));
 
-			ImGui::Spacing();
+			ImGui::Dummy(ImVec2(0.0f,10.0f));
+
+			ImGui::BeginGroup();
+			ImGui::Dummy(ImVec2(0.0f, 0.25f));
+			ImGui::PushFont(myApp->m_ui->arial);
+			ImGui::Text("Number of Layers:");
+			ImGui::EndGroup();
+
+			ImGui::SameLine();
+
+			ImGui::PushItemWidth(windowSizes.x - ImGui::CalcTextSize("Number of Layers:").x-25.0f);
+			ImGui::PushID("NumLayers");
+			ImGui::SliderInt("",&numLayers,1,6);
+			ImGui::PopID();
+
+			ImGui::PopItemWidth();
+
+			for (int i = 0; i < numLayers; i++)
+			{
+				string layer = "Layer " + std::to_string(i+1);
+				ImGui::Text(layer.c_str());
+
+				float range[2] = { 0.0f,1.0f };
+				float color[3];
+				
+				ImGui::Text("Range: ");
+
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth(75.0f);
+				ImGui::DragFloat2("",range,0.01f,0.0f,1.0,"%.2f");
+				ImGui::PopItemWidth();
+
+				ImGui::SameLine();
+
+				ImGui::PushItemWidth(150.0f);
+				ImGui::ColorEdit3("", color);
+				ImGui::PopItemWidth();
+
+			}
+			ImGui::PopFont();
+
+
 		}
 		ImGui::EndChild();
 		
