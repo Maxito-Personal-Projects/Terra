@@ -13,8 +13,8 @@ uniform vec3 camPos;
 void main()
 {
 	vec3 vecColor = Color_FS_in;
-	vec3 normal = mat3(transpose(inverse(Model))) * Normal_FS_in;
-	vec3 fragPos = vec3(Model * vec4(WorldPos_FS_in,1.0));
+	vec3 normal = Normal_FS_in;
+	vec3 fragPos = WorldPos_FS_in;
 
     vec3 lightColor = vec3(1.0);
 

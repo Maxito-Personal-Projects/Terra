@@ -2,9 +2,9 @@
 layout(quads, equal_spacing, ccw) in;
 layout (binding = 0, rgba8) uniform coherent image2D exportTexture;
 
-
 uniform mat4 View;
 uniform mat4 Projection;
+uniform mat4 Model;
 uniform float maxHeight;
 uniform float seed;
 uniform int gridSize;
@@ -394,7 +394,7 @@ void main()
 	
 	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+chunkCoords)/gridSize)*100);
 
-    Normal_FS_in = GetVertexNormal();
+    Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
 	float height=0.0;
 	
 	if(brownian_b)
@@ -415,7 +415,8 @@ void main()
 	}
 		
 	WorldPos_FS_in.y = height*maxHeight;
-	//WorldPos_FS_in.y = 0.0;
+	
+	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
 	
 	Color_FS_in = vec3(0.5);
 	
@@ -439,9 +440,6 @@ void main()
 	{
 		Color_FS_in = vec3(1.0);
 	}
-	
-	//Color_FS_in = vec3(height);
-	//Color_FS_in =texture(heightmap,gl_TessCoord.xy).xyz;
 	
 	texColor_FS_in = vec3(height);
 	

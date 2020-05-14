@@ -221,8 +221,8 @@ void Mesh::GenerateVertexBuffer()
 
 void Mesh::GenerateFlatMesh_quads(int x, int y)
 {
-	numVertices = size * size;
-	numIndices = (size - 1)*(size - 1) * 4;
+	numVertices = 4;
+	numIndices = 4;
 
 	vertices = new float[numVertices * 3];
 	testIndices = new int[numIndices];
@@ -247,7 +247,6 @@ void Mesh::GenerateFlatMesh_quads(int x, int y)
 				testIndices[(indice_it * 4) + 1] = index + 1;
 				testIndices[(indice_it * 4) + 2] = size + index+1;
 				testIndices[(indice_it * 4) + 3] = size + index;
-				indice_it++;
 			}
 		}
 	}

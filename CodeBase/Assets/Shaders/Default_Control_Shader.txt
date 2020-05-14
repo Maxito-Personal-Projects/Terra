@@ -3,12 +3,12 @@
 //define the number of CPs in the output patch
 layout(vertices=4) out;
 
-// attributes of the input CPs
+//variables from the Vertex shader
 in vec3 WorldPos_CS_in[];
 in vec3 Normal_CS_in[];
 in vec3 Color_CS_in[];
 
-// attributes of the output CPs
+//variables for the Evaluation shader
 out vec3 WorldPos_ES_in[];
 out vec3 Normal_ES_in[];
 out vec3 Color_ES_in[];

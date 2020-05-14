@@ -4,6 +4,8 @@ layout (location = 1) in vec3 aColor;
 layout (location = 2) in vec3 aNormal;
 
 uniform mat4 Model;
+uniform mat4 Projection;
+uniform mat4 View;
 
 out vec3 WorldPos_CS_in;
 out vec3 Normal_CS_in;
@@ -11,8 +13,8 @@ out vec3 Color_CS_in;
 
 void main()
 {
-    //WorldPos_CS_in = vec3(Model*vec4(aPos,1.0));
-    WorldPos_CS_in = aPos;
+    WorldPos_CS_in = vec3(Model*vec4(aPos,1.0));
+    //WorldPos_CS_in = aPos;
 	Normal_CS_in = vec3(Model*vec4(aNormal,1.0));
     Color_CS_in = aColor;
 }

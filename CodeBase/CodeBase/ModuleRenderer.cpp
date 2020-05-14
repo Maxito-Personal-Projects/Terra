@@ -36,6 +36,8 @@ bool ModuleRenderer::Init()
 	int MaxPatchVertices = 0;
 	glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
 	LOG("Max supported patch vertices %d\n", MaxPatchVertices);
+
+
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	glClearColor(1, 0.55f, 0.48f, 1);
