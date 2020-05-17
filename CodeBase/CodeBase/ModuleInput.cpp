@@ -2,6 +2,7 @@
 #include "ModuleInput.h"
 #include "ModuleRenderer.h"
 #include "ModuleUI.h"
+#include "ModuleWindow.h"
 #include "FileSystem.h"
 
 
@@ -51,7 +52,7 @@ bool ModuleInput::PreUpdate()
 	Uint8 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
 	//Keyboard inputs
-	for (int i = 0; i < MAX_KEYS && io.WantCaptureKeyboard == false; ++i)
+	for (int i = 0; i < MAX_KEYS /*&& io.WantCaptureKeyboard == false*/; ++i)
 	{
 		//Check if the key is pressed(1) or not(0)
 		if (keyState[i] == 1)
@@ -80,7 +81,7 @@ bool ModuleInput::PreUpdate()
 
 	//Mouse inputs
 
-	for (int i = 0; i < 5 && io.WantCaptureMouse==false; ++i)
+	for (int i = 0; i < 5 /*&& io.WantCaptureMouse==false*/; ++i)
 	{
 		//Check if the key is pressed(1) or not(0)
 		if (mouseState & SDL_BUTTON(i))
@@ -129,7 +130,7 @@ bool ModuleInput::PreUpdate()
 			switch (myEvent.window.event)
 			{
 			case SDL_WINDOWEVENT_RESIZED:
-				myApp->m_render->ResizeWindow();
+				SDL_GetWindowSize(myApp->m_window->window, &myApp->m_window->width, &myApp->m_window->height);
 				LOG("Window size has changed!");
 				break;
 			case SDL_WINDOWEVENT_MAXIMIZED:

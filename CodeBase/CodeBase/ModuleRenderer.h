@@ -31,7 +31,8 @@ public:
 	bool CleanUp();
 
 	//Resize window & viewport
-	void ResizeWindow();
+	void ResizeWindow(int x, int y);
+	void GenerateFrameBuffer(int x, int y);
 
 public:
 
@@ -44,6 +45,11 @@ public:
 	float lightDirection[3] = { 1.0f,-0.5f,1.0f };
 	
 	uint exportTexture = 0;
+
+	uint frameBuffer = 0;
+	uint renderBuffer = 0;
+	uint fbTexture = 0;
+
 
 };
 

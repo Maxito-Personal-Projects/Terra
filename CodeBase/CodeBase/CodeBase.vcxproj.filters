@@ -243,6 +243,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="UIScene.cpp">
+      <Filter>Source Files\UIWindows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -556,6 +559,9 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Source Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UIScene.h">
+      <Filter>Source Files\UIWindows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

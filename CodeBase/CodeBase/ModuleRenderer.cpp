@@ -6,6 +6,8 @@
 
 #include "GameObject.h"
 
+#include "UIScene.h"
+
 
 bool ModuleRenderer::Init()
 {
@@ -79,6 +81,8 @@ bool ModuleRenderer::PreUpdate()
 bool ModuleRenderer::PosUpdate()
 {
 	bool ret = true;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 	
 	if (myApp->m_input->GetKey(SDL_SCANCODE_F) == DOWN) 
 	{
@@ -108,6 +112,11 @@ bool ModuleRenderer::PosUpdate()
 		glClearColor(0, 1, 1, 1);
 	}
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//Clear the buffers before drawing!
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// Rendering
 	myApp->m_ui->DrawUI();
 	ImGui::Render();
@@ -129,12 +138,44 @@ bool ModuleRenderer::CleanUp()
 	return true;
 }
 
-void ModuleRenderer::ResizeWindow()
+void ModuleRenderer::ResizeWindow(int x, int y)
 {
-	//Change windo Size
-	SDL_GetWindowSize(myApp->m_window->window, &myApp->m_window->width, &myApp->m_window->height);
-
 	//Change Viewport Size
-	glViewport(0, 0, myApp->m_window->width, myApp->m_window->height);
+	glViewport(0, 0, x, y);
 
+	GenerateFrameBuffer(x,y);
+
+}
+
+void ModuleRenderer::GenerateFrameBuffer(int x, int y)
+{
+	if (frameBuffer == 0)
+	{
+		glGenFramebuffers(1, &frameBuffer);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+	if (fbTexture != 0)
+	{
+		glDeleteTextures(1, &fbTexture);
+	}
+	
+	if (renderBuffer != 0)
+	{
+		glDeleteRenderbuffers(1, &renderBuffer);
+	}
+
+	glGenTextures(1, &fbTexture);
+	glBindTexture(GL_TEXTURE_2D, fbTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x,y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbTexture, 0);
+
+	glGenRenderbuffers(1, &renderBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, x, y);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer);
 }

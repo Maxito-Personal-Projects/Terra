@@ -13,6 +13,7 @@ class UIWindow;
 class UITest;
 class UIExport;
 class UIGeneration;
+class UIScene;
 
 class Texture;
 
@@ -52,6 +53,8 @@ private:
 	UIGeneration* generationWindow = nullptr;
 
 public:
+
+	UIScene* sceneWindow = nullptr;
 
 	Texture* errorImage = nullptr;
 	Texture* textTest = nullptr;

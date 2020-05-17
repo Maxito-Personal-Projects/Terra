@@ -9,6 +9,7 @@
 #include "UITest.h"
 #include "UIExport.h"
 #include "UIGeneration.h"
+#include "UIScene.h"
 
 
 ModuleUI::ModuleUI(string _name, bool _active) : Module(_name,_active)
@@ -53,10 +54,12 @@ bool ModuleUI::Init()
 	testWindow = new UITest("Test Window");
 	exportWindow = new UIExport("Export",false);
 	generationWindow = new UIGeneration("Generate");
+	sceneWindow = new UIScene("Scene");
 
 	windows.push_back(testWindow);
 	windows.push_back(exportWindow);
 	windows.push_back(generationWindow);
+	windows.push_back(sceneWindow);
 
 	//Fonts 
 	defaultFont = io.Fonts->AddFontDefault();
@@ -88,6 +91,20 @@ bool ModuleUI::PreUpdate()
 	ImGui_ImplSDL2_NewFrame(myApp->m_window->window);
 	ImGui::NewFrame();
 
+	ImGui::SetNextWindowPos({ 0,0 });
+	ImGui::SetNextWindowSize({ (float)myApp->m_window->width, (float)myApp->m_window->height });
+	ImGui::SetNextWindowBgAlpha(0.0f);
+
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace", 0, window_flags);
+	ImGui::PopStyleVar(3);
+
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -114,6 +131,12 @@ bool ModuleUI::PreUpdate()
 
 		ImGui::EndMainMenuBar();
 	}
+
+	ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
+	ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+	ImGui::End();
+
 
 	return ret;
 }
