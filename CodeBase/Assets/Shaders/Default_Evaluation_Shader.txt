@@ -26,6 +26,7 @@ uniform sampler2D outputTexture;
 uniform float delta;
 uniform float freq;
 uniform int octaves;
+uniform float divisions;
 
 uniform bool brownian_b;
 uniform bool perlin_b;
@@ -287,11 +288,11 @@ float ReadHeightmap(float x, float y)
 	return texture(heightmap,(vec2(x,y)+chunkCoords)/gridSize).x;
 }
 
-//      z0 
-//       |     
-//z1 --  M -- z2
-//       |     
-//      z3 
+//     U 
+//     |     
+//L -- M -- R
+//     |     
+//     D 
 
 vec3 GetVertex(float deltaX, float deltaY)
 {
@@ -313,78 +314,111 @@ vec3 GetVertexNormal()
 {
 	vec3 ret=vec3(0.0);
 	float tl,l,bl,t,b,tr,r,br;
+	float deltatest = 1.0/divisions;
+
 	
-	// vec3 z0 = GetVertex(0.0,delta);
-	// z0.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+delta)*maxHeight;
+	vec3 M = GetVertex(0.0,0.0);
+	vec3 U = GetVertex(0.0,deltatest);
+	vec3 L = GetVertex(-deltatest,0.0);
+	vec3 R = GetVertex(deltatest,0.0);
+	vec3 D = GetVertex(0.0,-deltatest);
 	
-	// vec3 z1 = GetVertex(-delta,0.0);
-	// z1.y = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y)*maxHeight;
-	
-	// vec3 z2 = GetVertex(delta,0.0);
-	// z1.y = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y)*maxHeight;
-	
-	// vec3 z3 = GetVertex(0.0,-delta);
-	// z3.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y-delta)*maxHeight;
-	
-	// vec3 A = z3-z0;
-	// vec3 B = z2-z1;
-	
-	// ret = normalize(cross(A,B));
 	
 	if(brownian_b)
 	{
-		tl = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
-		l = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
-		bl = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
-		t = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
-		b = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
-		tr = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
-		r = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
-		br = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+		M.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
+		U.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
+		L.y = BrownianNoise(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
+		R.y = BrownianNoise(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
+		D.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		
+		//tl = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		//l = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
+		//bl = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		//t = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
+		//b = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
+		//tr = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		//r = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
+		//br = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
 	}
 	if(perlin_b)
 	{
-		tl = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
-		l = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
-		bl = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
-		t = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
-		b = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
-		tr = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
-		r = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
-		br = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+		M.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
+		U.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
+		L.y = PerlinNoise(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
+		R.y = PerlinNoise(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
+		D.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		
+		//tl = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		//l = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
+		//bl = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		//t = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
+		//b = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
+		//tr = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		//r = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
+		//br = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
 	}
 	if(voronoi_b)
 	{
-		tl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
-		l = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
-		bl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
-		t = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
-		b = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
-		tr = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
-		r = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
-		br = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+		M.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
+		U.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
+		L.y = VoronoiNoise(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
+		R.y = VoronoiNoise(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
+		D.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		
+		//tl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		//l = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
+		//bl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		//t = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y+delta);
+		//b = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y-delta);
+		//tr = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		//r = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
+		//br = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
 	}
 	if(heightmap_b)
 	{
-		tl = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
-		l = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y);
-		bl = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
-		t = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y+delta);
-		b = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y-delta);
-		tr = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
-		r = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y);
-		br = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
+		M.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
+		U.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
+		L.y = ReadHeightmap(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
+		R.y = ReadHeightmap(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
+		D.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		
+		//tl = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
+		//l = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y);
+		//bl = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y-delta);
+		//t = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y+delta);
+		//b = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y-delta);
+		//tr = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y+delta);
+		//r = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y);
+		//br = ReadHeightmap(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
 	}
+	//
+	//// sobel filter
+	//float dX = (tl + 2.0 * l + bl) - (tr + 2.0 * r + br);
+	//float dY = (bl + 2.0 * b + br) - (tl + 2.0 * t + tr);
+	//float dZ = 1.0/maxHeight;
+	//
+	//// vec3 vertical = vec3(0.0,z3.y-z0.y/maxHeight,2.0);
+	//// vec3 horizontal = vec3(2.0,z2.y-z1.y/maxHeight,0.0);
+	//
+	//ret = normalize(vec3(dX,dZ,dY));
 	
-	// sobel filter
-	float dX = (tl + 2.0 * l + bl) - (tr + 2.0 * r + br);
-	float dY = (bl + 2.0 * b + br) - (tl + 2.0 * t + tr);
-	float dZ = 1.0/maxHeight;
+	vec3 LM = M - L;
+	vec3 MR = R - M;
+	vec3 UM = M - U;
+	vec3 MD = D - M;
 	
-	// vec3 vertical = vec3(0.0,z3.y-z0.y/maxHeight,2.0);
-	// vec3 horizontal = vec3(2.0,z2.y-z1.y/maxHeight,0.0);
+	vec3 UMLM = cross(LM,UM);
+	vec3 UMMR = cross(UM,MR);
+	vec3 MDLM = cross(MD,LM);
+	vec3 MDMR = cross(MD,MR);
 	
-	ret = normalize(vec3(dX,dZ,dY));
+	
+	//vec3 A = z3-z0;
+	//vec3 B = z2-z1;
+	
+	ret = normalize(UMLM+UMMR+MDLM+MDMR);
+	ret.y = -ret.y;
 	return ret;
 }
 
