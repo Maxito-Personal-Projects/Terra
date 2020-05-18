@@ -3,6 +3,7 @@
 #include "ModuleRenderer.h"
 #include "ModuleUI.h"
 #include "ModuleWindow.h"
+#include "UIScene.h"
 #include "FileSystem.h"
 
 
@@ -51,8 +52,10 @@ bool ModuleInput::PreUpdate()
 	const Uint8* keyState = SDL_GetKeyboardState(NULL);
 	Uint8 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
+
+
 	//Keyboard inputs
-	for (int i = 0; i < MAX_KEYS /*&& io.WantCaptureKeyboard == false*/; ++i)
+	for (int i = 0; i < MAX_KEYS && myApp->m_ui->sceneWindow->focused; ++i)
 	{
 		//Check if the key is pressed(1) or not(0)
 		if (keyState[i] == 1)
@@ -81,7 +84,7 @@ bool ModuleInput::PreUpdate()
 
 	//Mouse inputs
 
-	for (int i = 0; i < 5 /*&& io.WantCaptureMouse==false*/; ++i)
+	for (int i = 0; i < 5 && myApp->m_ui->sceneWindow->focused; ++i)
 	{
 		//Check if the key is pressed(1) or not(0)
 		if (mouseState & SDL_BUTTON(i))

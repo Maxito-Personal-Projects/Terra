@@ -32,6 +32,8 @@ bool UIScene::Draw()
 		ImageSize.y += ImGui::GetCursorPosY();
 
 		ImGui::Image((void*)(intptr_t)myApp->m_render->fbTexture, ImageSize, { 0,1 }, { 1,0 });
+
+		focused = ImGui::IsWindowHovered();
 	}
 	ImGui::End();
 	

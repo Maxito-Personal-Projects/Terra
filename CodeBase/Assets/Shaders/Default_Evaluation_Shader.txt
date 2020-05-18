@@ -444,25 +444,29 @@ void main()
 	if(primitive==1)
 	{
 		height = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y);
+		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+
 	}
 	else if(primitive==2)
 	{
 		height = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y);
+		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+
 	}
 	else if(primitive==3)
 	{
 		height = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y);
+		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
 	}
 	else if(primitive==4)
 	{
 		height = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y);
+		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
 	}
 	else
 	{
-		height=0.0;
+		WorldPos_FS_in.y = 0.0;
 	}
-		
-	WorldPos_FS_in.y = height*maxHeight;
 	
 	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
 	

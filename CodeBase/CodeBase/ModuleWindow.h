@@ -34,7 +34,7 @@ public:
 
 	SDL_Window* window = nullptr;
 
-	int width = 1200;
+	int width = 1800;
 	int height = 1000;
 
 	string title = "CodeBase v";

@@ -16,6 +16,8 @@ public:
 
 	int width;
 	int height;
+
+	bool focused = false;
 };
 
 #endif // !__UISCENE_H__
