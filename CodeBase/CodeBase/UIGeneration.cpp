@@ -3,7 +3,11 @@
 #include "ModuleUI.h"
 #include "FileSystem.h"
 #include "UIGeneration.h"
+
+#include "GameObject.h"
 #include "Texture.h"
+#include "Terrain.h"
+
 #include <Windows.h>
 
 UIGeneration::UIGeneration(std::string name, bool active) : UIWindow(name, active)
@@ -21,6 +25,14 @@ UIGeneration::~UIGeneration()
 bool UIGeneration::Draw()
 {
 	bool ret = true;
+
+	if (!terrain)
+	{
+		terrain = myApp->m_render->firstGO->terrain;
+		terrainWidth = terrain->width;
+		terrainHeight = terrain->height;
+		terrainChunks = terrain->numChunks;
+	}
 
 	ImGui::Begin(name.c_str(), &active);
 	{
@@ -66,19 +78,16 @@ bool UIGeneration::Draw()
 
 			ImGui::BeginGroup();
 
-			float ftest = 0;
-			int itest = 0;
-
 			ImGui::PushID("MeshHeight");
-			ImGui::DragFloat("", &ftest);
+			ImGui::DragFloat("", &terrainHeight);
 			ImGui::PopID();
 
 			ImGui::PushID("MeshWidth");
-			ImGui::DragFloat("", &ftest);
+			ImGui::DragFloat("", &terrainWidth);
 			ImGui::PopID();
 
 			ImGui::PushID("ChunkNum");
-			ImGui::DragInt("", &itest);
+			ImGui::DragInt("", &terrainChunks);
 			ImGui::PopID();
 
 			ImGui::EndGroup();
@@ -93,7 +102,8 @@ bool UIGeneration::Draw()
 			ImGui::PushFont(myApp->m_ui->montserrat);
 			if (ImGui::Button("Generate",buttonSize))
 			{
-				LOG("Mesh Generated");
+				terrain->DeleteChunks();
+				terrain->GenerateChunks(terrainChunks, terrainHeight, terrainWidth);
 			}
 			ImGui::PopFont();
 			ImGui::PopStyleColor(2);
@@ -132,7 +142,7 @@ bool UIGeneration::Draw()
 
 			ImGui::SameLine();
 
-			char* primitives[] = { "Flat","Perlin","Voronoi", "Random","Heightmap" };
+			char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
 			
 			ImGui::PushID("None Primitive");
 			if (ImGui::BeginCombo("", currPrimitive))
@@ -143,6 +153,7 @@ bool UIGeneration::Draw()
 					if (ImGui::Selectable(primitives[i], isSelected))
 					{
 						currPrimitive=primitives[i];
+						terrain->primitive = i;
 					}
 				}
 

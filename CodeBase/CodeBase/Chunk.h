@@ -8,7 +8,7 @@ class Chunk
 {
 public:
 	
-	Chunk(GameObject* _parent, int id, int _x, int _y);
+	Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width);
 	~Chunk();
 
 public:

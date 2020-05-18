@@ -10,7 +10,7 @@ class Mesh
 {
 public:
 
-	Mesh(GameObject* _parent, int x, int y);
+	Mesh(GameObject* _parent, int x, int y, float _height, float _width);
 	~Mesh();
 
 	void DrawMesh();
@@ -23,14 +23,11 @@ public:
 public:
 
 	float* vertices = nullptr;
-	int* testIndices = nullptr;
-	int* tileCoords = nullptr;
-
-	//float* faceNormals = nullptr;
+	int* indices = nullptr;
 	float* infoGPU = nullptr;
 
-	int numVertices = 8;
-	int numIndices = 36;
+	int numVertices = 0;
+	int numIndices = 0;
 
 	uint VBO;	//Vertex Buffer Object
 	uint VAO;	//Vertex Array Object

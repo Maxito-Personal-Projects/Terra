@@ -28,10 +28,12 @@ uniform float freq;
 uniform int octaves;
 uniform float divisions;
 
-uniform bool brownian_b;
-uniform bool perlin_b;
-uniform bool heightmap_b;
-uniform bool voronoi_b;
+uniform int primitive;
+
+//uniform bool brownian_b;
+//uniform bool perlin_b;
+//uniform bool heightmap_b;
+//uniform bool voronoi_b;
 
 uniform vec2 chunkCoords;
 
@@ -324,7 +326,7 @@ vec3 GetVertexNormal()
 	vec3 D = GetVertex(0.0,-deltatest);
 	
 	
-	if(brownian_b)
+	if(primitive==1)
 	{
 		M.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
 		U.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
@@ -341,7 +343,7 @@ vec3 GetVertexNormal()
 		//r = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
 		//br = BrownianNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
 	}
-	if(perlin_b)
+	if(primitive==2)
 	{
 		M.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
 		U.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
@@ -358,7 +360,7 @@ vec3 GetVertexNormal()
 		//r = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
 		//br = PerlinNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
 	}
-	if(voronoi_b)
+	if(primitive==3)
 	{
 		M.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
 		U.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
@@ -375,7 +377,7 @@ vec3 GetVertexNormal()
 		//r = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y);
 		//br = VoronoiNoise(gl_TessCoord.x+delta,gl_TessCoord.y-delta);
 	}
-	if(heightmap_b)
+	if(primitive==4)
 	{
 		M.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
 		U.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
@@ -428,24 +430,36 @@ void main()
 	
 	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+chunkCoords)/gridSize)*100);
 
-    Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
+	if(primitive!=0)
+	{
+		Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
+	}
+	else
+	{
+		Normal_FS_in = vec3(0.0,1.0,0.0);
+	}
+	
 	float height=0.0;
 	
-	if(brownian_b)
+	if(primitive==1)
 	{
 		height = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y);
 	}
-	if(perlin_b)
+	else if(primitive==2)
 	{
 		height = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y);
 	}
-	if(voronoi_b)
+	else if(primitive==3)
 	{
 		height = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y);
 	}
-	if(heightmap_b)
+	else if(primitive==4)
 	{
 		height = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y);
+	}
+	else
+	{
+		height=0.0;
 	}
 		
 	WorldPos_FS_in.y = height*maxHeight;

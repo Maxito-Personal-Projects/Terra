@@ -50,10 +50,10 @@ private:
 
 	UITest* testWindow = nullptr;
 	UIExport* exportWindow = nullptr;
-	UIGeneration* generationWindow = nullptr;
 
 public:
 
+	UIGeneration* generationWindow = nullptr;
 	UIScene* sceneWindow = nullptr;
 
 	Texture* errorImage = nullptr;

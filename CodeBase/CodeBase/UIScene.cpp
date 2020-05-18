@@ -5,11 +5,9 @@
 #include "Texture.h"
 
 
-
 UIScene::UIScene(std::string name, bool active) :UIWindow(name, active)
 {
 }
-
 
 UIScene::~UIScene()
 {

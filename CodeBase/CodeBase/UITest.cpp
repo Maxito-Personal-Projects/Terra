@@ -128,37 +128,37 @@ bool UITest::Draw()
 
 	ImGui::Text("-------------------------");
 
-	ImGui::Text("Map Generation:");
-	if (ImGui::Checkbox("Perlin Noise", &terrain->perlin))
-	{
-		terrain->brownian = false;
-		terrain->voronoi = false;
-		terrain->heightmap = false;
-	}
-	if (ImGui::Checkbox("Brownian Noise", &terrain->brownian))
-	{
-		terrain->perlin = false;
-		terrain->voronoi = false;
-		terrain->heightmap = false;
-	}
-	if (ImGui::Checkbox("Voronoi Noise", &terrain->voronoi))
-	{
-		terrain->brownian = false;
-		terrain->perlin = false;
-		terrain->heightmap = false;
-	}
-	if (ImGui::Checkbox("Heightmap", &terrain->heightmap))
-	{
-		terrain->brownian = false;
-		terrain->voronoi = false;
-		terrain->perlin = false;
-	}
+	//ImGui::Text("Map Generation:");
+	//if (ImGui::Checkbox("Perlin Noise", &terrain->perlin))
+	//{
+	//	terrain->brownian = false;
+	//	terrain->voronoi = false;
+	//	terrain->heightmap = false;
+	//}
+	//if (ImGui::Checkbox("Brownian Noise", &terrain->brownian))
+	//{
+	//	terrain->perlin = false;
+	//	terrain->voronoi = false;
+	//	terrain->heightmap = false;
+	//}
+	//if (ImGui::Checkbox("Voronoi Noise", &terrain->voronoi))
+	//{
+	//	terrain->brownian = false;
+	//	terrain->perlin = false;
+	//	terrain->heightmap = false;
+	//}
+	//if (ImGui::Checkbox("Heightmap", &terrain->heightmap))
+	//{
+	//	terrain->brownian = false;
+	//	terrain->voronoi = false;
+	//	terrain->perlin = false;
+	//}
 
 	ImGui::Text("-------------------------");
 
 	ImGui::Text("Result:");
 
-	ImGui::Image((void*)(intptr_t)myApp->m_render->fbTexture, ImVec2(200, 200));
+	ImGui::Image((void*)(intptr_t)myApp->m_render->exportTexture, ImVec2(200, 200));
 
 
 	ImGui::End();

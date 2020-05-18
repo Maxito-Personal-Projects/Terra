@@ -11,14 +11,19 @@
 #include "Texture.h"
 #include "Terrain.h"
 #include "FileSystem.h"
+#include "UIGeneration.h"
 
 
 
-Mesh::Mesh(GameObject* _parent, int x, int y)
+Mesh::Mesh(GameObject* _parent, int x, int y, float _height, float _width)
 {
 	parent = _parent;
+	
 	chunkX = x;
 	chunkY = y;
+	
+	height = _height;
+	width = _width;
 
 	GenerateFlatMesh_quads(x,y);
 	FillInfoGPU();
@@ -44,10 +49,10 @@ Mesh::~Mesh()
 		vertexBuffer = nullptr;
 	}
 
-	if (testIndices)
+	if (indices)
 	{
-		delete[] testIndices;
-		testIndices = nullptr;
+		delete[] indices;
+		indices = nullptr;
 	}
 
 	if (infoGPU)
@@ -62,8 +67,11 @@ Mesh::~Mesh()
 void Mesh::DrawMesh()
 {
 	//GL_TEXTURE_0 is activate by default
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, myApp->m_ui->textTest->imageID);
+	if (myApp->m_ui->generationWindow->heightmap)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, myApp->m_ui->generationWindow->heightmap->imageID);
+	}
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, myApp->m_render->exportTexture);
@@ -90,14 +98,16 @@ void Mesh::DrawMesh()
 	int octaves = glGetUniformLocation(parent->shader, "octaves");
 	glUniform1i(octaves, parent->terrain->octaves);
 
-	int brownian = glGetUniformLocation(parent->shader,"brownian_b");
+	int primitive = glGetUniformLocation(parent->shader, "primitive");
+	glUniform1i(primitive, parent->terrain->primitive);
+	/*int brownian = glGetUniformLocation(parent->shader,"brownian_b");
 	glUniform1i(brownian, parent->terrain->brownian);
 	int perlin = glGetUniformLocation(parent->shader, "perlin_b");
 	glUniform1i(perlin, parent->terrain->perlin);
 	int heightmap = glGetUniformLocation(parent->shader, "heightmap_b");
 	glUniform1i(heightmap, parent->terrain->heightmap);
 	int voronoi = glGetUniformLocation(parent->shader, "voronoi_b");
-	glUniform1i(voronoi, parent->terrain->voronoi);
+	glUniform1i(voronoi, parent->terrain->voronoi);*/
 
 	// Mesh info
 	int grid = glGetUniformLocation(parent->shader, "gridSize");
@@ -158,7 +168,7 @@ void Mesh::LoadToGPU()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
 	//Copying the index data into the buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*numIndices, testIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*numIndices, indices, GL_STATIC_DRAW);
 
 	//Telling OpenGL how to interprete our data //Loading to GPU
 	//( layout loactaion = 0, size of shader var -> vec3, type of data, normalize or not, space between data, offset)  
@@ -225,7 +235,7 @@ void Mesh::GenerateFlatMesh_quads(int x, int y)
 	numIndices = 4;
 
 	vertices = new float[numVertices * 3];
-	testIndices = new int[numIndices];
+	indices = new int[numIndices];
 
 	int indice_it = 0;
 
@@ -243,10 +253,10 @@ void Mesh::GenerateFlatMesh_quads(int x, int y)
 
 			if (j < size - 1 && i < size - 1)
 			{
-				testIndices[indice_it * 4] = index;
-				testIndices[(indice_it * 4) + 1] = index + 1;
-				testIndices[(indice_it * 4) + 2] = size + index+1;
-				testIndices[(indice_it * 4) + 3] = size + index;
+				indices[indice_it * 4] = index;
+				indices[(indice_it * 4) + 1] = index + 1;
+				indices[(indice_it * 4) + 2] = size + index+1;
+				indices[(indice_it * 4) + 3] = size + index;
 			}
 		}
 	}

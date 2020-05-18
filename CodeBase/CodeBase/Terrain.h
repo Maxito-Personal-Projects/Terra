@@ -13,6 +13,8 @@ public:
 	~Terrain();
 
 	void DrawChunks();
+	void GenerateChunks(int nChunks, float height, float width);
+	void DeleteChunks();
 
 public:
 
@@ -32,10 +34,7 @@ public:
 	float width = 64.0f;
 	float height = 64.0f;
 
-	bool heightmap = false;
-	bool perlin = false;
-	bool voronoi = false;
-	bool brownian = true;
+	int primitive = 0;
 
 };
 
