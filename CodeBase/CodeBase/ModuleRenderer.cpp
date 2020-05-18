@@ -83,6 +83,7 @@ bool ModuleRenderer::PosUpdate()
 	bool ret = true;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+	glEnable(GL_DEPTH_TEST);
 	
 	if (myApp->m_input->GetKey(SDL_SCANCODE_F) == DOWN) 
 	{
@@ -113,9 +114,10 @@ bool ModuleRenderer::PosUpdate()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
 
 	//Clear the buffers before drawing!
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Rendering
 	myApp->m_ui->DrawUI();
@@ -177,5 +179,13 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 	glGenRenderbuffers(1, &renderBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, x, y);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LOG("Error Generating the framebuffer");
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

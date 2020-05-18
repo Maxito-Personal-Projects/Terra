@@ -33,7 +33,7 @@ bool UIScene::Draw()
 		ImageSize.x += ImGui::GetCursorPosX();
 		ImageSize.y += ImGui::GetCursorPosY();
 
-		ImGui::Image((void*)(intptr_t)myApp->m_render->fbTexture, ImageSize);
+		ImGui::Image((void*)(intptr_t)myApp->m_render->fbTexture, ImageSize, { 0,1 }, { 1,0 });
 	}
 	ImGui::End();
 	
