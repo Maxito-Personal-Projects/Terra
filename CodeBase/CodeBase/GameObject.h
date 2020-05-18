@@ -14,6 +14,7 @@ public:
 	~GameObject();
 
 	bool Draw();
+	bool SelectionDraw();
 	void SendMatrixToGPU();
 	
 public:

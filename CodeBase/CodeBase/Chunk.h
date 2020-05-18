@@ -8,7 +8,9 @@ class Chunk
 {
 public:
 	
-	Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width);
+	Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width,float _color);
+	void SetColor();
+
 	~Chunk();
 
 public:
@@ -22,6 +24,8 @@ public:
 	int chunkID = 0;
 	int x=0;
 	int y=0;
+
+	float3 color = { 0.0f,0.0f,0.0f };
 
 };
 

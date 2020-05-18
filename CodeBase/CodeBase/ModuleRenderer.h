@@ -50,6 +50,9 @@ public:
 	uint renderBuffer = 0;
 	uint fbTexture = 0;
 
+	uint mouseClickFB;
+	uint mouseClickRB;
+	uint mouseClickTexture;
 
 };
 

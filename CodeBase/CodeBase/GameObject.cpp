@@ -47,6 +47,22 @@ bool GameObject::Draw()
 	return ret;
 }
 
+bool GameObject::SelectionDraw()
+{
+	bool ret = true;
+
+	if (terrain)
+	{
+		
+		//Using object shader
+		glUseProgram(shader);
+		SendMatrixToGPU();
+		terrain->DrawChunks();
+	}
+
+	return ret;
+}
+
 void GameObject::SendMatrixToGPU()
 {
 	//Getting uniform from shader

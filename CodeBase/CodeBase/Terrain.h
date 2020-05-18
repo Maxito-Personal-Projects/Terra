@@ -13,6 +13,7 @@ public:
 	~Terrain();
 
 	void DrawChunks();
+	void DrawSelectionChunks();
 	void GenerateChunks(int nChunks, float height, float width);
 	void DeleteChunks();
 

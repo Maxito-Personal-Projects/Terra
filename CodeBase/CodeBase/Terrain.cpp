@@ -27,6 +27,14 @@ void Terrain::DrawChunks()
 	}
 }
 
+void Terrain::DrawSelectionChunks()
+{
+	for (int i = 0; i < totalkChunks; ++i)
+	{
+		chunks[i]->mesh->DrawSelectionMesh();
+	}
+}
+
 void Terrain::GenerateChunks(int nChunks, float height, float width)
 {
 	numChunks = nChunks;					//Side
@@ -36,7 +44,8 @@ void Terrain::GenerateChunks(int nChunks, float height, float width)
 	{
 		int x = i / numChunks;
 		int y = i % numChunks;
-		Chunk* curr = new Chunk(parent, i, x, y, height,width);
+		float color = (float)i / float(totalkChunks);
+		Chunk* curr = new Chunk(parent, i, x, y, height,width,color);
 		chunks.push_back(curr);
 	}
 }

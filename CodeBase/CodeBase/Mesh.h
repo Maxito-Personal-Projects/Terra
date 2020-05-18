@@ -10,10 +10,11 @@ class Mesh
 {
 public:
 
-	Mesh(GameObject* _parent, int x, int y, float _height, float _width);
+	Mesh(GameObject* _parent, int x, int y, float _height, float _width, float color);
 	~Mesh();
 
 	void DrawMesh();
+	void DrawSelectionMesh();
 	void GenerateFlatMesh_quads(int x, int y);
 	void LoadToGPU();
 	void FillInfoGPU();
@@ -48,6 +49,7 @@ public:
 	int chunkY = 0;
 
 	float time = 0.0f;
+	float3 selectColor = { 0.0f,0.0f,0.0f };
 
 };
 

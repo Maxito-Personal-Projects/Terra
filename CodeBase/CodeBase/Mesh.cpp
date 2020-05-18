@@ -15,7 +15,7 @@
 
 
 
-Mesh::Mesh(GameObject* _parent, int x, int y, float _height, float _width)
+Mesh::Mesh(GameObject* _parent, int x, int y, float _height, float _width, float _color)
 {
 	parent = _parent;
 	
@@ -24,6 +24,8 @@ Mesh::Mesh(GameObject* _parent, int x, int y, float _height, float _width)
 	
 	height = _height;
 	width = _width;
+
+	selectColor = { _color,_color,1.0f };
 
 	GenerateFlatMesh_quads(x,y);
 	FillInfoGPU();
@@ -134,6 +136,10 @@ void Mesh::DrawMesh()
 	glEndTransformFeedback();
 
 	time += 0.016;
+}
+
+void Mesh::DrawSelectionMesh()
+{
 }
 
 void Mesh::LoadToGPU()

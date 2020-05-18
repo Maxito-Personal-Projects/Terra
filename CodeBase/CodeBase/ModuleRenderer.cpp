@@ -104,6 +104,12 @@ bool ModuleRenderer::PosUpdate()
 	//Draw all game objects (now one)
 	firstGO->Draw();
 
+	if (myApp->m_input->GetMouseButton(3) == DOWN && myApp->m_ui->sceneWindow->focused)
+	{
+		LOG("Render for mouse picking!!!");
+
+	}
+
 	//Unbinding all buffers
 	glBindVertexArray(0);
 
@@ -154,6 +160,7 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 	if (frameBuffer == 0)
 	{
 		glGenFramebuffers(1, &frameBuffer);
+		glGenFramebuffers(1, &mouseClickFB);
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -185,7 +192,42 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		LOG("Error Generating the framebuffer");
+		LOG("Error Generating the Scene framebuffer");
 	}
+	
+
+	//Mouse click GPU -------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, mouseClickFB);
+
+	if (mouseClickTexture != 0)
+	{
+		glDeleteTextures(1, &mouseClickTexture);
+	}
+
+	if (renderBuffer != 0)
+	{
+		glDeleteRenderbuffers(1, &mouseClickRB);
+	}
+
+	glGenTextures(1, &mouseClickTexture);
+	glBindTexture(GL_TEXTURE_2D, mouseClickTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mouseClickTexture, 0);
+
+
+	glGenRenderbuffers(1, &mouseClickRB);
+	glBindRenderbuffer(GL_RENDERBUFFER, mouseClickRB);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, x, y);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mouseClickRB);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LOG("Error Generating the mouse clicking framebuffer");
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
