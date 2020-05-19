@@ -5,6 +5,8 @@
 #include "ModuleUI.h"
 
 #include "GameObject.h"
+#include "Terrain.h"
+#include "Chunk.h"
 
 #include "UIScene.h"
 
@@ -104,12 +106,6 @@ bool ModuleRenderer::PosUpdate()
 	//Draw all game objects (now one)
 	firstGO->Draw();
 
-	if (myApp->m_input->GetMouseButton(3) == DOWN && myApp->m_ui->sceneWindow->focused)
-	{
-		LOG("Render for mouse picking!!!");
-
-	}
-
 	//Unbinding all buffers
 	glBindVertexArray(0);
 
@@ -117,6 +113,38 @@ bool ModuleRenderer::PosUpdate()
 	if (myApp->m_input->GetKey(SDL_SCANCODE_SPACE) == DOWN)
 	{
 		glClearColor(0, 1, 1, 1);
+	}
+
+	if (myApp->m_input->GetMouseButton(3) == DOWN && myApp->m_ui->sceneWindow->focused)
+	{
+		LOG("Render for mouse picking!!!");
+		glBindFramebuffer(GL_FRAMEBUFFER, mouseClickFB);
+		
+		//glClearColor(0, 0, 0, 1);
+
+		glDisable(GL_BLEND);
+
+		//Clear the buffers before drawing!
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		firstGO->SelectionDraw();
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		GLfloat* pixels = (GLfloat*)malloc(sizeof(GLfloat) * 3);
+		glReadPixels(myApp->m_input->mouseSceneX, height - myApp->m_input->mouseSceneY, 1, 1, GL_RGB, GL_FLOAT, pixels);
+
+		for (int i = 0; i < firstGO->terrain->totalkChunks; ++i)
+		{
+			firstGO->terrain->chunks[i]->selected = false;
+			LOG("%f,%f,%f", pixels[0], pixels[1], pixels[2]);
+			if (abs(firstGO->terrain->chunks[i]->color.x - pixels[0])<0.00001f)
+			{
+				firstGO->terrain->chunks[i]->selected = true;
+			}
+		}
+
+		//Unbinding all buffers
+		glBindVertexArray(0);
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -153,6 +181,8 @@ void ModuleRenderer::ResizeWindow(int x, int y)
 
 	GenerateFrameBuffer(x,y);
 
+	width = x;
+	height = y;
 }
 
 void ModuleRenderer::GenerateFrameBuffer(int x, int y)
@@ -211,10 +241,10 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 
 	glGenTextures(1, &mouseClickTexture);
 	glBindTexture(GL_TEXTURE_2D, mouseClickTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, x, y, 0, GL_RGB, GL_FLOAT, NULL);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mouseClickTexture, 0);
 
 

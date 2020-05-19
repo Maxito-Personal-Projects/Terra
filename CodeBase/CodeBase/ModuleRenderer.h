@@ -54,6 +54,9 @@ public:
 	uint mouseClickRB;
 	uint mouseClickTexture;
 
+	int width = 0;
+	int height = 0;
+
 };
 
 #endif // !__MODULERENDERER_H__

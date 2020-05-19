@@ -50,6 +50,9 @@ public:
 	int mouseX = 0;
 	int mouseY = 0;
 
+	int mouseSceneX = 0;
+	int mouseSceneY = 0;
+
 	int motionX = 0;
 	int motionY = 0;
 

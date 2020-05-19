@@ -13,7 +13,7 @@ public:
 	Mesh(GameObject* _parent, int x, int y, float _height, float _width, float color);
 	~Mesh();
 
-	void DrawMesh();
+	void DrawMesh(bool selected);
 	void DrawSelectionMesh();
 	void GenerateFlatMesh_quads(int x, int y);
 	void LoadToGPU();

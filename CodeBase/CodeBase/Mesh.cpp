@@ -66,7 +66,7 @@ Mesh::~Mesh()
 	parent = nullptr;
 }
 
-void Mesh::DrawMesh()
+void Mesh::DrawMesh(bool selected)
 {
 	//GL_TEXTURE_0 is activate by default
 	if (myApp->m_ui->generationWindow->heightmap)
@@ -119,6 +119,9 @@ void Mesh::DrawMesh()
 	int chunkCoords = glGetUniformLocation(parent->shader, "chunkCoords");
 	glUniform2f(chunkCoords, chunkX, chunkY);
 
+	int select = glGetUniformLocation(parent->shader, "selected");
+	glUniform1i(select, (int)selected);
+
 	// Other
 	/*int testtime = glGetUniformLocation(parent->shader, "time");
 	glUniform1f(testtime, time);*/
@@ -140,6 +143,12 @@ void Mesh::DrawMesh()
 
 void Mesh::DrawSelectionMesh()
 {
+	glBindVertexArray(VAO);
+
+	int modelMatrix = glGetUniformLocation(parent->mousePickingShader, "Model");
+	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
+
+	glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
 }
 
 void Mesh::LoadToGPU()
@@ -216,9 +225,9 @@ void Mesh::FillInfoGPU()
 		infoGPU[it + 2] = vertices[o_it+2];
 		
 		//coping Colors
-		infoGPU[it + 3] = 0.5f;
-		infoGPU[it + 4] = 0.5f;
-		infoGPU[it + 5] = 0.5f;
+		infoGPU[it + 3] = selectColor.x;
+		infoGPU[it + 4] = selectColor.y;
+		infoGPU[it + 5] = selectColor.z;
 		
 		//coping Normals
 		infoGPU[it + 6] = 0.0f;

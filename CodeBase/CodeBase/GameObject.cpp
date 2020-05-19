@@ -15,6 +15,7 @@ GameObject::GameObject()
 
 	//Default Shader
 	shader = myApp->m_shader->GetShader("Default Shader");
+	mousePickingShader = myApp->m_shader->GetShader("Mouse Picking Shader");
 }
 
 
@@ -40,7 +41,7 @@ bool GameObject::Draw()
 	{
 		//Using object shader
 		glUseProgram(shader);
-		SendMatrixToGPU();
+		SendMatrixToGPU(shader);
 		terrain->DrawChunks();
 	}
 
@@ -53,25 +54,24 @@ bool GameObject::SelectionDraw()
 
 	if (terrain)
 	{
-		
 		//Using object shader
-		glUseProgram(shader);
-		SendMatrixToGPU();
-		terrain->DrawChunks();
+		glUseProgram(mousePickingShader);
+		SendMatrixToGPU(mousePickingShader);
+		terrain->DrawSelectionChunks();
 	}
 
 	return ret;
 }
 
-void GameObject::SendMatrixToGPU()
+void GameObject::SendMatrixToGPU(int shaderID)
 {
 	//Getting uniform from shader
-	int projMatrix = glGetUniformLocation(shader, "Projection");
+	int projMatrix = glGetUniformLocation(shaderID, "Projection");
 	//Sending info to the GPU
 	glUniformMatrix4fv(projMatrix, 1, GL_FALSE, myApp->m_camera->mainCamera->getProjectionMatrix());
 
 	//Getting uniform from shader
-	int viewMatrix = glGetUniformLocation(shader, "View");
+	int viewMatrix = glGetUniformLocation(shaderID, "View");
 	//Sending info to the GPU
 	glUniformMatrix4fv(viewMatrix, 1, GL_FALSE, myApp->m_camera->mainCamera->getViewMatrix());
 }

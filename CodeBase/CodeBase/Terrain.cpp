@@ -23,7 +23,7 @@ void Terrain::DrawChunks()
 {
 	for (int i = 0; i < totalkChunks; ++i)
 	{
-		chunks[i]->mesh->DrawMesh();
+		chunks[i]->mesh->DrawMesh(chunks[i]->selected);
 	}
 }
 

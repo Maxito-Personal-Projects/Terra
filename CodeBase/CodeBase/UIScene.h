@@ -18,6 +18,9 @@ public:
 	int height;
 
 	bool focused = false;
+
+	float2 imagePosition = { 0.0f,0.0f };
+
 };
 
 #endif // !__UISCENE_H__

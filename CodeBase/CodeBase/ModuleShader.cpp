@@ -25,6 +25,7 @@ bool ModuleShader::Start()
 	bool ret = true;
 
 	GenerateDefaultShaders();
+	GenerateMousePickingShaders();
 
 	return ret;
 }
@@ -127,6 +128,37 @@ void ModuleShader::GenerateDefaultShaders()
 		shadersNames.insert({ defaultShader->name, defaultShader->id });
 	}
 
+}
+
+void ModuleShader::GenerateMousePickingShaders()
+{
+	//Creating default Vertex Shader
+	_Shader* mousePickingVertexSahder = new _Shader("Default Vertex Shader", VERTEX);
+	mousePickingVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Mouse_Picking_Vertex_Shader.txt");
+
+	if (CompileShader(mousePickingVertexSahder))
+	{
+		LOG("Mouse Picking Vertex Shader Compiled Successfully");
+	}
+
+	//Creating default Fragment Shader
+	_Shader* mousePickingFragmentSahder = new _Shader("Default Fragment Shader", FRAGMENT);
+	mousePickingFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Mouse_Picking_Fragment_Shader.txt");
+
+	if (CompileShader(mousePickingFragmentSahder))
+	{
+		LOG("Mouse Picking Fragment Shader Compiled Successfully");
+	}
+
+	//Creating Default Shader Program
+	Shader* mousePickingShader = new Shader("Mouse Picking Shader", mousePickingVertexSahder, mousePickingFragmentSahder, nullptr, nullptr, nullptr);
+	if (CompileShaderProgram(mousePickingShader))
+	{
+		LOG("Mouse Picking Shader Program Compiled Successfully");
+
+		shaders.push_back(mousePickingShader);
+		shadersNames.insert({ mousePickingShader->name, mousePickingShader->id });
+	}
 }
 
 bool ModuleShader::CompileShader(_Shader* shader)

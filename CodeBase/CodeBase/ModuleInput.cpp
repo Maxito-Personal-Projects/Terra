@@ -148,6 +148,9 @@ bool ModuleInput::PreUpdate()
 			mouseX = myEvent.motion.x;
 			mouseY = myEvent.motion.y;
 
+			mouseSceneX = mouseX - myApp->m_ui->sceneWindow->imagePosition.x;
+			mouseSceneY = mouseY - myApp->m_ui->sceneWindow->imagePosition.y;
+
 			//relative position to detect movement
 			motionX = myEvent.motion.xrel;
 			motionY = myEvent.motion.yrel;

@@ -27,11 +27,11 @@ bool UIScene::Draw()
 			height = ImGui::GetWindowSize().y;
 		}
 
-		ImVec2 ImageSize = ImGui::GetWindowSize();
-		ImageSize.x += ImGui::GetCursorPosX();
-		ImageSize.y += ImGui::GetCursorPosY();
+		ImVec2 imageSize = ImGui::GetWindowSize();
+		
+		imagePosition = float2(ImGui::GetWindowPos().x+ImGui::GetCursorPosX(), ImGui::GetWindowPos().y+ ImGui::GetCursorPosY());
 
-		ImGui::Image((void*)(intptr_t)myApp->m_render->fbTexture, ImageSize, { 0,1 }, { 1,0 });
+		ImGui::Image((void*)(intptr_t)myApp->m_render->fbTexture, imageSize, { 0,1 }, { 1,0 });
 
 		focused = ImGui::IsWindowHovered();
 	}

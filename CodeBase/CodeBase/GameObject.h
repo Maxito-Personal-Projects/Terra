@@ -15,11 +15,12 @@ public:
 
 	bool Draw();
 	bool SelectionDraw();
-	void SendMatrixToGPU();
+	void SendMatrixToGPU(int shaderID);
 	
 public:
 
 	int shader = 0;
+	int mousePickingShader = 0;
 	
 	Transform* transform = nullptr;
 	Terrain* terrain = nullptr;

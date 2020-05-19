@@ -34,6 +34,7 @@ public:
 	bool CleanUp();
 
 	void GenerateDefaultShaders();
+	void GenerateMousePickingShaders();
 
 	bool CompileShader(_Shader* shader);
 	bool CompileShaderProgram(Shader* shaderProgram, bool isDefault = false);
