@@ -57,6 +57,8 @@ public:
 	int width = 0;
 	int height = 0;
 
+	bool optim = false;
+
 };
 
 #endif // !__MODULERENDERER_H__

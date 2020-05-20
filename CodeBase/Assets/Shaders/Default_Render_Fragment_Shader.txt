@@ -1,0 +1,40 @@
+#version 440 core
+
+out vec4 FragColor;
+
+in vec3 WorldPos_FS_in;
+in vec3 Normal_FS_in;
+in vec3 Color_FS_in;
+
+uniform vec3 lDirection;
+uniform vec3 camPos;
+
+void main()
+{
+	vec3 vecColor = Color_FS_in;
+	vec3 normal = Normal_FS_in;
+	vec3 fragPos = WorldPos_FS_in;
+
+    vec3 lightColor = vec3(1.0);
+
+    // ambient
+    float ambientStrength = 0.5;
+    vec3 ambient = ambientStrength * lightColor;
+  	
+    // diffuse 
+    vec3 norm = normalize(normal);
+    vec3 lightDir = normalize(-lDirection);
+    float diff = max(dot(lightDir,norm), 0.0);
+    vec3 diffuse = diff * lightColor;
+	
+	// specular
+	float spec = 0.0;
+	vec3 viewDir = normalize(camPos-fragPos);
+	vec3 reflectDir = reflect(-lightDir,norm);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	spec = pow(max(dot(normal,halfwayDir),0.0),256.0);
+	vec3 specular = 0.2*spec*lightColor;
+	            
+    vec3 result = (ambient + diffuse + specular) * vecColor;
+    FragColor = vec4(result,1.0);
+} 

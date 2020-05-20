@@ -19,8 +19,11 @@ public:
 	
 public:
 
-	int shader = 0;
+	int terrainShader = 0;
+	int renderShader = 0;
 	int mousePickingShader = 0;
+
+	bool updateTFB = false;
 	
 	Transform* transform = nullptr;
 	Terrain* terrain = nullptr;

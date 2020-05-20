@@ -12,7 +12,7 @@ public:
 	Terrain(GameObject* _parent, int nChunks);
 	~Terrain();
 
-	void DrawChunks();
+	void DrawChunks(bool updateTFB);
 	void DrawSelectionChunks();
 	void GenerateChunks(int nChunks, float height, float width);
 	void DeleteChunks();

@@ -13,7 +13,7 @@ public:
 	Mesh(GameObject* _parent, int x, int y, float _height, float _width, float color);
 	~Mesh();
 
-	void DrawMesh(bool selected);
+	void DrawMesh(bool updateTFB, bool selected);
 	void DrawSelectionMesh();
 	void GenerateFlatMesh_quads(int x, int y);
 	void LoadToGPU();
@@ -34,6 +34,9 @@ public:
 	uint VAO;	//Vertex Array Object
 	uint IBO;	//Index Buffer Object
 	uint TBO;	//Transform Feedback Buffer Object
+
+	uint VAOrender;	//Vertex Buffer Object
+
 
 	float* vertexBuffer = nullptr;
 	int buffSize = 0;

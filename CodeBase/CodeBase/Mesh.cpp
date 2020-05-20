@@ -35,6 +35,7 @@ Mesh::Mesh(GameObject* _parent, int x, int y, float _height, float _width, float
 Mesh::~Mesh()
 {
 	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &VAOrender);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
 	glDeleteBuffers(1, &TBO);
@@ -66,79 +67,83 @@ Mesh::~Mesh()
 	parent = nullptr;
 }
 
-void Mesh::DrawMesh(bool selected)
+void Mesh::DrawMesh(bool updateTFB,bool selected)
 {
-	//GL_TEXTURE_0 is activate by default
-	if (myApp->m_ui->generationWindow->heightmap)
+	if (updateTFB)
 	{
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, myApp->m_ui->generationWindow->heightmap->imageID);
+		//GL_TEXTURE_0 is activate by default
+		if (myApp->m_ui->generationWindow->heightmap)
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, myApp->m_ui->generationWindow->heightmap->imageID);
+		}
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, myApp->m_render->exportTexture);
+
+		glBindVertexArray(VAO);
+
+		// Render Info 
+		int modelMatrix = glGetUniformLocation(parent->terrainShader, "Model");
+		glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
+		int light = glGetUniformLocation(parent->terrainShader, "lDirection");
+		glUniform3f(light, myApp->m_render->lightDirection[0], myApp->m_render->lightDirection[1], myApp->m_render->lightDirection[2]);
+		int delta = glGetUniformLocation(parent->terrainShader, "delta");
+		glUniform1f(delta, myApp->m_render->delta);
+		int cam = glGetUniformLocation(parent->terrainShader, "camPos");
+		glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
+
+		// Terrain info 
+		int height = glGetUniformLocation(parent->terrainShader, "maxHeight");
+		glUniform1f(height, parent->terrain->maxHeight);
+		int seed = glGetUniformLocation(parent->terrainShader, "seed");
+		glUniform1f(seed, parent->terrain->seed);
+		int frequency = glGetUniformLocation(parent->terrainShader, "freq");
+		glUniform1f(frequency, parent->terrain->frequency);
+		int octaves = glGetUniformLocation(parent->terrainShader, "octaves");
+		glUniform1i(octaves, parent->terrain->octaves);
+		int primitive = glGetUniformLocation(parent->terrainShader, "primitive");
+		glUniform1i(primitive, parent->terrain->primitive);
+
+
+		// Mesh info
+		int grid = glGetUniformLocation(parent->terrainShader, "gridSize");
+		glUniform1i(grid, parent->terrain->numChunks);
+		int div = glGetUniformLocation(parent->terrainShader, "divisions");
+		glUniform1f(div, divisions);
+		int chunkCoords = glGetUniformLocation(parent->terrainShader, "chunkCoords");
+		glUniform2f(chunkCoords, chunkX, chunkY);
+		int select = glGetUniformLocation(parent->terrainShader, "selected");
+		glUniform1i(select, (int)selected);
+
+		//Binding transform feedback buffer
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TBO);
+
+		//Start Capturing shader output
+		glBeginTransformFeedback(GL_TRIANGLES);
+
+		//Drawing mesh
+		glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
+
+		//Stop Capturing shader output
+		glEndTransformFeedback();
+
+	}
+	else
+	{
+		glBindVertexArray(VAOrender);
+
+		int modelMatrix = glGetUniformLocation(parent->renderShader, "Model");
+		glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
+		int light = glGetUniformLocation(parent->renderShader, "lDirection");
+		glUniform3f(light, myApp->m_render->lightDirection[0], myApp->m_render->lightDirection[1], myApp->m_render->lightDirection[2]);
+		int cam = glGetUniformLocation(parent->renderShader, "camPos");
+		glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
+
+
+		glDrawArrays(GL_TRIANGLES,0,64*64*2*3);
 	}
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, myApp->m_render->exportTexture);
-
-	glBindVertexArray(VAO);
-
-	// Render Info 
-	int modelMatrix = glGetUniformLocation(parent->shader, "Model");
-	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
-	int light = glGetUniformLocation(parent->shader, "lDirection");
-	glUniform3f(light, myApp->m_render->lightDirection[0], myApp->m_render->lightDirection[1], myApp->m_render->lightDirection[2]);
-	int delta = glGetUniformLocation(parent->shader, "delta");
-	glUniform1f(delta, myApp->m_render->delta);
-	int cam = glGetUniformLocation(parent->shader, "camPos");
-	glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
-	
-	// Terrain info 
-	int height = glGetUniformLocation(parent->shader, "maxHeight");
-	glUniform1f(height, parent->terrain->maxHeight);
-	int seed = glGetUniformLocation(parent->shader, "seed");
-	glUniform1f(seed, parent->terrain->seed);
-	int frequency = glGetUniformLocation(parent->shader, "freq");
-	glUniform1f(frequency, parent->terrain->frequency);
-	int octaves = glGetUniformLocation(parent->shader, "octaves");
-	glUniform1i(octaves, parent->terrain->octaves);
-
-	int primitive = glGetUniformLocation(parent->shader, "primitive");
-	glUniform1i(primitive, parent->terrain->primitive);
-	/*int brownian = glGetUniformLocation(parent->shader,"brownian_b");
-	glUniform1i(brownian, parent->terrain->brownian);
-	int perlin = glGetUniformLocation(parent->shader, "perlin_b");
-	glUniform1i(perlin, parent->terrain->perlin);
-	int heightmap = glGetUniformLocation(parent->shader, "heightmap_b");
-	glUniform1i(heightmap, parent->terrain->heightmap);
-	int voronoi = glGetUniformLocation(parent->shader, "voronoi_b");
-	glUniform1i(voronoi, parent->terrain->voronoi);*/
-
-	// Mesh info
-	int grid = glGetUniformLocation(parent->shader, "gridSize");
-	glUniform1i(grid, parent->terrain->numChunks);
-	int div = glGetUniformLocation(parent->shader, "divisions");
-	glUniform1f(div, divisions);
-	int chunkCoords = glGetUniformLocation(parent->shader, "chunkCoords");
-	glUniform2f(chunkCoords, chunkX, chunkY);
-
-	int select = glGetUniformLocation(parent->shader, "selected");
-	glUniform1i(select, (int)selected);
-
-	// Other
-	/*int testtime = glGetUniformLocation(parent->shader, "time");
-	glUniform1f(testtime, time);*/
-
-	//Binding transform feedback buffer
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER,0,TBO);
-
-	//Start Capturing shader output
-	glBeginTransformFeedback(GL_TRIANGLES);
-	
-	//Drawing mesh
-	glDrawElements(GL_PATCHES, numIndices, GL_UNSIGNED_INT, 0);
-
-	//Stop Capturing shader output
-	glEndTransformFeedback();
-
-	time += 0.016;
 }
 
 void Mesh::DrawSelectionMesh()
@@ -155,6 +160,7 @@ void Mesh::LoadToGPU()
 {
 	//Generating Vertex Array, Vertex buffer, Index buffer & transform feedback buffer ids or names 
 	glGenVertexArrays(1, &VAO);
+	glGenVertexArrays(1, &VAOrender);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &IBO);
 	glGenBuffers(1, &TBO);
@@ -168,6 +174,15 @@ void Mesh::LoadToGPU()
 	//Copying the vertex data into the buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*numVertices * 9, infoGPU, GL_STATIC_DRAW);
 
+	//Telling OpenGL how to interprete our data //Loading to GPU
+	//( layout loactaion = 0, size of shader var -> vec3, type of data, normalize or not, space between data, offset)  
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0); //Position
+	glEnableVertexAttribArray(0); //layout loactaion = 0
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float))); //Color
+	glEnableVertexAttribArray(1); //layout loactaion = 1	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float))); //Normals
+	glEnableVertexAttribArray(2); //layout loactaion = 2
+
 	//Binding the buffer to create it
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, TBO);
 
@@ -175,8 +190,8 @@ void Mesh::LoadToGPU()
 	//Size = division*division*numTris*numVertex*numFloats
 	//If we want normals x2 (TODO) Done
 	//If we want more tiles x(Tiles-1)^2 (TODO)
-	buffSize = 64 * 64 * 2 * 3 * 3 * 2;
-	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3 * 2, nullptr, GL_DYNAMIC_COPY);
+	buffSize = 64 * 64 * 2 * 3 * 3 * 3;
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3 * 3, nullptr, GL_DYNAMIC_COPY);
 	vertexBuffer = new float[buffSize];
 
 	//bind IB as element array buffer
@@ -185,15 +200,25 @@ void Mesh::LoadToGPU()
 	//Copying the index data into the buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float)*numIndices, indices, GL_STATIC_DRAW);
 
-	//Telling OpenGL how to interprete our data //Loading to GPU
-	//( layout loactaion = 0, size of shader var -> vec3, type of data, normalize or not, space between data, offset)  
+	//safely unbind
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	
+	//bind VA as array buffer first
+	glBindVertexArray(VAOrender);
+
+	//bind the TBO as array buffer
+	glBindBuffer(GL_ARRAY_BUFFER, TBO);	
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0); //Position
 	glEnableVertexAttribArray(0); //layout loactaion = 0
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3*sizeof(float))); //Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float))); //Color
 	glEnableVertexAttribArray(1); //layout loactaion = 1	
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6*sizeof(float))); //Normals
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float))); //Normals
 	glEnableVertexAttribArray(2); //layout loactaion = 2
-	
+
 
 	//safely unbind
 	glBindVertexArray(0);

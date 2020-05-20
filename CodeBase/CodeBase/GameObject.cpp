@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "ModuleShader.h"
 #include "ModuleCamera.h"
+#include "ModuleRenderer.h"
 #include "Camera.h"
 #include "Transform.h"
 #include "Mesh.h"
@@ -14,8 +15,11 @@ GameObject::GameObject()
 	terrain = new Terrain(this,2);
 
 	//Default Shader
-	shader = myApp->m_shader->GetShader("Default Shader");
+	terrainShader = myApp->m_shader->GetShader("Default Shader");
+	renderShader = myApp->m_shader->GetShader("Render Shader");
 	mousePickingShader = myApp->m_shader->GetShader("Mouse Picking Shader");
+
+	updateTFB = true;
 }
 
 
@@ -39,10 +43,23 @@ bool GameObject::Draw()
 
 	if (terrain)
 	{
-		//Using object shader
-		glUseProgram(shader);
-		SendMatrixToGPU(shader);
-		terrain->DrawChunks();
+		if (updateTFB)
+		{
+			glUseProgram(terrainShader);
+			SendMatrixToGPU(terrainShader);
+			terrain->DrawChunks(updateTFB);
+			if (myApp->m_render->optim)
+			{
+				updateTFB = false;
+			}
+		}
+		else
+		{
+			glUseProgram(renderShader);
+			SendMatrixToGPU(renderShader);
+			terrain->DrawChunks(updateTFB);
+		}
+		
 	}
 
 	return ret;

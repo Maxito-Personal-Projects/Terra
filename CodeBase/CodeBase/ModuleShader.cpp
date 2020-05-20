@@ -25,6 +25,7 @@ bool ModuleShader::Start()
 	bool ret = true;
 
 	GenerateDefaultShaders();
+	GenerateDefaultRenderShaders();
 	GenerateMousePickingShaders();
 
 	return ret;
@@ -130,6 +131,37 @@ void ModuleShader::GenerateDefaultShaders()
 
 }
 
+void ModuleShader::GenerateDefaultRenderShaders()
+{
+	//Creating default Vertex Shader
+	_Shader* renderVertexSahder = new _Shader("Default Render Vertex Shader", VERTEX);
+	renderVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Render_Vertex_Shader.txt");
+
+	if (CompileShader(renderVertexSahder))
+	{
+		LOG("Render Vertex Shader Compiled Successfully");
+	}
+
+	//Creating default Fragment Shader
+	_Shader* renderFragmentSahder = new _Shader("Default RenderFragment Shader", FRAGMENT);
+	renderFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Render_Fragment_Shader.txt");
+
+	if (CompileShader(renderFragmentSahder))
+	{
+		LOG("Render Fragment Shader Compiled Successfully");
+	}
+
+	//Creating Default Shader Program
+	Shader* renderShader = new Shader("Render Shader", renderVertexSahder, renderFragmentSahder, nullptr, nullptr, nullptr);
+	if (CompileShaderProgram(renderShader))
+	{
+		LOG("Render Shader Program Compiled Successfully");
+
+		shaders.push_back(renderShader);
+		shadersNames.insert({ renderShader->name, renderShader->id });
+	}
+}
+
 void ModuleShader::GenerateMousePickingShaders()
 {
 	//Creating default Vertex Shader
@@ -215,10 +247,10 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram, bool isDefault)
 	//Telling the program which var/s we want to capture
 	if (isDefault)
 	{
-		const GLchar* captureVars[] = { "TFPosition","TFNormal" };
+		const GLchar* captureVars[] = { "TFPosition","TFColor","TFNormal" };
 
 		//We want everything in the same buffer!
-		glTransformFeedbackVaryings(shaderProgram->id, 2, captureVars, GL_INTERLEAVED_ATTRIBS);
+		glTransformFeedbackVaryings(shaderProgram->id, 3, captureVars, GL_INTERLEAVED_ATTRIBS);
 	}
 
 	//Compiling Shader Program

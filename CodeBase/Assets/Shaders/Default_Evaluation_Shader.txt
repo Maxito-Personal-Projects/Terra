@@ -19,6 +19,7 @@ out vec3 Color_FS_in;
 vec3 texColor_FS_in;
 out vec3 TFPosition;
 out vec3 TFNormal;
+out vec3 TFColor;
 
 uniform sampler2D heightmap;
 uniform sampler2D outputTexture;
@@ -507,4 +508,5 @@ void main()
 	gl_Position = Projection * View * vec4(WorldPos_FS_in, 1.0);
 	TFPosition = WorldPos_FS_in;
 	TFNormal = Normal_FS_in;
+	TFColor = Color_FS_in;
 }

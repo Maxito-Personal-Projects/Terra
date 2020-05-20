@@ -157,6 +157,8 @@ bool UIGeneration::Draw()
 					}
 				}
 
+				terrain->parent->updateTFB = true;
+
 				ImGui::EndCombo();
 			}
 			ImGui::PopFont();

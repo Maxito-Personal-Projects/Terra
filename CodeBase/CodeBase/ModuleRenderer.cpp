@@ -77,6 +77,12 @@ bool ModuleRenderer::PreUpdate()
 {
 	bool ret = true;
 
+	if (myApp->m_input->GetKey(SDL_SCANCODE_1) == DOWN)
+	{
+		optim = !optim;
+		firstGO->updateTFB = true;
+	}
+
 	return ret;
 }
 
@@ -140,6 +146,7 @@ bool ModuleRenderer::PosUpdate()
 			if (abs(firstGO->terrain->chunks[i]->color.x - pixels[0])<0.00001f)
 			{
 				firstGO->terrain->chunks[i]->selected = true;
+				continue;
 			}
 		}
 

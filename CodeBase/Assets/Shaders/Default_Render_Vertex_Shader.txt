@@ -1,0 +1,21 @@
+#version 440 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+layout (location = 2) in vec3 aNormal;
+
+uniform mat4 Model;
+uniform mat4 Projection;
+uniform mat4 View;
+
+out vec3 WorldPos_FS_in;
+out vec3 Normal_FS_in;
+out vec3 Color_FS_in;
+
+void main()
+{
+    WorldPos_FS_in = vec3(Model*vec4(aPos,1.0));
+	Normal_FS_in = vec3(Model*vec4(aNormal,0.0));
+    Color_FS_in = aColor;
+	
+	gl_Position = Projection * View * Model * vec4(aPos, 1.0);
+}

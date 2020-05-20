@@ -19,11 +19,11 @@ Terrain::~Terrain()
 	parent = nullptr;
 }
 
-void Terrain::DrawChunks()
+void Terrain::DrawChunks(bool updateTFB)
 {
 	for (int i = 0; i < totalkChunks; ++i)
 	{
-		chunks[i]->mesh->DrawMesh(chunks[i]->selected);
+		chunks[i]->mesh->DrawMesh(updateTFB, chunks[i]->selected);
 	}
 }
 
