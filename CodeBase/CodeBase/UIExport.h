@@ -32,6 +32,8 @@ private:
 
 	std::string fileName = "";
 
+	char* currResolution = nullptr;
+
 public:
 
 	std::string exportMessage = "";

@@ -201,29 +201,31 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	aiMesh* mesh = scene->mMeshes[0];		//Getting mesh pointer
 	mesh->mName = "Terrain";
 	
-	//Now we are just taking the vertex info so the size is:
-	int size = sizeBuffer / 6;
+	//Now we are taking the vertex, normals & color info so the size is:
+	int numVertices = sizeBuffer / 9;
 
 	//Setting mesh info
-	mesh->mVertices = new aiVector3D[size];
-	mesh->mNumVertices = size;
+	mesh->mVertices = new aiVector3D[numVertices];
+	mesh->mNumVertices = numVertices;
 
-	mesh->mNormals = new aiVector3D[size];
+	mesh->mNormals = new aiVector3D[numVertices];
+	mesh->mColors[0] = new aiColor4D[numVertices];
 	
-	mesh->mTextureCoords[0] = new aiVector3D[size];
-	mesh->mNumUVComponents[0] = size;
+	mesh->mTextureCoords[0] = new aiVector3D[numVertices];
+	mesh->mNumUVComponents[0] = numVertices;
 
 	int buffIndx = 0;
 
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < numVertices; ++i)
 	{
 		mesh->mVertices[i] = aiVector3D(vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
 		mesh->mNormals[i] = aiVector3D(vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], vertexBuffer[buffIndx + 5]);
-		mesh->mTextureCoords[0][i] = aiVector3D(1.0f, 1.0f, 0.0f);
-		buffIndx += 6;
+		mesh->mColors[0][i] = aiColor4D(vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], vertexBuffer[buffIndx + 8], 1.0f);
+		mesh->mTextureCoords[0][i] = aiVector3D(1.0f, 1.0f, 0.0f); //TODO get uv coords (tessCoords)
+		buffIndx += 9;
 	}
 
-	int fSize = size / 3;
+	int fSize = numVertices / 3;
 	mesh->mFaces = new aiFace[fSize];
 	mesh->mNumFaces = (uint)(fSize);
 	

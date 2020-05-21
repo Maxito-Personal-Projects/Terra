@@ -90,6 +90,27 @@ bool UIExport::Draw()
 		exportMessage = "";
 	}
 
+	ImGui::Text("Resolution:");
+
+	ImGui::SameLine();
+
+	char* resolutions[] = { "64","32","16"};
+
+	ImGui::PushID("None Function");
+	if (ImGui::BeginCombo("", currResolution))
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			bool isSelected = (currResolution == resolutions[i]);
+			if (ImGui::Selectable(resolutions[i], isSelected))
+			{
+				currResolution = resolutions[i];
+			}
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::PopID();
+
 	if (ImGui::Button("Export", ImVec2(50, 50)))
 	{
 		if (fileName.length() > 0)
@@ -97,11 +118,39 @@ bool UIExport::Draw()
 			for (int i = 0; i < terrain->totalkChunks; ++i)
 			{
 				Mesh* mesh = terrain->chunks[i]->mesh;
-				if (mesh->vertexBuffer)
+
+				if (currResolution == "64")
 				{
-					mesh->GenerateVertexBuffer();
-					myApp->fileSystem->Export(mesh->vertexBuffer, mesh->buffSize, fileName + std::to_string(i), format,exportMessage);
+					if (mesh->vertexBuffer64)
+					{
+						mesh->GenerateVertexBuffer();
+						myApp->fileSystem->Export(mesh->vertexBuffer64, mesh->buffSize64, fileName + std::to_string(i), format, exportMessage);
+					}
 				}
+				else if (currResolution == "32")
+				{
+					terrain->chunks[i]->mesh->divisions = 32.0f;
+					terrain->chunks[i]->mesh->DrawMesh(true, false);
+
+					if (mesh->vertexBuffer32)
+					{
+						mesh->GenerateVertexBuffer();
+						myApp->fileSystem->Export(mesh->vertexBuffer32, mesh->buffSize32, fileName + std::to_string(i), format, exportMessage);
+					}
+				}
+				else
+				{
+					terrain->chunks[i]->mesh->divisions = 16.0f;
+					terrain->chunks[i]->mesh->DrawMesh(true, false);
+
+					if (mesh->vertexBuffer16)
+					{
+						mesh->GenerateVertexBuffer();
+						myApp->fileSystem->Export(mesh->vertexBuffer16, mesh->buffSize16, fileName + std::to_string(i), format, exportMessage);
+					}
+				}
+
+				terrain->chunks[i]->mesh->divisions = 64.0f;
 			}
 		}
 		else

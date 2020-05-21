@@ -34,12 +34,18 @@ public:
 	uint VAO;	//Vertex Array Object
 	uint IBO;	//Index Buffer Object
 	uint TBO;	//Transform Feedback Buffer Object
+	uint TBO_mid;	//Transform Feedback Buffer Object
+	uint TBO_low;	//Transform Feedback Buffer Object
 
 	uint VAOrender;	//Vertex Buffer Object
 
 
-	float* vertexBuffer = nullptr;
-	int buffSize = 0;
+	float* vertexBuffer64 = nullptr;
+	int buffSize64 = 0;
+	float* vertexBuffer32 = nullptr;
+	int buffSize32 = 0;
+	float* vertexBuffer16 = nullptr;
+	int buffSize16 = 0;
 
 	GameObject* parent = nullptr;
 

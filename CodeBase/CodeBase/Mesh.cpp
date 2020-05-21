@@ -46,10 +46,22 @@ Mesh::~Mesh()
 		vertices = nullptr;
 	}
 
-	if (vertexBuffer)
+	if (vertexBuffer64)
 	{
-		delete[] vertexBuffer;
-		vertexBuffer = nullptr;
+		delete[] vertexBuffer64;
+		vertexBuffer64 = nullptr;
+	}
+
+	if (vertexBuffer32)
+	{
+		delete[] vertexBuffer32;
+		vertexBuffer32 = nullptr;
+	}
+
+	if (vertexBuffer16)
+	{
+		delete[] vertexBuffer16;
+		vertexBuffer16 = nullptr;
 	}
 
 	if (indices)
@@ -116,8 +128,19 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		int select = glGetUniformLocation(parent->terrainShader, "selected");
 		glUniform1i(select, (int)selected);
 
-		//Binding transform feedback buffer
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TBO);
+		if (divisions == 64.0f)
+		{
+			//Binding transform feedback buffer
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TBO);
+		}
+		else if(divisions == 32.0f)
+		{
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TBO_mid);
+		}
+		else
+		{
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, TBO_low);
+		}
 
 		//Start Capturing shader output
 		glBeginTransformFeedback(GL_TRIANGLES);
@@ -166,6 +189,8 @@ void Mesh::LoadToGPU()
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &IBO);
 	glGenBuffers(1, &TBO);
+	glGenBuffers(1, &TBO_low);
+	glGenBuffers(1, &TBO_mid);
 
 	//bind VA as array buffer first
 	glBindVertexArray(VAO);
@@ -192,9 +217,21 @@ void Mesh::LoadToGPU()
 	//Size = division*division*numTris*numVertex*numFloats
 	//If we want normals x2 (TODO) Done
 	//If we want more tiles x(Tiles-1)^2 (TODO)
-	buffSize = 64 * 64 * 2 * 3 * 3 * 3;
+	
+	buffSize64 = 64 * 64 * 2 * 3 * 3 * 3;
+	buffSize32 = 32 * 32 * 2 * 3 * 3 * 3;
+	buffSize16 = 16 * 16 * 2 * 3 * 3 * 3;
+
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 64 * 64 * 2 * 3 * 3 * 3, nullptr, GL_DYNAMIC_COPY);
-	vertexBuffer = new float[buffSize];
+	vertexBuffer64 = new float[buffSize64];
+
+	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, TBO_mid);
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 32 * 32 * 2 * 3 * 3 * 3, nullptr, GL_DYNAMIC_COPY);
+	vertexBuffer32 = new float[buffSize32];
+
+	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, TBO_low);
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(float) * 16 * 16 * 2 * 3 * 3 * 3, nullptr, GL_DYNAMIC_COPY);
+	vertexBuffer16 = new float[buffSize16];
 
 	//bind IB as element array buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -265,9 +302,17 @@ void Mesh::FillInfoGPU()
 
 void Mesh::GenerateVertexBuffer()
 {
-	if (vertexBuffer)
+	if (vertexBuffer64)
 	{
-		glGetNamedBufferSubData(TBO, 0, sizeof(float)*buffSize, vertexBuffer);
+		glGetNamedBufferSubData(TBO, 0, sizeof(float)*buffSize64, vertexBuffer64);
+	}
+	if (vertexBuffer32)
+	{
+		glGetNamedBufferSubData(TBO_mid, 0, sizeof(float)*buffSize32, vertexBuffer32);
+	}
+	if (vertexBuffer16)
+	{
+		glGetNamedBufferSubData(TBO_low, 0, sizeof(float)*buffSize16, vertexBuffer16);
 	}
 }
 
