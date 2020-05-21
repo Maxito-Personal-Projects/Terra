@@ -148,12 +148,14 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 
 void Mesh::DrawSelectionMesh()
 {
-	glBindVertexArray(VAO);
+	glBindVertexArray(VAOrender);
 
 	int modelMatrix = glGetUniformLocation(parent->mousePickingShader, "Model");
 	glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
+	int color = glGetUniformLocation(parent->mousePickingShader, "color");
+	glUniform3f(color, selectColor.x, selectColor.y, selectColor.z);
 
-	glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 64 * 64 * 2 * 3);
 }
 
 void Mesh::LoadToGPU()
