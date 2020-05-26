@@ -1,6 +1,8 @@
 #ifndef __CHUNK_H__
 #define __CHUNK_H__
 
+#include "MathGeoLib/Math/float3.h"
+
 class GameObject;
 class Mesh;
 
@@ -17,7 +19,7 @@ public:
 	GameObject* parent = nullptr;
 	Mesh* mesh = nullptr;
 
-	float maxHeight = 20.0f;
+	float maxHeight = 0.0f;
 	int octaves = 8;
 
 	int chunkID = 0;

@@ -33,6 +33,7 @@ public:
 	//Resize window & viewport
 	void ResizeWindow(int x, int y);
 	void GenerateFrameBuffer(int x, int y);
+	void SelectChunk();
 
 public:
 

@@ -61,29 +61,10 @@ bool UITest::Draw()
 
 	ImGui::Text("-------------------------");
 
-
-	// Mesh setting
-	//ImGui::Text("Mesh Settings:");
-	//ImGui::Text("Mesh Divisions:");
-	//ImGui::SameLine();
-	//ImGui::PushID("Divisions");
-	//ImGui::PushItemWidth(100.0f);
-	//ImGui::DragFloat("", &mesh->divisions, 0.25f, 1.0f, 64.0f, "%.0f");
-	//ImGui::PopItemWidth();
-	//ImGui::PopID();
-
 	ImGui::Text("-------------------------");
 
 	// Terrain setting
 	ImGui::Text("Terrain Settings:");
-	
-	ImGui::Text("Max Height:");
-	ImGui::SameLine();
-	ImGui::PushID("Height");
-	ImGui::PushItemWidth(100.0f);
-	ImGui::DragFloat("", &terrain->maxHeight, 1.0f,0.0f);
-	ImGui::PopItemWidth();
-	ImGui::PopID();
 	
 	ImGui::Text("Seed:");
 	ImGui::SameLine();
@@ -111,20 +92,6 @@ bool UITest::Draw()
 
 	ImGui::Text("-------------------------");
 
-	ImGui::Text("Heightmap:");
-
-	if (myApp->m_ui->textTest)
-	{
-		ImGui::Image((void*)(intptr_t)myApp->m_ui->textTest->imageID, ImVec2(200, 200));
-		ImGui::Text("size = %d x %d", myApp->m_ui->textTest->width, myApp->m_ui->textTest->height);
-
-	}
-	else
-	{
-		ImGui::Image((void*)(intptr_t)myApp->m_ui->errorImage->imageID, ImVec2(100, 100));
-		ImGui::Text("Error Reading the Image");
-
-	}
 
 	ImGui::Text("-------------------------");
 

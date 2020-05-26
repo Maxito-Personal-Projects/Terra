@@ -10,6 +10,7 @@
 #include "UIExport.h"
 #include "UIGeneration.h"
 #include "UIScene.h"
+#include "UIChunk.h"
 
 
 ModuleUI::ModuleUI(string _name, bool _active) : Module(_name,_active)
@@ -55,11 +56,13 @@ bool ModuleUI::Init()
 	exportWindow = new UIExport("Export",false);
 	generationWindow = new UIGeneration("Generate");
 	sceneWindow = new UIScene("Scene");
+	chunkWindow = new UIChunk("Chunk Properties");
 
 	windows.push_back(testWindow);
 	windows.push_back(exportWindow);
 	windows.push_back(generationWindow);
 	windows.push_back(sceneWindow);
+	windows.push_back(chunkWindow);
 
 	//Fonts 
 	defaultFont = io.Fonts->AddFontDefault();

@@ -9,6 +9,7 @@
 #include "Chunk.h"
 
 #include "UIScene.h"
+#include "UIChunk.h"
 
 
 bool ModuleRenderer::Init()
@@ -44,7 +45,7 @@ bool ModuleRenderer::Init()
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	glClearColor(1, 0.55f, 0.48f, 1);
+	glClearColor(.5f, 0.7f, 0.8f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -123,35 +124,7 @@ bool ModuleRenderer::PosUpdate()
 
 	if (myApp->m_input->GetMouseButton(3) == DOWN && myApp->m_ui->sceneWindow->focused)
 	{
-		LOG("Render for mouse picking!!!");
-		glBindFramebuffer(GL_FRAMEBUFFER, mouseClickFB);
-		
-		//glClearColor(0, 0, 0, 1);
-
-		glDisable(GL_BLEND);
-
-		//Clear the buffers before drawing!
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		firstGO->SelectionDraw();
-
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		GLfloat* pixels = (GLfloat*)malloc(sizeof(GLfloat) * 3);
-		glReadPixels(myApp->m_input->mouseSceneX, height - myApp->m_input->mouseSceneY, 1, 1, GL_RGB, GL_FLOAT, pixels);
-
-		for (int i = 0; i < firstGO->terrain->totalkChunks; ++i)
-		{
-			firstGO->terrain->chunks[i]->selected = false;
-			LOG("%f,%f,%f", pixels[0], pixels[1], pixels[2]);
-			if (abs(firstGO->terrain->chunks[i]->color.x - pixels[0])<0.00001f)
-			{
-				firstGO->terrain->chunks[i]->selected = true;
-				continue;
-			}
-		}
-
-		//Unbinding all buffers
-		glBindVertexArray(0);
+		SelectChunk();
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -267,4 +240,37 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void ModuleRenderer::SelectChunk()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, mouseClickFB);
+
+	glDisable(GL_BLEND);
+
+	//Clear the buffers before drawing!
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	firstGO->SelectionDraw();
+
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+	GLfloat* pixels = (GLfloat*)malloc(sizeof(GLfloat) * 3);
+	glReadPixels(myApp->m_input->mouseSceneX, height - myApp->m_input->mouseSceneY, 1, 1, GL_RGB, GL_FLOAT, pixels);
+
+	bool chunkSelected = false;
+	myApp->m_ui->chunkWindow->selectedChunk = nullptr;
+
+	for (int i = 0; i < firstGO->terrain->totalkChunks; ++i)
+	{
+		firstGO->terrain->chunks[i]->selected = false;
+
+		if (abs(firstGO->terrain->chunks[i]->color.x - pixels[0]) < 0.00001f && abs(firstGO->terrain->chunks[i]->color.y - pixels[1]) < 0.00001f)
+		{
+			firstGO->terrain->chunks[i]->selected = true;
+			myApp->m_ui->chunkWindow->selectedChunk = firstGO->terrain->chunks[i];
+		}
+	}
+
+	//Unbinding all buffers
+	glBindVertexArray(0);
 }

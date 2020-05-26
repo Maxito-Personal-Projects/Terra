@@ -8,7 +8,7 @@ Chunk::Chunk(GameObject* _parent, int id, int _x, int _y, float height, float wi
 {
 	parent = _parent;
 
-	mesh = new Mesh(_parent,_x,_y, height, width,_color);
+	mesh = new Mesh(_parent,this,_x,_y, height, width,_color);
 	chunkID = id;
 	x = _x;
 	y = _y;

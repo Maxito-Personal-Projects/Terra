@@ -5,12 +5,13 @@
 #include <map>
 
 class GameObject;
+class Chunk;
 
 class Mesh
 {
 public:
 
-	Mesh(GameObject* _parent, int x, int y, float _height, float _width, float color);
+	Mesh(GameObject* _parent, Chunk* _chunkP, int x, int y, float _height, float _width, float color);
 	~Mesh();
 
 	void DrawMesh(bool updateTFB, bool selected);
@@ -26,6 +27,8 @@ public:
 	float* vertices = nullptr;
 	int* indices = nullptr;
 	float* infoGPU = nullptr;
+
+	
 
 	int numVertices = 0;
 	int numIndices = 0;
@@ -48,6 +51,7 @@ public:
 	int buffSize16 = 0;
 
 	GameObject* parent = nullptr;
+	Chunk* chunkP = nullptr;
 
 	int size = 2;
 	float width = 64.0f;

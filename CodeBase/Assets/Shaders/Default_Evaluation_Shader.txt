@@ -5,9 +5,12 @@ layout (binding = 0, rgba8) uniform coherent image2D exportTexture;
 uniform mat4 View;
 uniform mat4 Projection;
 uniform mat4 Model;
-uniform float maxHeight;
 uniform float seed;
 uniform int gridSize;
+
+uniform float terrainHeight;
+uniform float chunkHeight;
+
 
 in vec3 WorldPos_ES_in[];
 in vec3 Normal_ES_in[];
@@ -26,15 +29,16 @@ uniform sampler2D outputTexture;
 
 uniform float delta;
 uniform float freq;
-uniform int octaves;
+uniform int chunkOctaves;
+uniform int terrainOctaves;
 uniform float divisions;
+
+int octaves;
+
 
 uniform int primitive;
 
-//uniform bool brownian_b;
-//uniform bool perlin_b;
-//uniform bool heightmap_b;
-//uniform bool voronoi_b;
+float maxHeight;
 
 uniform vec2 chunkCoords;
 uniform int selected;
@@ -428,9 +432,41 @@ vec3 GetVertexNormal()
 
 void main()
 {		
+	float totalHeight = terrainHeight;
+	
+	if(chunkOctaves!=terrainOctaves)
+	{
+		if(gl_TessCoord.x == 0.0 || gl_TessCoord.y == 0.0|| gl_TessCoord.x == 1.0|| gl_TessCoord.y == 1.0)
+		{
+			octaves = terrainOctaves;
+		}
+		else
+		{
+			float dist = distance(gl_TessCoord.xy,vec2(0.5))*2.0;
+			int testOct = int(mix(terrainOctaves,chunkOctaves,max(1.0-abs(dist),0.0)));
+			octaves = testOct;
+		}
+	}
+	else
+	{
+		octaves = terrainOctaves;
+	}
+	
 	WorldPos_FS_in = GetVertex(0.0,0.0);
 	
 	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+chunkCoords)/gridSize)*100);
+	
+	if(chunkHeight!=0)
+	{
+		totalHeight = terrainHeight+chunkHeight;
+		float dist = distance(gl_TessCoord.xy,vec2(0.5))*2.0;
+		maxHeight = int(mix(terrainHeight,chunkHeight,max(1.0-abs(dist),0.0)));
+		
+	}
+	else
+	{
+		maxHeight=terrainHeight;
+	}
 
 	if(primitive!=0)
 	{
@@ -446,24 +482,31 @@ void main()
 	if(primitive==1)
 	{
 		height = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y);
-		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
-
+		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+		WorldPos_FS_in.y = height*maxHeight;
+		
 	}
 	else if(primitive==2)
 	{
 		height = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y);
-		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+		WorldPos_FS_in.y = height*maxHeight;
+
 
 	}
 	else if(primitive==3)
 	{
 		height = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y);
-		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+		WorldPos_FS_in.y = height*maxHeight;
+
 	}
 	else if(primitive==4)
 	{
 		height = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y);
-		WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
+		WorldPos_FS_in.y = height*maxHeight;
+
 	}
 	else
 	{
@@ -473,6 +516,7 @@ void main()
 	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
 	
 	Color_FS_in = vec3(0.5);
+
 	
 	if(height <0.09)
 	{
@@ -499,7 +543,7 @@ void main()
 	{
 		Color_FS_in.x=1.0f;
 	}
-	
+		
 	texColor_FS_in = vec3(height);
 	
 	imageStore(exportTexture, pix_coord, vec4(texColor_FS_in, 1.0));

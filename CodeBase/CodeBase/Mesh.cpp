@@ -12,12 +12,14 @@
 #include "Terrain.h"
 #include "FileSystem.h"
 #include "UIGeneration.h"
+#include "Chunk.h"
 
 
 
-Mesh::Mesh(GameObject* _parent, int x, int y, float _height, float _width, float _color)
+Mesh::Mesh(GameObject* _parent, Chunk* _chunkP, int x, int y, float _height, float _width, float _color)
 {
 	parent = _parent;
+	chunkP = _chunkP;
 	
 	chunkX = x;
 	chunkY = y;
@@ -76,6 +78,7 @@ Mesh::~Mesh()
 		infoGPU = nullptr;
 	}
 
+	chunkP = nullptr;
 	parent = nullptr;
 }
 
@@ -106,17 +109,22 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
 
 		// Terrain info 
-		int height = glGetUniformLocation(parent->terrainShader, "maxHeight");
-		glUniform1f(height, parent->terrain->maxHeight);
 		int seed = glGetUniformLocation(parent->terrainShader, "seed");
 		glUniform1f(seed, parent->terrain->seed);
 		int frequency = glGetUniformLocation(parent->terrainShader, "freq");
 		glUniform1f(frequency, parent->terrain->frequency);
-		int octaves = glGetUniformLocation(parent->terrainShader, "octaves");
-		glUniform1i(octaves, parent->terrain->octaves);
 		int primitive = glGetUniformLocation(parent->terrainShader, "primitive");
 		glUniform1i(primitive, parent->terrain->primitive);
+		int terrainHeight = glGetUniformLocation(parent->terrainShader, "terrainHeight");
+		glUniform1f(terrainHeight, parent->terrain->maxHeight);
+		int terainOctaves = glGetUniformLocation(parent->terrainShader, "terrainOctaves");
+		glUniform1i(terainOctaves, parent->terrain->octaves);
 
+		// Chunk info 
+		int chunkHeight = glGetUniformLocation(parent->terrainShader, "chunkHeight");
+		glUniform1f(chunkHeight, chunkP->maxHeight);
+		int chunkOctaves = glGetUniformLocation(parent->terrainShader, "chunkOctaves");
+		glUniform1i(chunkOctaves, chunkP->octaves);
 
 		// Mesh info
 		int grid = glGetUniformLocation(parent->terrainShader, "gridSize");

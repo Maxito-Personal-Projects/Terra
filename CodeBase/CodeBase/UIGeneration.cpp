@@ -70,6 +70,10 @@ bool UIGeneration::Draw()
 			ImGui::Text("Width:");
 			ImGui::Dummy(ImVec2(0.0f, 0.25f));
 			ImGui::Text("Chunks:");
+			ImGui::Dummy(ImVec2(0.0f, 0.1f));
+			ImGui::Text("Terrain Height:");	
+			ImGui::Dummy(ImVec2(0.0f, 0.1f));
+			ImGui::Text("Terrain Seed:");			
 
 			ImGui::PopFont();
 			ImGui::EndGroup();
@@ -88,6 +92,14 @@ bool UIGeneration::Draw()
 
 			ImGui::PushID("ChunkNum");
 			ImGui::DragInt("", &terrainChunks);
+			ImGui::PopID();
+
+			ImGui::PushID("Terr Height");
+			ImGui::DragFloat("", &terrain->maxHeight, 1.0f, 0.0f);
+			ImGui::PopID();
+
+			ImGui::PushID("Seed");
+			ImGui::DragFloat("", &terrain->seed, 0.01f);
 			ImGui::PopID();
 
 			ImGui::EndGroup();

@@ -246,6 +246,9 @@
     <ClCompile Include="UIScene.cpp">
       <Filter>Source Files\UIWindows</Filter>
     </ClCompile>
+    <ClCompile Include="UIChunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -562,6 +565,9 @@
     </ClInclude>
     <ClInclude Include="UIScene.h">
       <Filter>Source Files\UIWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="UIChunk.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

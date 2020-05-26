@@ -14,6 +14,7 @@ class UITest;
 class UIExport;
 class UIGeneration;
 class UIScene;
+class UIChunk;
 
 class Texture;
 
@@ -55,6 +56,7 @@ public:
 
 	UIGeneration* generationWindow = nullptr;
 	UIScene* sceneWindow = nullptr;
+	UIChunk* chunkWindow = nullptr;
 
 	Texture* errorImage = nullptr;
 	Texture* textTest = nullptr;

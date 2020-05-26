@@ -212,6 +212,7 @@
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="UIChunk.cpp" />
     <ClCompile Include="UIExport.cpp" />
     <ClCompile Include="UIGeneration.cpp" />
     <ClCompile Include="UIScene.cpp" />
@@ -319,6 +320,7 @@
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="UIChunk.h" />
     <ClInclude Include="UIExport.h" />
     <ClInclude Include="UIGeneration.h" />
     <ClInclude Include="UIScene.h" />
