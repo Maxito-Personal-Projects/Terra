@@ -39,14 +39,6 @@ bool UITest::Draw()
 	ImGui::PopItemWidth();
 	ImGui::PopID();
 
-	ImGui::Text("Light delta:");
-	ImGui::SameLine();
-	ImGui::PushID("delta");
-	ImGui::PushItemWidth(100.0f);
-	ImGui::DragFloat("", &myApp->m_render->delta, 0.00001f, 0.000001f, 1.0f, "%.7f");
-	ImGui::PopItemWidth();
-	ImGui::PopID();
-
 	ImGui::Text("-------------------------");
 	
 	// Cam setting
@@ -61,18 +53,8 @@ bool UITest::Draw()
 
 	ImGui::Text("-------------------------");
 
-	ImGui::Text("-------------------------");
-
 	// Terrain setting
 	ImGui::Text("Terrain Settings:");
-	
-	ImGui::Text("Seed:");
-	ImGui::SameLine();
-	ImGui::PushID("Seed");
-	ImGui::PushItemWidth(100.0f);
-	ImGui::DragFloat("", &terrain->seed, 0.01f);
-	ImGui::PopItemWidth();
-	ImGui::PopID();
 
 	ImGui::Text("Frequency:");
 	ImGui::SameLine();

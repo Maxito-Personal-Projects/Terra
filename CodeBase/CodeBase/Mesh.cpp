@@ -136,6 +136,15 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		int select = glGetUniformLocation(parent->terrainShader, "selected");
 		glUniform1i(select, (int)selected);
 
+		//Color info
+		int numLayers = glGetUniformLocation(parent->terrainShader, "numLayers");
+		glUniform1i(numLayers, myApp->m_ui->generationWindow->numLayers);
+		int colorsRanges = glGetUniformLocation(parent->terrainShader, "layerRanges");
+		glUniform1fv(colorsRanges,12,myApp->m_ui->generationWindow->layerRanges->ptr());
+		int colorsLayer = glGetUniformLocation(parent->terrainShader, "layerColors");
+		glUniform1fv(colorsLayer, 18, myApp->m_ui->generationWindow->layerColors->ptr());
+
+
 		if (divisions == 64.0f)
 		{
 			//Binding transform feedback buffer

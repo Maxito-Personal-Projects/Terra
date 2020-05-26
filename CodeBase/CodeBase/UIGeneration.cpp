@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "Texture.h"
 #include "Terrain.h"
+#include "Chunk.h"
 
 #include <Windows.h>
 
@@ -15,6 +16,9 @@ UIGeneration::UIGeneration(std::string name, bool active) : UIWindow(name, activ
 	currPrimitive = "None";
 	currFunction = "None";
 	currNumLayer = "1";
+
+	layerRanges[0] = { 0.0f,1.0f };
+	layerColors[0] = { 0.25f,0.88f,0.82f};
 }
 
 
@@ -36,8 +40,12 @@ bool UIGeneration::Draw()
 
 	ImGui::Begin(name.c_str(), &active);
 	{
+		int numWindows = 6;
+
+		if (heightWindow) numWindows = 5;
+
 		ImVec2 mainWindowSize = ImGui::GetWindowSize();
-		ImVec2 windowSizes = { (mainWindowSize.x-50.0f)/6.f, mainWindowSize.y-50.0f };
+		ImVec2 windowSizes = { (mainWindowSize.x-50.0f)/ numWindows, mainWindowSize.y-50.0f };
 
 		ImVec4 titleColor = ImVec4(0.2f, 0.2f, 0.2f, 0.8f);
 
@@ -70,10 +78,6 @@ bool UIGeneration::Draw()
 			ImGui::Text("Width:");
 			ImGui::Dummy(ImVec2(0.0f, 0.25f));
 			ImGui::Text("Chunks:");
-			ImGui::Dummy(ImVec2(0.0f, 0.1f));
-			ImGui::Text("Terrain Height:");	
-			ImGui::Dummy(ImVec2(0.0f, 0.1f));
-			ImGui::Text("Terrain Seed:");			
 
 			ImGui::PopFont();
 			ImGui::EndGroup();
@@ -92,14 +96,6 @@ bool UIGeneration::Draw()
 
 			ImGui::PushID("ChunkNum");
 			ImGui::DragInt("", &terrainChunks);
-			ImGui::PopID();
-
-			ImGui::PushID("Terr Height");
-			ImGui::DragFloat("", &terrain->maxHeight, 1.0f, 0.0f);
-			ImGui::PopID();
-
-			ImGui::PushID("Seed");
-			ImGui::DragFloat("", &terrain->seed, 0.01f);
 			ImGui::PopID();
 
 			ImGui::EndGroup();
@@ -129,6 +125,11 @@ bool UIGeneration::Draw()
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.8f, 0.5f));
 		ImGui::BeginChild("Primitive Selector", windowSizes, true);
 		{
+			heightWindow = false;
+
+			//type of primitives
+			char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
+
 			//Centered Title
 			std::string text = "Primitive Selector";
 			ImGui::PushFont(myApp->m_ui->montserratBold);
@@ -150,12 +151,34 @@ bool UIGeneration::Draw()
 			ImGui::Dummy(ImVec2(0.0f, 0.25f));
 			ImGui::PushFont(myApp->m_ui->arial);
 			ImGui::Text("Primitive:");
+			ImGui::Dummy(ImVec2(0.0f, 0.1f));
+			ImGui::Text("Height:");
+			ImGui::Dummy(ImVec2(0.0f, 0.05f));
+			ImGui::Text("Seed:");
+			ImGui::Dummy(ImVec2(0.0f, 0.05f));
+			ImGui::Text("Octaves:");
+
+			if (currPrimitive != primitives[4])
+			{
+				ImGui::Dummy(ImVec2(0.0f, 0.05f));
+				ImGui::Text("Frequency:");
+			}
+
+			if (currPrimitive == primitives[4])
+			{
+				char buff[256];
+				strcpy_s(buff, 256, fileName.c_str());
+
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text("File:");
+				ImGui::PopFont();
+			}
 			ImGui::EndGroup();
 
 			ImGui::SameLine();
 
-			char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
-			
+			ImGui::BeginGroup();
+
 			ImGui::PushID("None Primitive");
 			if (ImGui::BeginCombo("", currPrimitive))
 			{
@@ -176,29 +199,44 @@ bool UIGeneration::Draw()
 			ImGui::PopFont();
 			ImGui::PopID();
 
+			ImGui::PushID("Terr Height");
+			ImGui::DragFloat("", &terrain->maxHeight, 1.0f, 0.0f);
+			ImGui::PopID();
+
+			ImGui::PushID("Seed");
+			ImGui::DragFloat("", &terrain->seed, 0.01f);
+			ImGui::PopID();
+
+			ImGui::PushID("Octaves");
+			ImGui::DragInt("", &terrain->octaves, 0.1f, 1, 8, "%.0f");
+			ImGui::PopID();
+
+			if (currPrimitive != primitives[4])
+			{
+				ImGui::PushID("Frequency");
+				ImGui::DragFloat("", &terrain->frequency, 0.1, 0.1f, 1000.0f, "%.1f");
+				ImGui::PopID();
+			}
+
 			if (currPrimitive == primitives[4])
 			{
+				heightWindow = true;
+
 				char buff[256];
 				strcpy_s(buff, 256, fileName.c_str());
 
-				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text("File:");
-				ImGui::PopFont();
-				
-				ImGui::SameLine();
-
 				ImGui::PushID("Heightmapfile");
-				ImGui::InputText("", buff, 256,ImGuiInputTextFlags_ReadOnly);
+				ImGui::InputText("", buff, 256, ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopID();
 
 				char buff2[256];
 
 				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
-				if (ImGui::Button("...",ImVec2(50.0f,25.0f)))
+				if (ImGui::Button("...", ImVec2(50.0f, 25.0f)))
 				{
 					string ret = myApp->fileSystem->GetFileNameAt(myApp->fileSystem->GetFolderPath("Images").c_str());
-					if (ret!="")
+					if (ret != "")
 					{
 						if (heightmap)
 						{
@@ -215,66 +253,74 @@ bool UIGeneration::Draw()
 
 				if (heightmap)
 				{
-					ImVec2 imageSize = {windowSizes.x-25.0f,windowSizes.x - 25.0f };
+					ImVec2 imageSize = { windowSizes.x - 25.0f,windowSizes.x - 25.0f };
 					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
 					ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(imageSize));
 				}
 			}
-		}
-		ImGui::EndChild();
 
-		ImGui::SameLine();
-
-		//--------------------------- Function Editor ------------------------------------------------
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
-		ImGui::BeginChild("Function Selector", windowSizes, true);
-		{
-			//Centered Title
-			std::string text = "Function Selector";
-			ImGui::PushFont(myApp->m_ui->montserratBold);
-			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
-			ImGui::TextColored(titleColor, text.c_str());
-			ImGui::PopFont();
-
-			//Window DrawList
-			ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-			//Title Underline 
-			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
-			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
-
-
-			ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-			ImGui::BeginGroup();
-			ImGui::Dummy(ImVec2(0.0f, 0.25f));
-			ImGui::PushFont(myApp->m_ui->arial);
-			ImGui::Text("Function:");
 			ImGui::EndGroup();
 
-			ImGui::SameLine();
-
-			char* functions[] = { "Brownian Motion","Fraction","Module", "Sinus"};
-
-			ImGui::PushID("None Function");
-			if (ImGui::BeginCombo("", currFunction))
-			{
-				for (int i = 0; i < 4; ++i)
-				{
-					bool isSelected = (currFunction == functions[i]);
-					if (ImGui::Selectable(functions[i], isSelected))
-					{
-						currFunction = functions[i];
-					}
-				}
-				ImGui::EndCombo();
-			}
-			ImGui::PopFont();
-			ImGui::PopID();
 
 		}
 		ImGui::EndChild();
+
+		//--------------------------- Function Editor ------------------------------------------------
+		if (!heightWindow)
+		{
+			ImGui::SameLine();
+
+			ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
+			ImGui::BeginChild("Function Selector", windowSizes, true);
+			{
+				//Centered Title
+				std::string text = "Function Selector";
+				ImGui::PushFont(myApp->m_ui->montserratBold);
+				ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
+				ImGui::TextColored(titleColor, text.c_str());
+				ImGui::PopFont();
+
+				//Window DrawList
+				ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+				//Title Underline 
+				ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
+				ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+				drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
+
+
+				ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+				ImGui::BeginGroup();
+				ImGui::Dummy(ImVec2(0.0f, 0.25f));
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text("Function:");
+				ImGui::EndGroup();
+
+				ImGui::SameLine();
+
+				char* functions[] = { "Brownian Motion","Fraction","Module", "Sinus" };
+
+				ImGui::PushID("None Function");
+				if (ImGui::BeginCombo("", currFunction))
+				{
+					for (int i = 0; i < 4; ++i)
+					{
+						bool isSelected = (currFunction == functions[i]);
+						if (ImGui::Selectable(functions[i], isSelected))
+						{
+							currFunction = functions[i];
+						}
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::PopFont();
+				ImGui::PopID();
+
+			}
+			ImGui::EndChild();
+			ImGui::PopStyleColor(1);
+		}
 
 		ImGui::SameLine();
 
@@ -314,27 +360,106 @@ bool UIGeneration::Draw()
 
 			ImGui::PopItemWidth();
 
-			for (int i = 0; i < numLayers; i++)
+			for (int i = 0; i < 6; i++)
 			{
-				string layer = "Layer " + std::to_string(i+1);
-				ImGui::Text(layer.c_str());
+				if (i < numLayers)
+				{
+					string layer = "Layer " + std::to_string(i + 1);
+					ImGui::Text(layer.c_str());
 
-				float range[2] = { 0.0f,1.0f };
-				float color[3];
-				
-				ImGui::Text("Range: ");
+					ImGui::Text("Range: ");
 
-				ImGui::SameLine();
+					ImGui::SameLine();
 
-				ImGui::PushItemWidth(75.0f);
-				ImGui::DragFloat2("",range,0.01f,0.0f,1.0,"%.2f");
-				ImGui::PopItemWidth();
+					if (i == 0)
+					{
+						layerRanges[i].x = 0.0f;
 
-				ImGui::SameLine();
+						ImGui::PushID("Show 1");
+						ImGui::PushItemWidth(75.0f);
+						ImGui::DragFloat("", &layerRanges[i].x, 0.01f, 0.0f, 1.0, "%.2f");
+						ImGui::PopItemWidth();
+						ImGui::PopID();
 
-				ImGui::PushItemWidth(150.0f);
-				ImGui::ColorEdit3("", color);
-				ImGui::PopItemWidth();
+						ImGui::SameLine();
+
+						ImGui::PushID(layer.c_str());
+						ImGui::PushItemWidth(75.0f);
+						if (ImGui::DragFloat("", &layerRanges[i].ptr()[1], 0.01f, 0.0f, 1.0, "%.2f"))
+						{
+							layerRanges[i + 1].x = layerRanges[i].y;
+						}
+						ImGui::PopItemWidth();
+						ImGui::PopID();
+
+						if (numLayers==1)
+						{
+							layerRanges[i].y = 1.0f;
+						}
+					}
+					else if(i>0 && i<numLayers-1)
+					{
+						string layerID = layer + "ID";
+
+						ImGui::PushID(layer.c_str());
+						ImGui::PushItemWidth(75.0f);
+						if (ImGui::DragFloat("", &layerRanges[i - 1].ptr()[1], 0.01f, layerRanges[i-1].x, layerRanges[i].y, "%.2f"))
+						{
+							layerRanges[i].x = layerRanges[i-1].y;
+						}
+						ImGui::PopID();
+
+						ImGui::SameLine();
+
+						ImGui::PushID(layerID.c_str());
+
+						if (ImGui::DragFloat("", &layerRanges[i].ptr()[1], 0.01f, layerRanges[i].x, layerRanges[i+1].y, "%.2f") && i < numLayers - 1)
+						{
+							layerRanges[i+1].x = layerRanges[i].y;
+						}
+						ImGui::PopItemWidth();
+						ImGui::PopID();
+					}
+					else
+					{
+						ImGui::PushID(layer.c_str());
+						ImGui::PushItemWidth(75.0f);
+						if (ImGui::DragFloat("", &layerRanges[i].ptr()[0], 0.01f, layerRanges[i - 1].x, 1.0, "%.2f"))
+						{
+							layerRanges[i-1].y = layerRanges[i].x;
+						}
+						ImGui::PopItemWidth();
+						ImGui::PopID();
+
+						ImGui::SameLine();
+
+						ImGui::PushID("Show last");
+						ImGui::PushItemWidth(75.0f);
+						ImGui::DragFloat("", &layerRanges[i].y, 0.01f, 0.0f, 1.0, "%.2f");
+						ImGui::PopItemWidth();
+						ImGui::PopID();
+
+
+						layerRanges[i].y = 1.0f;
+					}
+
+					ImGui::Text("Color: ");
+
+					ImGui::SameLine();
+
+					string Color = layer + "color";
+					
+					ImGui::PushID(Color.c_str());
+					ImGui::PushItemWidth(200.0f);
+					ImGui::ColorEdit3("", layerColors[i].ptr());
+					ImGui::PopItemWidth();
+					ImGui::PopID();
+				}
+				else
+				{
+					layerRanges[i] = { 1.0f,1.0f };
+					layerColors[i] = { 0.0f,0.0f,0.0f };
+				}
 
 			}
 			ImGui::PopFont();
@@ -364,6 +489,36 @@ bool UIGeneration::Draw()
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.0f, 0.7f, 0.0f, 1.0f));
 
 			ImGui::Spacing();
+
+			if (selectedChunk)
+			{
+				string chunkName = "Chunk " + to_string(selectedChunk->chunkID) + " Settings";
+				// Terrain setting
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text(chunkName.c_str());
+				ImGui::PopFont();
+
+				ImGui::BeginGroup();
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text("Chunk Height:");
+				ImGui::Text("Octaves:");
+				ImGui::PopFont();
+				ImGui::EndGroup();
+
+				
+				ImGui::SameLine();
+
+				ImGui::BeginGroup();
+				ImGui::PushID("C Height");
+				ImGui::DragFloat("", &selectedChunk->maxHeight, 1.0f, 0.0f);
+				ImGui::PopID();
+				
+				ImGui::PushID("C Octaves");
+				ImGui::DragInt("", &selectedChunk->octaves, 0.1f, 1, 8, "%.0f");
+				ImGui::PopID();
+				ImGui::EndGroup();
+
+			}
 		}
 		ImGui::EndChild();
 
@@ -391,7 +546,7 @@ bool UIGeneration::Draw()
 		}
 		ImGui::EndChild();
 
-		ImGui::PopStyleColor(6);
+		ImGui::PopStyleColor(5);
 	}
 	ImGui::End();
 

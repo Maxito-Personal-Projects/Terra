@@ -10,6 +10,7 @@
 
 #include "UIScene.h"
 #include "UIChunk.h"
+#include "UIGeneration.h"
 
 
 bool ModuleRenderer::Init()
@@ -45,7 +46,7 @@ bool ModuleRenderer::Init()
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	glClearColor(.5f, 0.7f, 0.8f, 1);
+	glClearColor(.22f, 0.25f, 0.28f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -259,6 +260,7 @@ void ModuleRenderer::SelectChunk()
 
 	bool chunkSelected = false;
 	myApp->m_ui->chunkWindow->selectedChunk = nullptr;
+	myApp->m_ui->generationWindow->selectedChunk = nullptr;
 
 	for (int i = 0; i < firstGO->terrain->totalkChunks; ++i)
 	{
@@ -268,6 +270,7 @@ void ModuleRenderer::SelectChunk()
 		{
 			firstGO->terrain->chunks[i]->selected = true;
 			myApp->m_ui->chunkWindow->selectedChunk = firstGO->terrain->chunks[i];
+			myApp->m_ui->generationWindow->selectedChunk = firstGO->terrain->chunks[i];
 		}
 	}
 

@@ -5,6 +5,7 @@
 
 class Texture;
 class Terrain;
+class Chunk;
 
 class UIGeneration : public UIWindow
 {
@@ -25,7 +26,8 @@ private:
 	float terrainWidth = 0;
 	int terrainChunks = 0;
 
-	int numLayers = 1;
+
+	bool heightWindow = false;
 
 	string fileName;
 
@@ -34,6 +36,13 @@ private:
 public:
 
 	Texture* heightmap = nullptr;
+
+	float2 layerRanges[6];
+	float3 layerColors[6];
+
+	int numLayers = 1;
+
+	Chunk* selectedChunk = nullptr;
 
 };
 
