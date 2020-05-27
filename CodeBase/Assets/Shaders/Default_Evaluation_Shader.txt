@@ -14,18 +14,19 @@ uniform int numLayers;
 uniform float terrainHeight;
 uniform float chunkHeight;
 
-
 in vec3 WorldPos_ES_in[];
 in vec3 Normal_ES_in[];
 in vec3 Color_ES_in[];
 
 out vec3 WorldPos_FS_in;
+out vec3 Blend_Normal_FS_in;
 out vec3 Normal_FS_in;
 out vec3 Color_FS_in;
 vec3 texColor_FS_in;
 out vec3 TFPosition;
 out vec3 TFNormal;
 out vec3 TFColor;
+out vec2 uvCoords;
 
 uniform sampler2D heightmap;
 uniform sampler2D outputTexture;
@@ -471,16 +472,24 @@ void main()
 		maxHeight=terrainHeight;
 	}
 
+	int saveOct =octaves;
+	
 	if(primitive!=0)
 	{
 		Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
+		
+		octaves=2;
+		Blend_Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
 	}
 	else
 	{
 		Normal_FS_in = vec3(0.0,1.0,0.0);
+		Blend_Normal_FS_in = vec3(0.0,1.0,0.0);
 	}
 	
 	float height=0.0;
+	
+	octaves=saveOct;
 	
 	if(primitive==1)
 	{
@@ -517,6 +526,8 @@ void main()
 	}
 	
 	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
+	
+	uvCoords = gl_TessCoord.xy;
 	
 	Color_FS_in = vec3(0.5);
 	
