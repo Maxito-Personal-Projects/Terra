@@ -19,6 +19,7 @@ in vec3 Normal_ES_in[];
 in vec3 Color_ES_in[];
 
 out vec3 WorldPos_FS_in;
+out float MapPos_FS_in;
 out vec3 Blend_Normal_FS_in;
 out vec3 Normal_FS_in;
 out vec3 Color_FS_in;
@@ -524,6 +525,8 @@ void main()
 	{
 		WorldPos_FS_in.y = 0.0;
 	}
+	
+	MapPos_FS_in=height;
 	
 	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
 	

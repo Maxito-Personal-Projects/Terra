@@ -3,6 +3,7 @@
 out vec4 FragColor;
 
 in vec3 WorldPos_FS_in;
+in float MapPos_FS_in;
 in vec3 Blend_Normal_FS_in;
 in vec3 Normal_FS_in;
 in vec3 Color_FS_in;
@@ -119,10 +120,9 @@ vec3 Grass(vec2 pos)
 {
 	vec3 color = vec3(0.0);
 	
-	float rand_2 = mixColor(pos,200.0);
 	float rand_1 = mixColor(pos,200.0);
 	vec3 col1 = vec3(0.0,rand_1,0.0);
-    vec3 col2 = vec3((1.0-rand_2),(1.0-rand_2)*0.5,0.0);
+    vec3 col2 = vec3((1.0-rand_1),(1.0-rand_1)*0.5,0.0);
 	color = mix(col1,col2,(1.0-rand_1)*0.9);
 	
 	return color;
@@ -132,11 +132,34 @@ vec3 Rock(vec2 pos)
 {
 	vec3 color = vec3(0.0);
 	
-	float rand_2 = mixColor(pos,50.0);
 	float rand_1 = mixColor(pos,50.0);
 	vec3 col3 = vec3(rand_1,rand_1,rand_1);
-    vec3 col4 = vec3(rand_2,rand_2*0.8,rand_2);
+    vec3 col4 = vec3(rand_1,rand_1*0.8,rand_1);
 	color = mix(col3,col4,(1.0-rand_1)*0.9);
+	
+	return color;
+}
+
+vec3 Beach(vec2 pos)
+{
+	vec3 color = vec3(0.0);
+	
+	float rand_1 = mixColor(pos,50.0);
+	vec3 col3 = vec3(rand_1,rand_1,0.0);
+    vec3 col4 = vec3(1.0,1.0,1.0);
+	color = mix(col3,col4,(1.0-rand_1)*0.9);
+	
+	return color;
+}
+
+vec3 Snow(vec2 pos)
+{
+	vec3 color = vec3(0.0);
+	
+	float rand_1 = mixColor(pos,200.0);
+	vec3 col3 = vec3(rand_1,rand_1,rand_1);
+    vec3 col4 = vec3(1.0,1.0,1.0);
+	color = mix(col3,col4,(1.0-rand_1));
 	
 	return color;
 }
@@ -147,16 +170,49 @@ void main()
 	vec3 fragPos = WorldPos_FS_in;
 	
 	vec3 blending = abs( Blend_Normal_FS_in );
-	blending = normalize(max(blending, 0.00001)); 
-	blending.x*=2.0;
-	blending.z*=2.0;
+	blending = normalize(max(blending, 0.00001));
 	// Force weights to sum to 1.0
 	float b = (blending.x + blending.y + blending.z);
 	blending /= vec3(b, b, b);
 	
-	vec3 xaxis = Rock(uvCoords);
-	vec3 yaxis = Grass(uvCoords);
-	vec3 zaxis = xaxis;
+	vec3 xaxis;
+	vec3 yaxis;
+	vec3 zaxis;
+	
+	if(MapPos_FS_in<=0.1)
+	{
+		xaxis = Rock(uvCoords);
+		yaxis = Beach(uvCoords);
+		zaxis = xaxis;
+	}
+	else if(MapPos_FS_in>0.1 && MapPos_FS_in<0.2)
+	{
+		float mixFactor = (0.2-MapPos_FS_in)*10.0;
+		xaxis = Rock(uvCoords);
+		yaxis = mix(Beach(uvCoords),Grass(uvCoords),1.-mixFactor);
+		zaxis = xaxis;
+	}
+	else if(MapPos_FS_in>0.2 && MapPos_FS_in<0.4)
+	{
+		xaxis = Rock(uvCoords);
+		yaxis = Grass(uvCoords);
+		zaxis = xaxis;
+	}
+	else if(MapPos_FS_in>0.4 && MapPos_FS_in<=0.6)
+	{
+		float mixFactor = (0.6-MapPos_FS_in)/0.2;
+		xaxis = Rock(uvCoords);
+		yaxis = mix(Grass(uvCoords),Snow(uvCoords),1.-mixFactor);
+		zaxis = xaxis;
+	}
+	else
+	{
+		xaxis = Rock(uvCoords);
+		yaxis = Snow(uvCoords);
+		zaxis = xaxis;
+	}
+	
+	
 	
 	// blend the results of the 3 planar projections.
 	vec3 vecColor = xaxis * blending.x + yaxis * blending.y + zaxis * blending.z;
