@@ -112,6 +112,7 @@ bool UIGeneration::Draw()
 			{
 				terrain->DeleteChunks();
 				terrain->GenerateChunks(terrainChunks, terrainHeight, terrainWidth);
+				terrain->SetNeighbours();
 			}
 			ImGui::PopFont();
 			ImGui::PopStyleColor(2);
@@ -496,6 +497,13 @@ bool UIGeneration::Draw()
 				// Terrain setting
 				ImGui::PushFont(myApp->m_ui->arial);
 				ImGui::Text(chunkName.c_str());
+				ImGui::PopFont();
+
+
+				string chunkCoords = "Coord X:  " + to_string(selectedChunk->x) + " Coord Y:  " + to_string(selectedChunk->y);
+				// Terrain setting
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text(chunkCoords.c_str());
 				ImGui::PopFont();
 
 				ImGui::BeginGroup();

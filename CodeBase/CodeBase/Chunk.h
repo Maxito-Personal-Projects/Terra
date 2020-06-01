@@ -14,10 +14,13 @@ public:
 
 	~Chunk();
 
+	void SetNeighbours();
+
 public:
 
 	GameObject* parent = nullptr;
 	Mesh* mesh = nullptr;
+	Chunk* neighbours[8];
 
 	float maxHeight = 0.0f;
 	int octaves = 8;
@@ -25,6 +28,7 @@ public:
 	int chunkID = 0;
 	int x=0;
 	int y=0;
+	int numNeighbours = 0;
 
 	float3 color = { 0.0f,0.0f,0.0f };
 	bool selected = false;

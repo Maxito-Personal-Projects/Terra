@@ -42,8 +42,8 @@ void Terrain::GenerateChunks(int nChunks, float height, float width)
 
 	for (int i = 0; i < totalkChunks; ++i)
 	{
-		int x = i / numChunks;
-		int y = i % numChunks;
+		int x = i % numChunks;
+		int y = i / numChunks;
 		float color = (float)i / float(totalkChunks);
 		Chunk* curr = new Chunk(parent, i, x, y, height,width,color);
 		chunks.push_back(curr);
@@ -60,5 +60,27 @@ void Terrain::DeleteChunks()
 
 	totalkChunks = 0;
 	chunks.clear();
+}
+
+Chunk * Terrain::GetChunkFromCoords(int x, int y, int &num)
+{
+	Chunk* ret = nullptr;
+
+	if (x>-1 && y>-1 && x<numChunks && y<numChunks)
+	{
+		int id = numChunks * x + y;
+		num++;
+		ret = chunks[id];
+	}
+
+	return ret;
+}
+
+void Terrain::SetNeighbours()
+{
+	for (int i = 0; i < totalkChunks; ++i)
+	{
+		chunks[i]->SetNeighbours();
+	}
 }
 

@@ -14,6 +14,11 @@ GameObject::GameObject()
 	transform = new Transform();
 	terrain = new Terrain(this,2);
 
+	if (terrain)
+	{
+		terrain->SetNeighbours();
+	}
+
 	//Default Shader
 	terrainShader = myApp->m_shader->GetShader("Default Shader");
 	renderShader = myApp->m_shader->GetShader("Render Shader");

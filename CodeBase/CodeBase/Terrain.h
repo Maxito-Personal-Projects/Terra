@@ -17,6 +17,9 @@ public:
 	void GenerateChunks(int nChunks, float height, float width);
 	void DeleteChunks();
 
+	Chunk* GetChunkFromCoords(int x, int y, int &num);
+	void SetNeighbours();
+
 public:
 
 	GameObject* parent = nullptr;

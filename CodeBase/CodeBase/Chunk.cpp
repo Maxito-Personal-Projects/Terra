@@ -22,5 +22,32 @@ Chunk::~Chunk()
 	delete mesh;
 	mesh = nullptr;
 
+	for (int i = 0; i < 8; ++i)
+	{
+		if (neighbours[i])
+		{
+			neighbours[i] = nullptr;
+		}
+	}
+
 	parent = nullptr;
+}
+
+void Chunk::SetNeighbours()
+{
+	Terrain* terrain = parent->terrain;
+
+	int size = terrain->numChunks;
+
+	neighbours[0] = terrain->GetChunkFromCoords(x - 1, y - 1, numNeighbours);
+	neighbours[1] = terrain->GetChunkFromCoords(x, y - 1, numNeighbours);
+	neighbours[2] = terrain->GetChunkFromCoords(x + 1 , y - 1, numNeighbours);
+	neighbours[3] = terrain->GetChunkFromCoords(x + 1, y, numNeighbours);
+	neighbours[4] = terrain->GetChunkFromCoords(x + 1, y + 1, numNeighbours);
+	neighbours[5] = terrain->GetChunkFromCoords(x , y + 1, numNeighbours);
+	neighbours[6] = terrain->GetChunkFromCoords(x - 1, y + 1, numNeighbours);
+	neighbours[7] = terrain->GetChunkFromCoords(x - 1, y, numNeighbours);
+
+	LOG("%d", numNeighbours);
+
 }
