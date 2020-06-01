@@ -47,7 +47,4 @@ void Chunk::SetNeighbours()
 	neighbours[5] = terrain->GetChunkFromCoords(x , y + 1, numNeighbours);
 	neighbours[6] = terrain->GetChunkFromCoords(x - 1, y + 1, numNeighbours);
 	neighbours[7] = terrain->GetChunkFromCoords(x - 1, y, numNeighbours);
-
-	LOG("%d", numNeighbours);
-
 }

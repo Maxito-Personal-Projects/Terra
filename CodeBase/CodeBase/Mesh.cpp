@@ -126,6 +126,33 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		int chunkOctaves = glGetUniformLocation(parent->terrainShader, "chunkOctaves");
 		glUniform1i(chunkOctaves, chunkP->octaves);
 
+		int count = 0;
+
+		for (int i = 0; i < 8; i++)
+		{
+			Chunk* neighbour = chunkP->neighbours[i];
+
+			if (neighbour)
+			{
+				string heightVar = "neighbours["+to_string(count)+"].height";
+				string octavesVar = "neighbours[" + to_string(count) + "].octaves";
+				string idVar = "neighbours[" + to_string(count) + "].neighbourID";
+
+				int neighHeight= glGetUniformLocation(parent->terrainShader, heightVar.c_str());
+				int neighOctaves= glGetUniformLocation(parent->terrainShader, octavesVar.c_str());
+				int neighID= glGetUniformLocation(parent->terrainShader, idVar.c_str());
+
+				glUniform1f(neighHeight, neighbour->maxHeight);
+				glUniform1i(neighOctaves, neighbour->octaves);
+				glUniform1i(neighID, i);
+
+				count++;
+			}
+		}
+
+		int numNeigh = glGetUniformLocation(parent->terrainShader,"numNeighbours");
+		glUniform1i(numNeigh, count);
+
 		// Mesh info
 		int grid = glGetUniformLocation(parent->terrainShader, "gridSize");
 		glUniform1i(grid, parent->terrain->numChunks);
