@@ -48,7 +48,8 @@ uniform int chunkOctaves;
 uniform int terrainOctaves;
 uniform float divisions;
 
-int octaves;
+int mixType;
+ivec3 neighIDs;
 
 
 uniform int primitive;
@@ -121,7 +122,7 @@ float Bnoise(vec2 vertexCoords, float frequency)
     return finalMix;
 }
 
-float BrownianNoise(float x, float y)
+float BrownianNoise(float x, float y, int octaves)
 {
     float height = 0.0;
     float a =0.5;
@@ -185,7 +186,7 @@ float Pnoise(vec2 fragCoord, float frequency)
 }
 
 //Different Levels of Detail 
-float PerlinNoise(float x, float y)
+float PerlinNoise(float x, float y, int octaves)
 {
     float height = 0.0;
     float a =0.5;
@@ -288,7 +289,7 @@ float Vnoise(vec2 fragCoord,float frequency)
 }
 
 //Accumulative noise
-float VoronoiNoise(float x, float y)
+float VoronoiNoise(float x, float y, int octaves)
 {
 	float height = 0.0;
     float a =0.5;
@@ -333,6 +334,177 @@ vec3 GetVertex(float deltaX, float deltaY)
 	//u * v * WorldPos_ES_in[2] + omu * v * WorldPos_ES_in[3];
 }
 
+float GetHeight(float x, float y, int octaves)
+{
+	float ret = 0.0;
+	
+	if(primitive==1)
+	{
+		ret = BrownianNoise(x,y,octaves);		
+	}
+	else if(primitive==2)
+	{
+		ret = PerlinNoise(x,y,octaves);
+	}
+	else if(primitive==3)
+	{
+		ret = VoronoiNoise(x,y,octaves);
+	}
+	else if(primitive==4)
+	{
+		ret = ReadHeightmap(x,y);
+	}
+	else
+	{
+		ret = 0.0;
+	}
+	
+	return ret;
+}
+
+vec2 GetMixFactors()
+{
+	vec2 ret = vec2(0.0);
+	
+	if(gl_TessCoord.x<0.5)
+	{
+		if(gl_TessCoord.y<0.5)
+		{
+			ret=gl_TessCoord.xy+vec2(0.5);
+			mixType=1; //Bottom Left Corner
+			neighIDs = ivec3(0,1,7);
+		}
+		else
+		{
+			ret=gl_TessCoord.xy+vec2(0.5,-0.5);
+			mixType=4; //Top Left Corner
+			neighIDs = ivec3(6,5,7);
+		}
+			
+	}
+	else
+	{
+		if(gl_TessCoord.y<0.5)
+		{
+			ret=gl_TessCoord.xy+vec2(-0.5,0.5);
+			mixType=2; //Bottom Right Corner
+			neighIDs = ivec3(1,2,3);
+
+		}
+		else
+		{
+			ret=gl_TessCoord.xy+vec2(-0.5);
+			mixType=3; //Top Right Corner
+			neighIDs = ivec3(5,4,3);
+		}
+	}
+			
+	return ret;
+}
+
+/* Neighbours IDs
+ -----------
+| 6 | 5 | 4 |
+|-----------|
+| 7 | C | 3 |
+|-----------|
+| 0 | 1 | 2 |
+ -----------
+*/
+
+float GetInterpolatedHeight(float x, float y)
+{
+	float ret = 0.0;
+
+	//Border chunks init
+	float surroundHeight = GetHeight(x,y,terrainOctaves);
+	vec3 heights = vec3(surroundHeight*terrainHeight);
+	
+	//Modified chunk
+	float mainHeight = GetHeight(x,y,chunkOctaves); //Main chunk
+	float height_C = mainHeight*(chunkHeight+terrainHeight);
+
+	//Mix Factor
+	vec2 mixFactors = GetMixFactors();
+	
+	if(mixType==1) 		//Bottom Left Corner
+	{
+		//0,1,7
+		for(int i = 0; i<3;++i)
+		{
+			for(int j=0;j<numNeighbours;j++)
+			{
+				if(neighbours[j].neighbourID == neighIDs[i])
+				{
+					//TODO: Check if octaves are different first!
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+				}
+			}
+		}
+		
+		float mix_H_1 = mix(heights.x,heights.y,mixFactors.x); //Bottom
+		float mix_H_2 = mix(heights.z,height_C,mixFactors.x);	// Top
+		ret = mix(mix_H_1,mix_H_2,mixFactors.y);
+	}
+	else if(mixType==2) //Bottom Right Corner
+	{
+		//1,2,3
+		for(int i = 0; i<3;++i)
+		{
+			for(int j=0;j<numNeighbours;j++)
+			{
+				if(neighbours[j].neighbourID == neighIDs[i])
+				{
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+				}
+			}
+		}
+		
+		float mix_H_1 = mix(heights.x,heights.y,mixFactors.x); //Bottom
+		float mix_H_2 = mix(height_C, heights.z,mixFactors.x);	// Top
+		ret = mix(mix_H_1,mix_H_2,mixFactors.y);
+	}
+	else if(mixType==3) //Top Right Corner
+	{
+		//5,4,3
+		for(int i = 0; i<3;++i)
+		{
+			for(int j=0;j<numNeighbours;j++)
+			{
+				if(neighbours[j].neighbourID == neighIDs[i])
+				{
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+				}
+			}
+		}
+		
+		float mix_H_1 = mix(heights.x,heights.y,mixFactors.x); //Bottom
+		float mix_H_2 = mix(height_C, heights.z,mixFactors.x);	// Top
+		ret = mix(mix_H_2,mix_H_1,mixFactors.y);
+		
+	}
+	else				//Top Left Corner
+	{
+		//6,5,7
+		for(int i = 0; i<3;++i)
+		{
+			for(int j=0;j<numNeighbours;j++)
+			{
+				if(neighbours[j].neighbourID == neighIDs[i])
+				{
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+				}
+			}
+		}
+		
+		float mix_H_1 = mix(heights.x,heights.y,mixFactors.x); //Bottom
+		float mix_H_2 = mix(heights.z,height_C,mixFactors.x);  // Top
+		ret = mix(mix_H_2,mix_H_1,mixFactors.y);
+	}
+		
+	return ret;
+}
+
 vec3 GetVertexNormal()
 {
 	vec3 ret=vec3(0.0);
@@ -349,11 +521,11 @@ vec3 GetVertexNormal()
 	
 	if(primitive==1)
 	{
-		M.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
-		U.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
-		L.y = BrownianNoise(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
-		R.y = BrownianNoise(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
-		D.y = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		M.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y);	
+		U.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y+deltatest);	
+		L.y = GetInterpolatedHeight(gl_TessCoord.x-deltatest,gl_TessCoord.y);	
+		R.y = GetInterpolatedHeight(gl_TessCoord.x+deltatest,gl_TessCoord.y);	
+		D.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y-deltatest);
 		
 		//tl = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
 		//l = BrownianNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
@@ -366,11 +538,11 @@ vec3 GetVertexNormal()
 	}
 	if(primitive==2)
 	{
-		M.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
-		U.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
-		L.y = PerlinNoise(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
-		R.y = PerlinNoise(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
-		D.y = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		M.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y);	
+		U.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y+deltatest);	
+		L.y = GetInterpolatedHeight(gl_TessCoord.x-deltatest,gl_TessCoord.y);	
+		R.y = GetInterpolatedHeight(gl_TessCoord.x+deltatest,gl_TessCoord.y);	
+		D.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y-deltatest);
 		
 		//tl = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
 		//l = PerlinNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
@@ -383,11 +555,11 @@ vec3 GetVertexNormal()
 	}
 	if(primitive==3)
 	{
-		M.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
-		U.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
-		L.y = VoronoiNoise(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
-		R.y = VoronoiNoise(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
-		D.y = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		M.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y);	
+		U.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y+deltatest);	
+		L.y = GetInterpolatedHeight(gl_TessCoord.x-deltatest,gl_TessCoord.y);	
+		R.y = GetInterpolatedHeight(gl_TessCoord.x+deltatest,gl_TessCoord.y);	
+		D.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y-deltatest);
 		
 		//tl = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
 		//l = VoronoiNoise(gl_TessCoord.x-delta,gl_TessCoord.y);
@@ -400,11 +572,11 @@ vec3 GetVertexNormal()
 	}
 	if(primitive==4)
 	{
-		M.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y)*maxHeight;	
-		U.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y+deltatest)*maxHeight;	
-		L.y = ReadHeightmap(gl_TessCoord.x-deltatest,gl_TessCoord.y)*maxHeight;	
-		R.y = ReadHeightmap(gl_TessCoord.x+deltatest,gl_TessCoord.y)*maxHeight;	
-		D.y = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y-deltatest)*maxHeight;
+		M.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y);	
+		U.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y+deltatest);	
+		L.y = GetInterpolatedHeight(gl_TessCoord.x-deltatest,gl_TessCoord.y);	
+		R.y = GetInterpolatedHeight(gl_TessCoord.x+deltatest,gl_TessCoord.y);	
+		D.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y-deltatest);
 		
 		//tl = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y+delta);
 		//l = ReadHeightmap(gl_TessCoord.x-delta,gl_TessCoord.y);
@@ -446,51 +618,16 @@ vec3 GetVertexNormal()
 }
 
 void main()
-{		
-	float totalHeight = terrainHeight;
-	
-	if(chunkOctaves!=terrainOctaves)
-	{
-		if(gl_TessCoord.x == 0.0 || gl_TessCoord.y == 0.0|| gl_TessCoord.x == 1.0|| gl_TessCoord.y == 1.0)
-		{
-			octaves = terrainOctaves;
-		}
-		else
-		{
-			float dist = distance(gl_TessCoord.xy,vec2(0.5))*2.0;
-			int testOct = int(mix(terrainOctaves,chunkOctaves,max(1.0-abs(dist),0.0)));
-			octaves = testOct;
-		}
-	}
-	else
-	{
-		octaves = terrainOctaves;
-	}
-	
+{			
 	WorldPos_FS_in = GetVertex(0.0,0.0);
 	
 	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+chunkCoords)/gridSize)*100);
 	
-	if(chunkHeight!=0)
-	{
-		totalHeight = terrainHeight+chunkHeight;
-		float dist = distance(gl_TessCoord.xy,vec2(0.5))*2.0;
-		maxHeight = int(mix(terrainHeight,chunkHeight,max(1.0-abs(dist),0.0)));
-		
-	}
-	else
-	{
-		maxHeight=terrainHeight;
-	}
-
-	int saveOct =octaves;
 	
 	if(primitive!=0)
 	{
 		Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
-		
-		octaves=2;
-		Blend_Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
+		Blend_Normal_FS_in = Normal_FS_in;
 	}
 	else
 	{
@@ -498,45 +635,11 @@ void main()
 		Blend_Normal_FS_in = vec3(0.0,1.0,0.0);
 	}
 	
-	float height=0.0;
+	float height=0.0;	
 	
-	octaves=saveOct;
+	WorldPos_FS_in.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y);
 	
-	if(primitive==1)
-	{
-		height = BrownianNoise(gl_TessCoord.x,gl_TessCoord.y);
-		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
-		WorldPos_FS_in.y = height*maxHeight;
-		
-	}
-	else if(primitive==2)
-	{
-		height = PerlinNoise(gl_TessCoord.x,gl_TessCoord.y);
-		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
-		WorldPos_FS_in.y = height*maxHeight;
-
-
-	}
-	else if(primitive==3)
-	{
-		height = VoronoiNoise(gl_TessCoord.x,gl_TessCoord.y);
-		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
-		WorldPos_FS_in.y = height*maxHeight;
-
-	}
-	else if(primitive==4)
-	{
-		height = ReadHeightmap(gl_TessCoord.x,gl_TessCoord.y);
-		//WorldPos_FS_in.y = mix(0.0,maxHeight,height)-(maxHeight/2.0);
-		WorldPos_FS_in.y = height*maxHeight;
-
-	}
-	else
-	{
-		WorldPos_FS_in.y = 0.0;
-	}
-	
-	MapPos_FS_in=height;
+	MapPos_FS_in=GetHeight(gl_TessCoord.x,gl_TessCoord.y,chunkOctaves);
 	
 	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
 	

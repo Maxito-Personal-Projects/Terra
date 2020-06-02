@@ -126,6 +126,8 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		int chunkOctaves = glGetUniformLocation(parent->terrainShader, "chunkOctaves");
 		glUniform1i(chunkOctaves, chunkP->octaves);
 
+
+		// Neighbours info 
 		int count = 0;
 
 		for (int i = 0; i < 8; i++)

@@ -68,7 +68,7 @@ Chunk * Terrain::GetChunkFromCoords(int x, int y, int &num)
 
 	if (x>-1 && y>-1 && x<numChunks && y<numChunks)
 	{
-		int id = numChunks * x + y;
+		int id = numChunks * y + x;
 		num++;
 		ret = chunks[id];
 	}
