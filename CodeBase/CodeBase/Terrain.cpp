@@ -4,17 +4,24 @@
 #include "Terrain.h"
 #include "Chunk.h"
 #include "Mesh.h"
+#include "Biome.h"
 
 
 Terrain::Terrain(GameObject* _parent, int nChunks)
 {
 	parent = _parent;
+
+	Biome* defaultBiome = new Biome("Default");
+	biomes.push_back(defaultBiome);
+
 	GenerateChunks(nChunks, height, width);
+	
 }
 
 Terrain::~Terrain()
 {
 	void DeleteChunks();
+	//TODO delete biomes!
 
 	parent = nullptr;
 }
@@ -45,7 +52,7 @@ void Terrain::GenerateChunks(int nChunks, float height, float width)
 		int x = i % numChunks;
 		int y = i / numChunks;
 		float color = (float)i / float(totalkChunks);
-		Chunk* curr = new Chunk(parent, i, x, y, height,width,color);
+		Chunk* curr = new Chunk(parent, i, x, y, height,width,color,biomes[0]);
 		chunks.push_back(curr);
 	}
 }
@@ -60,6 +67,14 @@ void Terrain::DeleteChunks()
 
 	totalkChunks = 0;
 	chunks.clear();
+}
+
+void Terrain::AddBiome(Biome* biome)
+{
+}
+
+void Terrain::DeleteBiome()
+{
 }
 
 Chunk * Terrain::GetChunkFromCoords(int x, int y, int &num)

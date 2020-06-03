@@ -5,22 +5,25 @@
 
 class GameObject;
 class Mesh;
+class Biome;
 
 class Chunk
 {
 public:
 	
-	Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width,float _color);
+	Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width,float _color, Biome* _biome);
 
 	~Chunk();
 
 	void SetNeighbours();
+	void SetBiome(Biome* biome);
 
 public:
 
 	GameObject* parent = nullptr;
 	Mesh* mesh = nullptr;
 	Chunk* neighbours[8];
+	Biome* biome = nullptr;
 
 	float maxHeight = 0.0f;
 	int octaves = 8;

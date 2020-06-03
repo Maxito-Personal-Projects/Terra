@@ -3,8 +3,9 @@
 #include "Chunk.h"
 #include "GameObject.h"
 #include "Mesh.h"
+#include "Biome.h"
 
-Chunk::Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width,float _color)
+Chunk::Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width,float _color, Biome* _biome)
 {
 	parent = _parent;
 
@@ -14,6 +15,8 @@ Chunk::Chunk(GameObject* _parent, int id, int _x, int _y, float height, float wi
 	y = _y;
 
 	color = float3(_color,_color,1.0f);
+
+	biome = _biome;
 }
 
 
@@ -47,4 +50,8 @@ void Chunk::SetNeighbours()
 	neighbours[5] = terrain->GetChunkFromCoords(x , y + 1, numNeighbours);
 	neighbours[6] = terrain->GetChunkFromCoords(x - 1, y + 1, numNeighbours);
 	neighbours[7] = terrain->GetChunkFromCoords(x - 1, y, numNeighbours);
+}
+
+void Chunk::SetBiome(Biome * biome)
+{
 }

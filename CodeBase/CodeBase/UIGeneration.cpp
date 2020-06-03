@@ -8,6 +8,7 @@
 #include "Texture.h"
 #include "Terrain.h"
 #include "Chunk.h"
+#include "Biome.h"
 
 #include <Windows.h>
 
@@ -122,9 +123,9 @@ bool UIGeneration::Draw()
 
 		ImGui::SameLine();
 		
-		//--------------------------- Primitive Editor ------------------------------------------------
+		//--------------------------- Biome Editor ------------------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.8f, 0.5f));
-		ImGui::BeginChild("Primitive Selector", windowSizes, true);
+		ImGui::BeginChild("BiomeSelector", windowSizes, true);
 		{
 			heightWindow = false;
 
@@ -132,7 +133,7 @@ bool UIGeneration::Draw()
 			char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
 
 			//Centered Title
-			std::string text = "Primitive Selector";
+			std::string text = "Biome Editor";
 			ImGui::PushFont(myApp->m_ui->montserratBold);
 			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
 			ImGui::TextColored(titleColor, text.c_str());
@@ -472,10 +473,10 @@ bool UIGeneration::Draw()
 		ImGui::SameLine();
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, .8f, 0.1f, 0.5f));
-		ImGui::BeginChild("Biomes Editor", windowSizes, true);
+		ImGui::BeginChild("ChunkInfo", windowSizes, true);
 		{
 			//Centered Title
-			std::string text = "Biomes Editor";
+			std::string text = "Chunk Info";
 			ImGui::PushFont(myApp->m_ui->montserratBold);
 			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
 			ImGui::TextColored(titleColor, text.c_str());
@@ -499,6 +500,11 @@ bool UIGeneration::Draw()
 				ImGui::Text(chunkName.c_str());
 				ImGui::PopFont();
 
+				string chunkBiome = "Biome: " + selectedChunk->biome->name;
+
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text(chunkBiome.c_str());
+				ImGui::PopFont();
 
 				string chunkCoords = "Coord X:  " + to_string(selectedChunk->x) + " Coord Y:  " + to_string(selectedChunk->y);
 				// Terrain setting

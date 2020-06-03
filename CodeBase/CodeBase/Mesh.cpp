@@ -13,13 +13,14 @@
 #include "FileSystem.h"
 #include "UIGeneration.h"
 #include "Chunk.h"
+#include "Biome.h"
 
 
 
 Mesh::Mesh(GameObject* _parent, Chunk* _chunkP, int x, int y, float _height, float _width, float _color)
 {
 	parent = _parent;
-	chunkP = _chunkP;
+	chunkParent = _chunkP;
 	
 	chunkX = x;
 	chunkY = y;
@@ -78,7 +79,7 @@ Mesh::~Mesh()
 		infoGPU = nullptr;
 	}
 
-	chunkP = nullptr;
+	chunkParent = nullptr;
 	parent = nullptr;
 }
 
@@ -98,6 +99,8 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 
 		glBindVertexArray(VAO);
 
+		Biome* biome = chunkParent->biome;
+
 		// Render Info 
 		int modelMatrix = glGetUniformLocation(parent->terrainShader, "Model");
 		glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
@@ -108,23 +111,17 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		int cam = glGetUniformLocation(parent->terrainShader, "camPos");
 		glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
 
-		// Terrain info 
+		// Biome info 
 		int seed = glGetUniformLocation(parent->terrainShader, "seed");
-		glUniform1f(seed, parent->terrain->seed);
+		glUniform1f(seed, biome->seed);
 		int frequency = glGetUniformLocation(parent->terrainShader, "freq");
-		glUniform1f(frequency, parent->terrain->frequency);
+		glUniform1f(frequency, biome->frequency);
 		int primitive = glGetUniformLocation(parent->terrainShader, "primitive");
-		glUniform1i(primitive, parent->terrain->primitive);
-		int terrainHeight = glGetUniformLocation(parent->terrainShader, "terrainHeight");
-		glUniform1f(terrainHeight, parent->terrain->maxHeight);
-		int terainOctaves = glGetUniformLocation(parent->terrainShader, "terrainOctaves");
-		glUniform1i(terainOctaves, parent->terrain->octaves);
-
-		// Chunk info 
+		glUniform1i(primitive, biome->primitive);
 		int chunkHeight = glGetUniformLocation(parent->terrainShader, "chunkHeight");
-		glUniform1f(chunkHeight, chunkP->maxHeight);
+		glUniform1f(chunkHeight, biome->height);
 		int chunkOctaves = glGetUniformLocation(parent->terrainShader, "chunkOctaves");
-		glUniform1i(chunkOctaves, chunkP->octaves);
+		glUniform1i(chunkOctaves, biome->octaves);
 
 
 		// Neighbours info 
@@ -132,7 +129,7 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 
 		for (int i = 0; i < 8; i++)
 		{
-			Chunk* neighbour = chunkP->neighbours[i];
+			Chunk* neighbour = chunkParent->neighbours[i];
 
 			if (neighbour)
 			{
@@ -144,8 +141,8 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 				int neighOctaves= glGetUniformLocation(parent->terrainShader, octavesVar.c_str());
 				int neighID= glGetUniformLocation(parent->terrainShader, idVar.c_str());
 
-				glUniform1f(neighHeight, neighbour->maxHeight);
-				glUniform1i(neighOctaves, neighbour->octaves);
+				glUniform1f(neighHeight, neighbour->biome->height);
+				glUniform1i(neighOctaves, neighbour->biome->octaves);
 				glUniform1i(neighID, i);
 
 				count++;

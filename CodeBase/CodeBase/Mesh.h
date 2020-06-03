@@ -28,8 +28,6 @@ public:
 	int* indices = nullptr;
 	float* infoGPU = nullptr;
 
-	
-
 	int numVertices = 0;
 	int numIndices = 0;
 
@@ -51,7 +49,7 @@ public:
 	int buffSize16 = 0;
 
 	GameObject* parent = nullptr;
-	Chunk* chunkP = nullptr;
+	Chunk* chunkParent = nullptr;
 
 	int size = 2;
 	float width = 64.0f;

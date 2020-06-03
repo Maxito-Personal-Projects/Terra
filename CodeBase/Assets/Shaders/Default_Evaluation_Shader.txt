@@ -21,7 +21,6 @@ uniform int numLayers;
 uniform Chunk neighbours[8];
 uniform int numNeighbours;
 
-uniform float terrainHeight;
 uniform float chunkHeight;
 
 in vec3 WorldPos_ES_in[];
@@ -45,12 +44,10 @@ uniform sampler2D outputTexture;
 uniform float delta;
 uniform float freq;
 uniform int chunkOctaves;
-uniform int terrainOctaves;
 uniform float divisions;
 
 int mixType;
 ivec3 neighIDs;
-
 
 uniform int primitive;
 
@@ -415,14 +412,12 @@ vec2 GetMixFactors()
 float GetInterpolatedHeight(float x, float y)
 {
 	float ret = 0.0;
-
-	//Border chunks init
-	float surroundHeight = GetHeight(x,y,terrainOctaves);
-	vec3 heights = vec3(surroundHeight*terrainHeight);
 	
 	//Modified chunk
 	float mainHeight = GetHeight(x,y,chunkOctaves); //Main chunk
-	float height_C = mainHeight*(chunkHeight+terrainHeight);
+	float height_C = mainHeight*(chunkHeight);
+	vec3 heights = vec3(mainHeight*chunkHeight);
+
 
 	//Mix Factor
 	vec2 mixFactors = GetMixFactors();
@@ -437,7 +432,7 @@ float GetInterpolatedHeight(float x, float y)
 				if(neighbours[j].neighbourID == neighIDs[i])
 				{
 					//TODO: Check if octaves are different first!
-					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height);
 				}
 			}
 		}
@@ -455,7 +450,7 @@ float GetInterpolatedHeight(float x, float y)
 			{
 				if(neighbours[j].neighbourID == neighIDs[i])
 				{
-					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height);
 				}
 			}
 		}
@@ -473,7 +468,7 @@ float GetInterpolatedHeight(float x, float y)
 			{
 				if(neighbours[j].neighbourID == neighIDs[i])
 				{
-					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height);
 				}
 			}
 		}
@@ -492,7 +487,7 @@ float GetInterpolatedHeight(float x, float y)
 			{
 				if(neighbours[j].neighbourID == neighIDs[i])
 				{
-					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height+terrainHeight);
+					heights[i]=GetHeight(x,y,neighbours[j].octaves)*(neighbours[j].height);
 				}
 			}
 		}
