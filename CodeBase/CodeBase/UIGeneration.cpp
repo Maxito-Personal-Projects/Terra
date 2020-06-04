@@ -263,20 +263,36 @@ bool UIGeneration::Draw()
 					char buff[256];
 					strcpy_s(buff, 256, biomeName.c_str());
 
+					ImGui::Dummy(ImVec2(0.0f, 5.0f));
+					ImGui::BeginGroup();
+					ImGui::PushFont(myApp->m_ui->arial);
 					ImGui::Text("Biome Name: ");
+					ImGui::EndGroup();
+
+
 					ImGui::SameLine();
+
+					ImGui::Dummy(ImVec2(0.0f, -5.0f));
+					ImGui::BeginGroup();
+
 					ImGui::PushID("BiomeName");
 					if (ImGui::InputText("", buff, 256))
 					{
 						biomeName = buff;
 					}
 					ImGui::PopID();
+					ImGui::EndGroup();
+
 
 					if (ImGui::Button("Add Biome"))
 					{
 						terrain->AddBiome(biomeName);
+						selectedBiome = terrain->biomes[terrain->biomes.size() - 1];
+						currBiome = biomeName;
 						biomeName = "";
 					}
+					ImGui::PopFont();
+
 				}
 			}
 
@@ -375,7 +391,7 @@ bool UIGeneration::Draw()
 				}
 				else
 				{
-					ImVec2 imageSize = { windowSizes.x - 200.0f,windowSizes.x - 200.0f };
+					ImVec2 imageSize = { windowSizes.x - 100.0f,windowSizes.x - 100.0f };
 					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
 					ImGui::Image((void*)(intptr_t)myApp->m_ui->dragImage->imageID, ImVec2(imageSize));
 
