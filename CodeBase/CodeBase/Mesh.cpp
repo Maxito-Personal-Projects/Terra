@@ -114,7 +114,7 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		// Biome info 
 		int seed = glGetUniformLocation(parent->terrainShader, "seed");
 		glUniform1f(seed, biome->seed);
-		int frequency = glGetUniformLocation(parent->terrainShader, "freq");
+		int frequency = glGetUniformLocation(parent->terrainShader, "chunkFreq");
 		glUniform1f(frequency, biome->frequency);
 		int primitive = glGetUniformLocation(parent->terrainShader, "primitive");
 		glUniform1i(primitive, biome->primitive);
@@ -136,13 +136,22 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 				string heightVar = "neighbours["+to_string(count)+"].height";
 				string octavesVar = "neighbours[" + to_string(count) + "].octaves";
 				string idVar = "neighbours[" + to_string(count) + "].neighbourID";
+				string seedVar = "neighbours[" + to_string(count) + "].seed";
+				string freqVar = "neighbours[" + to_string(count) + "].frequency";
+				string primVar = "neighbours[" + to_string(count) + "].primitive";
 
 				int neighHeight= glGetUniformLocation(parent->terrainShader, heightVar.c_str());
 				int neighOctaves= glGetUniformLocation(parent->terrainShader, octavesVar.c_str());
 				int neighID= glGetUniformLocation(parent->terrainShader, idVar.c_str());
+				int neighSeed = glGetUniformLocation(parent->terrainShader, seedVar.c_str());
+				int neighFreq = glGetUniformLocation(parent->terrainShader, freqVar.c_str());
+				int neighPrim = glGetUniformLocation(parent->terrainShader, primVar.c_str());
 
 				glUniform1f(neighHeight, neighbour->biome->height);
+				glUniform1f(neighSeed, neighbour->biome->seed);
+				glUniform1f(neighFreq, neighbour->biome->frequency);
 				glUniform1i(neighOctaves, neighbour->biome->octaves);
+				glUniform1i(neighPrim, neighbour->biome->primitive);
 				glUniform1i(neighID, i);
 
 				count++;

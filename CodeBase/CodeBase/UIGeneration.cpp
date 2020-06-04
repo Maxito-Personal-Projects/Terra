@@ -43,8 +43,6 @@ bool UIGeneration::Draw()
 	{
 		int numWindows = 6;
 
-		if (heightWindow) numWindows = 5;
-
 		ImVec2 mainWindowSize = ImGui::GetWindowSize();
 		ImVec2 windowSizes = { (mainWindowSize.x-50.0f)/ numWindows, mainWindowSize.y-50.0f };
 
@@ -111,6 +109,7 @@ bool UIGeneration::Draw()
 			ImGui::PushFont(myApp->m_ui->montserrat);
 			if (ImGui::Button("Generate",buttonSize))
 			{
+				selectedChunk = nullptr;
 				terrain->DeleteChunks();
 				terrain->GenerateChunks(terrainChunks, terrainHeight, terrainWidth);
 				terrain->SetNeighbours();
@@ -129,9 +128,6 @@ bool UIGeneration::Draw()
 		{
 			heightWindow = false;
 
-			//type of primitives
-			char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
-
 			//Centered Title
 			std::string text = "Biome Editor";
 			ImGui::PushFont(myApp->m_ui->montserratBold);
@@ -148,132 +144,153 @@ bool UIGeneration::Draw()
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.8f, 0.1f, 0.8f, 1.0f));
 
 			ImGui::Dummy(ImVec2(0.0f, 10.0f));
-			
-			ImGui::BeginGroup();
-			ImGui::Dummy(ImVec2(0.0f, 0.25f));
+
+			//Biome Selector
 			ImGui::PushFont(myApp->m_ui->arial);
-			ImGui::Text("Primitive:");
-			ImGui::Dummy(ImVec2(0.0f, 0.1f));
-			ImGui::Text("Height:");
-			ImGui::Dummy(ImVec2(0.0f, 0.05f));
-			ImGui::Text("Seed:");
-			ImGui::Dummy(ImVec2(0.0f, 0.05f));
-			ImGui::Text("Octaves:");
+			ImGui::Text("Biome:");
 
-			if (currPrimitive != primitives[4])
+			ImGui::PushID("None Biome");
+			if (ImGui::BeginCombo("", currBiome.c_str()))
 			{
-				ImGui::Dummy(ImVec2(0.0f, 0.05f));
-				ImGui::Text("Frequency:");
-			}
-
-			if (currPrimitive == primitives[4])
-			{
-				char buff[256];
-				strcpy_s(buff, 256, fileName.c_str());
-
-				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text("File:");
-				ImGui::PopFont();
-			}
-			ImGui::EndGroup();
-
-			ImGui::SameLine();
-
-			ImGui::BeginGroup();
-
-			ImGui::PushID("None Primitive");
-			if (ImGui::BeginCombo("", currPrimitive))
-			{
-				for (int i = 0; i < 5; ++i)
+				for (int i = 0; i <= terrain->biomes.size(); ++i)
 				{
-					bool isSelected = (currPrimitive == primitives[i]);
-					if (ImGui::Selectable(primitives[i], isSelected))
+					if (i == terrain->biomes.size())
 					{
-						currPrimitive=primitives[i];
-						terrain->primitive = i;
+						bool isSelected = (currBiome == "New Biome");
+						if (ImGui::Selectable("New Biome", isSelected))
+						{
+							currBiome = "New Biome";
+							selectedBiome = nullptr;
+						}
+					}
+					else
+					{
+						bool isSelected = (currBiome == terrain->biomes[i]->name);
+						if (ImGui::Selectable(terrain->biomes[i]->name.c_str(), isSelected))
+						{
+							currBiome = terrain->biomes[i]->name;
+							selectedBiome = terrain->biomes[i];
+						}
 					}
 				}
-
-				terrain->parent->updateTFB = true;
 
 				ImGui::EndCombo();
 			}
 			ImGui::PopFont();
 			ImGui::PopID();
 
-			ImGui::PushID("Terr Height");
-			ImGui::DragFloat("", &terrain->maxHeight, 1.0f, 0.0f);
-			ImGui::PopID();
-
-			ImGui::PushID("Seed");
-			ImGui::DragFloat("", &terrain->seed, 0.01f);
-			ImGui::PopID();
-
-			ImGui::PushID("Octaves");
-			ImGui::DragInt("", &terrain->octaves, 0.1f, 1, 8, "%.0f");
-			ImGui::PopID();
-
-			if (currPrimitive != primitives[4])
+			if (selectedBiome)
 			{
-				ImGui::PushID("Frequency");
-				ImGui::DragFloat("", &terrain->frequency, 0.1, 0.1f, 1000.0f, "%.1f");
-				ImGui::PopID();
-			}
+				//type of primitives
+				char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
 
-			if (currPrimitive == primitives[4])
-			{
-				heightWindow = true;
+				ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-				char buff[256];
-				strcpy_s(buff, 256, fileName.c_str());
+				ImGui::BeginGroup();
+				ImGui::Dummy(ImVec2(0.0f, 0.25f));
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text("Primitive:");
+				ImGui::Dummy(ImVec2(0.0f, 0.1f));
+				ImGui::Text("Height:");
+				ImGui::Dummy(ImVec2(0.0f, 0.05f));
+				ImGui::Text("Seed:");
+				ImGui::Dummy(ImVec2(0.0f, 0.05f));
+				ImGui::Text("Octaves:");
 
-				ImGui::PushID("Heightmapfile");
-				ImGui::InputText("", buff, 256, ImGuiInputTextFlags_ReadOnly);
-				ImGui::PopID();
-
-				char buff2[256];
-
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
-				if (ImGui::Button("...", ImVec2(50.0f, 25.0f)))
+				if (currPrimitive != primitives[4])
 				{
-					string ret = myApp->fileSystem->GetFileNameAt(myApp->fileSystem->GetFolderPath("Images").c_str());
-					if (ret != "")
-					{
-						if (heightmap)
-						{
-							glDeleteTextures(1, &(heightmap->imageID));
-							delete heightmap;
-							heightmap = nullptr;
-						}
+					ImGui::Dummy(ImVec2(0.0f, 0.05f));
+					ImGui::Text("Frequency:");
+				}
 
-						fileName = myApp->fileSystem->GetFileNameFromPath(ret);
-						heightmap = myApp->fileSystem->LoadImagePNG(ret);
+				ImGui::EndGroup();
+
+				ImGui::SameLine();
+
+				ImGui::BeginGroup();
+
+				ImGui::PushID("None Primitive");
+				if (ImGui::BeginCombo("", primitives[selectedBiome->primitive]))
+				{
+					for (int i = 0; i < 5; ++i)
+					{
+						bool isSelected = (currPrimitive == primitives[i]);
+						if (ImGui::Selectable(primitives[i], isSelected))
+						{
+							currPrimitive = primitives[i];
+							selectedBiome->primitive = i;
+
+							//TODO: implement Optimization!!!!
+							terrain->parent->updateTFB = true;
+						}
+					}
+
+					ImGui::EndCombo();
+				}
+				ImGui::PopFont();
+				ImGui::PopID();
+
+				ImGui::PushID("Terr Height");
+				ImGui::DragFloat("", &selectedBiome->height, 1.0f, 0.0f);
+				ImGui::PopID();
+
+				ImGui::PushID("Seed");
+				ImGui::DragFloat("", &selectedBiome->seed, 0.01f);
+				ImGui::PopID();
+
+				ImGui::PushID("Octaves");
+				ImGui::DragInt("", &selectedBiome->octaves, 0.1f, 1, 8, "%.0f");
+				ImGui::PopID();
+
+				if (currPrimitive != primitives[4])
+				{
+					ImGui::PushID("Frequency");
+					ImGui::DragFloat("", &selectedBiome->frequency, 0.1, 0.1f, 1000.0f, "%.1f");
+					ImGui::PopID();
+				}
+
+				ImGui::EndGroup();
+
+				if (currPrimitive == primitives[4])
+				{
+					heightWindow = true;
+				}
+			}
+			else
+			{
+				if (currBiome=="New Biome")
+				{
+					char buff[256];
+					strcpy_s(buff, 256, biomeName.c_str());
+
+					ImGui::Text("Biome Name: ");
+					ImGui::SameLine();
+					ImGui::PushID("BiomeName");
+					if (ImGui::InputText("", buff, 256))
+					{
+						biomeName = buff;
+					}
+					ImGui::PopID();
+
+					if (ImGui::Button("Add Biome"))
+					{
+						terrain->AddBiome(biomeName);
+						biomeName = "";
 					}
 				}
-				ImGui::PopStyleColor(2);
-
-				if (heightmap)
-				{
-					ImVec2 imageSize = { windowSizes.x - 25.0f,windowSizes.x - 25.0f };
-					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
-					ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(imageSize));
-				}
 			}
-
-			ImGui::EndGroup();
-
 
 		}
 		ImGui::EndChild();
 
 		//--------------------------- Function Editor ------------------------------------------------
-		if (!heightWindow)
-		{
-			ImGui::SameLine();
+		
+		ImGui::SameLine();
 
-			ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
-			ImGui::BeginChild("Function Selector", windowSizes, true);
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
+		ImGui::BeginChild("Function Selector", windowSizes, true);
+		{
+			if (!heightWindow)
 			{
 				//Centered Title
 				std::string text = "Function Selector";
@@ -318,11 +335,75 @@ bool UIGeneration::Draw()
 				}
 				ImGui::PopFont();
 				ImGui::PopID();
-
 			}
-			ImGui::EndChild();
-			ImGui::PopStyleColor(1);
+			else
+			{
+				//Centered Title
+				std::string text = "Heightmap Selector";
+				ImGui::PushFont(myApp->m_ui->montserratBold);
+				ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
+				ImGui::TextColored(titleColor, text.c_str());
+				ImGui::PopFont();
+
+				//Window DrawList
+				ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+				//Title Underline 
+				ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
+				ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+				drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
+
+
+				ImGui::Dummy(ImVec2(0.0f, 10.0f));
+				char buff[256];
+				strcpy_s(buff, 256, imageName.c_str());
+
+				if (heightmap)
+				{
+					ImVec2 imageSize = { windowSizes.x - 25.0f,windowSizes.x - 25.0f };
+					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
+					ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(imageSize));
+
+					if (ImGui::IsItemHovered())
+					{
+						canDrag = true;
+					}
+					else
+					{
+						canDrag = false;
+					}
+				}
+				else
+				{
+					ImVec2 imageSize = { windowSizes.x - 200.0f,windowSizes.x - 200.0f };
+					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
+					ImGui::Image((void*)(intptr_t)myApp->m_ui->dragImage->imageID, ImVec2(imageSize));
+
+					if (ImGui::IsItemHovered())
+					{
+						canDrag = true;
+					}
+					else
+					{
+						canDrag = false;
+					}
+				}
+
+				ImGui::PushFont(myApp->m_ui->arial);
+				ImGui::Text("File:");
+				ImGui::PopFont();
+
+				ImGui::SameLine();
+
+				ImGui::PushID("Heightmapfile");
+				ImGui::InputText("", buff, 256, ImGuiInputTextFlags_ReadOnly);
+				ImGui::PopID();
+			}
+
 		}
+		ImGui::EndChild();
+		ImGui::PopStyleColor(1);
+		
 
 		ImGui::SameLine();
 
@@ -498,9 +579,25 @@ bool UIGeneration::Draw()
 				// Terrain setting
 				ImGui::PushFont(myApp->m_ui->arial);
 				ImGui::Text(chunkName.c_str());
-				ImGui::PopFont();
 
 				string chunkBiome = "Biome: " + selectedChunk->biome->name;
+
+				ImGui::PushID("Chunk Biome");
+				if (ImGui::BeginCombo("", selectedChunk->biome->name.c_str()))
+				{
+					for (int i = 0; i < terrain->biomes.size(); ++i)
+					{
+						bool isSelected = (selectedChunk->biome->name == terrain->biomes[i]->name);
+						if (ImGui::Selectable(terrain->biomes[i]->name.c_str(), isSelected))
+						{
+							selectedChunk->biome = terrain->biomes[i];
+						}
+					}
+
+					ImGui::EndCombo();
+				}
+				ImGui::PopFont();
+				ImGui::PopID();
 
 				ImGui::PushFont(myApp->m_ui->arial);
 				ImGui::Text(chunkBiome.c_str());
@@ -511,26 +608,6 @@ bool UIGeneration::Draw()
 				ImGui::PushFont(myApp->m_ui->arial);
 				ImGui::Text(chunkCoords.c_str());
 				ImGui::PopFont();
-
-				ImGui::BeginGroup();
-				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text("Chunk Height:");
-				ImGui::Text("Octaves:");
-				ImGui::PopFont();
-				ImGui::EndGroup();
-
-				
-				ImGui::SameLine();
-
-				ImGui::BeginGroup();
-				ImGui::PushID("C Height");
-				ImGui::DragFloat("", &selectedChunk->maxHeight, 1.0f, 0.0f);
-				ImGui::PopID();
-				
-				ImGui::PushID("C Octaves");
-				ImGui::DragInt("", &selectedChunk->octaves, 0.1f, 1, 8, "%.0f");
-				ImGui::PopID();
-				ImGui::EndGroup();
 
 			}
 		}
@@ -565,4 +642,21 @@ bool UIGeneration::Draw()
 	ImGui::End();
 
 	return ret;
+}
+
+
+void UIGeneration::LoadHeightMap(string path)
+{
+	if (canDrag)
+	{
+		if (heightmap)
+		{
+			glDeleteTextures(1, &(heightmap->imageID));
+			delete heightmap;
+			heightmap = nullptr;
+		}
+
+		imageName = myApp->fileSystem->GetFileNameFromPath(path);
+		heightmap = myApp->fileSystem->LoadImagePNG(path);
+	}
 }

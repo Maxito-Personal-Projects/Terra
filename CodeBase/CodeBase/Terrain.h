@@ -17,7 +17,7 @@ public:
 	void DrawSelectionChunks();
 	void GenerateChunks(int nChunks, float height, float width);
 	void DeleteChunks();
-	void AddBiome(Biome* biome);
+	void AddBiome(string name);
 	void DeleteBiome();
 
 	Chunk* GetChunkFromCoords(int x, int y, int &num);

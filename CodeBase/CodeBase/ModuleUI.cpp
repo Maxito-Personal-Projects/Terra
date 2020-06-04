@@ -79,7 +79,7 @@ bool ModuleUI::Start()
 {
 	bool ret = true;
 
-	errorImage = myApp->fileSystem->LoadImagePNG("Images/Error.png");
+	dragImage = myApp->fileSystem->LoadImagePNG("Images/Error.png");
 	textTest = myApp->fileSystem->LoadImagePNG("Images/image_82566.png");
 
 	return ret;

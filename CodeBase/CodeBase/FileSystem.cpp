@@ -128,20 +128,21 @@ Texture* FileSystem::LoadImagePNG(string path)
 string FileSystem::AddExtension(string folder, string name, ExportFormat extension)
 {
 	string file = "";
+	string path = GetFolderPath(folder);
 
 	switch (extension)
 	{
 	case DAE:
-		file = folder +"/" + name + (".dae");
+		file = path +"\\" + name + (".dae");
 		break;
 	case OBJ_MAT:
-		file = folder + "/" + name + (".obj");
+		file = path + "\\" + name + (".obj");
 		break;
 	case OBJ:
-		file = folder + "/" + name + (".obj");
+		file = path + "\\" + name + (".obj");
 		break;
 	case FBX:
-		file = folder + "/" + name + (".fbx");
+		file = path + "\\" + name + (".fbx");
 		break;
 	default:
 		break;
@@ -201,7 +202,7 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	aiMesh* mesh = scene->mMeshes[0];		//Getting mesh pointer
 	mesh->mName = "Terrain";
 	
-	//Now we are taking the vertex, normals & color info so the size is:
+	//Now we are taking the vertex, normals & UV info so the size is:
 	int numVertices = sizeBuffer / 9;
 
 	//Setting mesh info
@@ -209,7 +210,6 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	mesh->mNumVertices = numVertices;
 
 	mesh->mNormals = new aiVector3D[numVertices];
-	mesh->mColors[0] = new aiColor4D[numVertices];
 	
 	mesh->mTextureCoords[0] = new aiVector3D[numVertices];
 	mesh->mNumUVComponents[0] = numVertices;
@@ -220,8 +220,8 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	{
 		mesh->mVertices[i] = aiVector3D(vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
 		mesh->mNormals[i] = aiVector3D(vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], vertexBuffer[buffIndx + 5]);
-		mesh->mColors[0][i] = aiColor4D(vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], vertexBuffer[buffIndx + 8], 1.0f);
-		mesh->mTextureCoords[0][i] = aiVector3D(1.0f, 1.0f, 0.0f); //TODO get uv coords (tessCoords)
+		mesh->mTextureCoords[0][i] = aiVector3D(vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], 0.0f);
+		
 		buffIndx += 9;
 	}
 

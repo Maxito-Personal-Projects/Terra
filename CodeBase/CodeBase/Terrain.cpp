@@ -69,8 +69,10 @@ void Terrain::DeleteChunks()
 	chunks.clear();
 }
 
-void Terrain::AddBiome(Biome* biome)
+void Terrain::AddBiome(string name)
 {
+	Biome* newBiome = new Biome(name);
+	biomes.push_back(newBiome);
 }
 
 void Terrain::DeleteBiome()

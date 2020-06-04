@@ -5,6 +5,7 @@
 #include "ModuleWindow.h"
 #include "UIScene.h"
 #include "FileSystem.h"
+#include "UIGeneration.h"
 
 
 ModuleInput::ModuleInput(string _name, bool _active) : Module(_name, _active)
@@ -159,11 +160,7 @@ bool ModuleInput::PreUpdate()
 
 		case SDL_DROPFILE:
 			path = myEvent.drop.file;
-
-			//TODO Check extensions
-			delete myApp->m_ui->textTest;
-			myApp->m_ui->textTest = nullptr;
-			myApp->m_ui->textTest = myApp->fileSystem->LoadImagePNG(path);
+			myApp->m_ui->generationWindow->LoadHeightMap(path);
 		
 		default:
 			break;

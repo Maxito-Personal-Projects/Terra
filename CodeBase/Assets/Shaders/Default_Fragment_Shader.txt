@@ -213,8 +213,6 @@ void main()
 		zaxis = xaxis;
 	}
 	
-	
-	
 	// blend the results of the 3 planar projections.
 	vec3 vecColor = xaxis * blending.x + yaxis * blending.y + zaxis * blending.z;
 	

@@ -6,6 +6,7 @@
 class Texture;
 class Terrain;
 class Chunk;
+class Biome;
 
 class UIGeneration : public UIWindow
 {
@@ -14,6 +15,8 @@ public:
 	UIGeneration(std::string name, bool active = true);
 	~UIGeneration();
 
+	void LoadHeightMap(string path);
+
 	bool Draw();
 
 private:
@@ -21,6 +24,7 @@ private:
 	char* currPrimitive = nullptr;
 	char* currFunction = nullptr;
 	char* currNumLayer = nullptr;
+	string currBiome = "";
 
 	float terrainHeight = 0;
 	float terrainWidth = 0;
@@ -29,7 +33,8 @@ private:
 
 	bool heightWindow = false;
 
-	string fileName;
+	string imageName;
+	string biomeName;
 
 	Terrain* terrain = nullptr;
 
@@ -43,6 +48,8 @@ public:
 	int numLayers = 1;
 
 	Chunk* selectedChunk = nullptr;
+	Biome* selectedBiome = nullptr;
+	bool canDrag = false;
 
 };
 

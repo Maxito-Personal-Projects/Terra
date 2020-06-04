@@ -58,7 +58,7 @@ public:
 	UIScene* sceneWindow = nullptr;
 	UIChunk* chunkWindow = nullptr;
 
-	Texture* errorImage = nullptr;
+	Texture* dragImage = nullptr;
 	Texture* textTest = nullptr;
 
 	ImFont* defaultFont = nullptr;
