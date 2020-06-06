@@ -44,13 +44,24 @@ bool UIGeneration::Draw()
 		int numWindows = 6;
 
 		ImVec2 mainWindowSize = ImGui::GetWindowSize();
-		ImVec2 windowSizes = { (mainWindowSize.x-50.0f)/ numWindows, mainWindowSize.y-50.0f };
+		ImVec2 windowSizes = { (mainWindowSize.x-30.0f) /* numWindows*/, /*mainWindowSize.y-*/250.0f };
+		ImVec2 meshSize = { mainWindowSize.x - 30.0f,175 };
+		ImVec2 biomeSize = { mainWindowSize.x - 30.0f,270.0f };
+		if (heightWindow)
+		{
+			biomeSize.y *= 2.0f;
+			biomeSize.y += 25.0f;
+		}
+		ImVec2 layerSize = { mainWindowSize.x - 30.0f,250.0f};
+		ImVec2 chunkSize = { mainWindowSize.x - 30.0f,130 };
+		ImVec2 oceanSize = { mainWindowSize.x - 30.0f,100 };
 
-		ImVec4 titleColor = ImVec4(0.2f, 0.2f, 0.2f, 0.8f);
+
+		ImVec4 titleColor = ImVec4(1.0f, 1.0f, 1.0f, 0.8f);
 
 		//--------------------------- Mesh Editor ------------------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.8f, 0.5f));
-		ImGui::BeginChild("Mesh Editor", windowSizes, true);
+		ImGui::BeginChild("Mesh Editor", meshSize, true);
 		{
 			//Centered Title
 			std::string text = "Mesh Editor";
@@ -120,11 +131,11 @@ bool UIGeneration::Draw()
 		}
 		ImGui::EndChild();
 
-		ImGui::SameLine();
+		//ImGui::SameLine();
 		
 		//--------------------------- Biome Editor ------------------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.8f, 0.5f));
-		ImGui::BeginChild("BiomeSelector", windowSizes, true);
+		ImGui::BeginChild("BiomeSelector", biomeSize, true);
 		{
 			heightWindow = false;
 
@@ -161,6 +172,7 @@ bool UIGeneration::Draw()
 						{
 							currBiome = "New Biome";
 							selectedBiome = nullptr;
+							showBiome = false;
 						}
 					}
 					else
@@ -203,11 +215,16 @@ bool UIGeneration::Draw()
 					ImGui::Text("Frequency:");
 				}
 
+				ImGui::Dummy(ImVec2(0.0f, 0.05f));
+				ImGui::Text("Show Biome");
+
 				ImGui::EndGroup();
 
 				ImGui::SameLine();
 
 				ImGui::BeginGroup();
+
+				ImGui::Dummy(ImVec2(0.0f, 0.7f));
 
 				ImGui::PushID("None Primitive");
 				if (ImGui::BeginCombo("", primitives[selectedBiome->primitive]))
@@ -249,11 +266,78 @@ bool UIGeneration::Draw()
 					ImGui::PopID();
 				}
 
+				ImGui::PushID("showBiome");
+				ImGui::Checkbox("",&showBiome);
+				ImGui::PopID();
+
 				ImGui::EndGroup();
 
 				if (currPrimitive == primitives[4])
 				{
 					heightWindow = true;
+
+					ImGui::Dummy(ImVec2(0.0f, 20.0f));
+
+					//Centered Title
+					std::string text = "Heightmap Selector";
+					ImGui::PushFont(myApp->m_ui->montserratBold);
+					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
+					ImGui::TextColored(titleColor, text.c_str());
+					ImGui::PopFont();
+
+					//Window DrawList
+					ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+					//Title Underline 
+					ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y +ImGui::GetWindowPos().y };
+					ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+					drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
+
+
+					ImGui::Dummy(ImVec2(0.0f, 10.0f));
+					char buff[256];
+					strcpy_s(buff, 256, imageName.c_str());
+
+					if (heightmap)
+					{
+						ImVec2 imageSize = { windowSizes.x - 100.0f,windowSizes.x - 100.0f };
+						ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
+						ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(imageSize));
+
+						if (ImGui::IsItemHovered())
+						{
+							canDrag = true;
+						}
+						else
+						{
+							canDrag = false;
+						}
+					}
+					else
+					{
+						ImVec2 imageSize = { windowSizes.x - 100.0f,windowSizes.x - 100.0f };
+						ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
+						ImGui::Image((void*)(intptr_t)myApp->m_ui->dragImage->imageID, ImVec2(imageSize));
+
+						if (ImGui::IsItemHovered())
+						{
+							canDrag = true;
+						}
+						else
+						{
+							canDrag = false;
+						}
+					}
+
+					ImGui::PushFont(myApp->m_ui->arial);
+					ImGui::Text("File:");
+					ImGui::PopFont();
+
+					ImGui::SameLine();
+
+					ImGui::PushID("Heightmapfile");
+					ImGui::InputText("", buff, 256, ImGuiInputTextFlags_ReadOnly);
+					ImGui::PopID();
 				}
 			}
 			else
@@ -269,7 +353,6 @@ bool UIGeneration::Draw()
 					ImGui::Text("Biome Name: ");
 					ImGui::EndGroup();
 
-
 					ImGui::SameLine();
 
 					ImGui::Dummy(ImVec2(0.0f, -5.0f));
@@ -283,7 +366,6 @@ bool UIGeneration::Draw()
 					ImGui::PopID();
 					ImGui::EndGroup();
 
-
 					if (ImGui::Button("Add Biome"))
 					{
 						terrain->AddBiome(biomeName);
@@ -292,140 +374,76 @@ bool UIGeneration::Draw()
 						biomeName = "";
 					}
 					ImGui::PopFont();
-
 				}
 			}
-
 		}
-		ImGui::EndChild();
+		ImGui::EndChild();		
 
-		//--------------------------- Function Editor ------------------------------------------------
-		
-		ImGui::SameLine();
+		//ImGui::SameLine();
 
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.1f, 0.5f));
-		ImGui::BeginChild("Function Selector", windowSizes, true);
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, .8f, 0.1f, 0.5f));
+		ImGui::BeginChild("ChunkInfo", chunkSize, true);
 		{
-			if (!heightWindow)
+			//Centered Title
+			std::string text = "Chunk Info";
+			ImGui::PushFont(myApp->m_ui->montserratBold);
+			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
+			ImGui::TextColored(titleColor, text.c_str());
+			ImGui::PopFont();
+
+			//Window DrawList
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			//Title Underline 
+			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.0f, 0.7f, 0.0f, 1.0f));
+
+			if (selectedChunk)
 			{
-				//Centered Title
-				std::string text = "Function Selector";
-				ImGui::PushFont(myApp->m_ui->montserratBold);
-				ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
-				ImGui::TextColored(titleColor, text.c_str());
-				ImGui::PopFont();
-
-				//Window DrawList
-				ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-				//Title Underline 
-				ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-				ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
-				drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
-
-
 				ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-				ImGui::BeginGroup();
-				ImGui::Dummy(ImVec2(0.0f, 0.25f));
+				string chunkName = "Chunk ID: " + to_string(selectedChunk->chunkID);
+				// Terrain setting
 				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text("Function:");
-				ImGui::EndGroup();
+				ImGui::Text(chunkName.c_str());
+
+				string chunkBiome = "Biome: ";
+
+				ImGui::Text(chunkBiome.c_str());
 
 				ImGui::SameLine();
 
-				char* functions[] = { "Brownian Motion","Fraction","Module", "Sinus" };
-
-				ImGui::PushID("None Function");
-				if (ImGui::BeginCombo("", currFunction))
+				ImGui::PushID("Chunk Biome");
+				if (ImGui::BeginCombo("", selectedChunk->biome->name.c_str()))
 				{
-					for (int i = 0; i < 4; ++i)
+					for (int i = 0; i < terrain->biomes.size(); ++i)
 					{
-						bool isSelected = (currFunction == functions[i]);
-						if (ImGui::Selectable(functions[i], isSelected))
+						bool isSelected = (selectedChunk->biome->name == terrain->biomes[i]->name);
+						if (ImGui::Selectable(terrain->biomes[i]->name.c_str(), isSelected))
 						{
-							currFunction = functions[i];
+							selectedChunk->biome = terrain->biomes[i];
 						}
 					}
+
 					ImGui::EndCombo();
 				}
-				ImGui::PopFont();
 				ImGui::PopID();
-			}
-			else
-			{
-				//Centered Title
-				std::string text = "Heightmap Selector";
-				ImGui::PushFont(myApp->m_ui->montserratBold);
-				ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
-				ImGui::TextColored(titleColor, text.c_str());
+
+				string chunkCoords = "Coord X:  " + to_string(selectedChunk->x) + " Coord Y:  " + to_string(selectedChunk->y);
+				// Terrain setting
+				ImGui::Text(chunkCoords.c_str());
 				ImGui::PopFont();
 
-				//Window DrawList
-				ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-				//Title Underline 
-				ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-				ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
-				drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
-
-
-				ImGui::Dummy(ImVec2(0.0f, 10.0f));
-				char buff[256];
-				strcpy_s(buff, 256, imageName.c_str());
-
-				if (heightmap)
-				{
-					ImVec2 imageSize = { windowSizes.x - 25.0f,windowSizes.x - 25.0f };
-					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
-					ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(imageSize));
-
-					if (ImGui::IsItemHovered())
-					{
-						canDrag = true;
-					}
-					else
-					{
-						canDrag = false;
-					}
-				}
-				else
-				{
-					ImVec2 imageSize = { windowSizes.x - 100.0f,windowSizes.x - 100.0f };
-					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
-					ImGui::Image((void*)(intptr_t)myApp->m_ui->dragImage->imageID, ImVec2(imageSize));
-
-					if (ImGui::IsItemHovered())
-					{
-						canDrag = true;
-					}
-					else
-					{
-						canDrag = false;
-					}
-				}
-
-				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text("File:");
-				ImGui::PopFont();
-
-				ImGui::SameLine();
-
-				ImGui::PushID("Heightmapfile");
-				ImGui::InputText("", buff, 256, ImGuiInputTextFlags_ReadOnly);
-				ImGui::PopID();
 			}
-
 		}
 		ImGui::EndChild();
-		ImGui::PopStyleColor(1);
-		
 
-		ImGui::SameLine();
+		//ImGui::SameLine();
 
 		//----------------------- Layer Editor -----------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.8f, 0.1f, 0.5f));
-		ImGui::BeginChild("Layer Editor", windowSizes, true);
+		ImGui::BeginChild("Layer Editor", layerSize, true);
 		{
 			//Centered Title
 			std::string text = "Layer Editor";
@@ -565,71 +583,9 @@ bool UIGeneration::Draw()
 
 
 		}
-		ImGui::EndChild();
-		
-		ImGui::SameLine();
+		ImGui::EndChild();		
 
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, .8f, 0.1f, 0.5f));
-		ImGui::BeginChild("ChunkInfo", windowSizes, true);
-		{
-			//Centered Title
-			std::string text = "Chunk Info";
-			ImGui::PushFont(myApp->m_ui->montserratBold);
-			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
-			ImGui::TextColored(titleColor, text.c_str());
-			ImGui::PopFont();
-
-			//Window DrawList
-			ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-			//Title Underline 
-			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
-			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.0f, 0.7f, 0.0f, 1.0f));
-
-			ImGui::Spacing();
-
-			if (selectedChunk)
-			{
-				string chunkName = "Chunk " + to_string(selectedChunk->chunkID) + " Settings";
-				// Terrain setting
-				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text(chunkName.c_str());
-
-				string chunkBiome = "Biome: " + selectedChunk->biome->name;
-
-				ImGui::PushID("Chunk Biome");
-				if (ImGui::BeginCombo("", selectedChunk->biome->name.c_str()))
-				{
-					for (int i = 0; i < terrain->biomes.size(); ++i)
-					{
-						bool isSelected = (selectedChunk->biome->name == terrain->biomes[i]->name);
-						if (ImGui::Selectable(terrain->biomes[i]->name.c_str(), isSelected))
-						{
-							selectedChunk->biome = terrain->biomes[i];
-						}
-					}
-
-					ImGui::EndCombo();
-				}
-				ImGui::PopFont();
-				ImGui::PopID();
-
-				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text(chunkBiome.c_str());
-				ImGui::PopFont();
-
-				string chunkCoords = "Coord X:  " + to_string(selectedChunk->x) + " Coord Y:  " + to_string(selectedChunk->y);
-				// Terrain setting
-				ImGui::PushFont(myApp->m_ui->arial);
-				ImGui::Text(chunkCoords.c_str());
-				ImGui::PopFont();
-
-			}
-		}
-		ImGui::EndChild();
-
-		ImGui::SameLine();
+		//ImGui::SameLine();
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.8f, 0.8f, 0.5f));
 		ImGui::BeginChild("Ocean Editor", windowSizes, true);

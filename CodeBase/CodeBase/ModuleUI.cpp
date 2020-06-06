@@ -43,7 +43,7 @@ bool ModuleUI::Init()
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
 	// Setup Dear ImGui style
-	ImGui::StyleColorsLight();
+	ImGui::StyleColorsClassic();
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplSDL2_InitForOpenGL(myApp->m_window->window, myApp->m_render->context);
@@ -52,7 +52,7 @@ bool ModuleUI::Init()
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	//Windows 
-	testWindow = new UITest("Test Window");
+	testWindow = new UITest("Settings");
 	exportWindow = new UIExport("Export",false);
 	generationWindow = new UIGeneration("Generate");
 	sceneWindow = new UIScene("Scene");
