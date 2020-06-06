@@ -124,6 +124,7 @@ bool UIGeneration::Draw()
 				terrain->DeleteChunks();
 				terrain->GenerateChunks(terrainChunks, terrainHeight, terrainWidth);
 				terrain->SetNeighbours();
+				terrain->parent->updateTFB = true;
 			}
 			ImGui::PopFont();
 			ImGui::PopStyleColor(2);
