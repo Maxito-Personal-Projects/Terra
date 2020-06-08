@@ -221,6 +221,13 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 		mesh->mVertices[i] = aiVector3D(vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
 		mesh->mNormals[i] = aiVector3D(vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], vertexBuffer[buffIndx + 5]);
 		mesh->mTextureCoords[0][i] = aiVector3D(vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], 0.0f);
+
+		if (i < 20)
+		{
+			LOG("%f,%f,%f", mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+			LOG("%f,%f,%f", mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+			LOG("%f,%f,%f", mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y, mesh->mTextureCoords[0][i].z);
+		}
 		
 		buffIndx += 9;
 	}
@@ -240,14 +247,16 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 		face.mIndices[0] = vertIndx;
 		face.mIndices[1] = vertIndx + 1;
 		face.mIndices[2] = vertIndx + 2;
-
+	
 		vertIndx += 3;	
 	}
 
 	const aiExportFormatDesc* formatDescription = aiGetExportFormatDescription(int(format));
 	LOG("%s", formatDescription->description);
 
-	if (exporter->Export(scene,formatDescription->id, AddExtension("Exports",name,format).c_str(), aiProcess_MakeLeftHanded) == AI_SUCCESS)
+	int flags = aiProcess_MakeLeftHanded;
+
+	if (exporter->Export(scene,formatDescription->id, AddExtension("Exports",name,format).c_str(), flags) == AI_SUCCESS)
 	{
 		string exprt = formatDescription->fileExtension;
 		message = "Success exporting Terrain in "+exprt+" format";

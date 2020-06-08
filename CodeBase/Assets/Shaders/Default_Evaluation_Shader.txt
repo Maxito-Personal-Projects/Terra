@@ -624,7 +624,6 @@ void main()
 	
 	ivec2 pix_coord = ivec2(((gl_TessCoord.xy+chunkCoords)/gridSize)*100);
 	
-	
 	if(primitive!=0)
 	{
 		Normal_FS_in = (Model * vec4(GetVertexNormal(),0.0)).xyz;
@@ -669,6 +668,8 @@ void main()
 
 
 	gl_Position = Projection * View * vec4(WorldPos_FS_in, 1.0);
+	
+	//Export vars
 	TFPosition = WorldPos_FS_in;
 	TFNormal = Normal_FS_in;
 	TFColor = vec3(gl_TessCoord.xy,0.0);
