@@ -30,12 +30,13 @@ bool UITest::Draw()
 	ImGui::Begin(name.c_str(), &active);
 
 	// Render setting
+	ImGui::PushFont(myApp->m_ui->arial);
 	ImGui::Text("Render Settings:");
 	ImGui::Text("Light Direction:");
 	ImGui::SameLine();
 	ImGui::PushID("Light Dir");
 	ImGui::PushItemWidth(100.0f);
-	ImGui::DragFloat3("", myApp->m_render->lightDirection, 0.1f, -1.0f, 1.0f, "%.1f");
+	ImGui::DragFloat3("", myApp->m_render->lightDirection, 0.01f, -1.0f, 1.0f, "%.1f");
 	ImGui::PopItemWidth();
 	ImGui::PopID();
 
@@ -53,61 +54,11 @@ bool UITest::Draw()
 
 	ImGui::Text("-------------------------");
 
-	// Terrain setting
-	ImGui::Text("Terrain Settings:");
-
-	ImGui::Text("Frequency:");
-	ImGui::SameLine();
-	ImGui::PushID("Frequency");
-	ImGui::PushItemWidth(100.0f);
-	ImGui::DragFloat("", &terrain->frequency, 0.1,0.1f, 1000.0f, "%.1f");
-	ImGui::PopItemWidth();
-	ImGui::PopID();
-
-	ImGui::Text("Octaves:");
-	ImGui::SameLine();
-	ImGui::PushID("Octaves");
-	ImGui::PushItemWidth(100.0f);
-	ImGui::DragInt("", &terrain->octaves, 0.1f, 1,8, "%.0f");
-	ImGui::PopItemWidth();
-	ImGui::PopID();
-
-	ImGui::Text("-------------------------");
-
-
-	ImGui::Text("-------------------------");
-
-	//ImGui::Text("Map Generation:");
-	//if (ImGui::Checkbox("Perlin Noise", &terrain->perlin))
-	//{
-	//	terrain->brownian = false;
-	//	terrain->voronoi = false;
-	//	terrain->heightmap = false;
-	//}
-	//if (ImGui::Checkbox("Brownian Noise", &terrain->brownian))
-	//{
-	//	terrain->perlin = false;
-	//	terrain->voronoi = false;
-	//	terrain->heightmap = false;
-	//}
-	//if (ImGui::Checkbox("Voronoi Noise", &terrain->voronoi))
-	//{
-	//	terrain->brownian = false;
-	//	terrain->perlin = false;
-	//	terrain->heightmap = false;
-	//}
-	//if (ImGui::Checkbox("Heightmap", &terrain->heightmap))
-	//{
-	//	terrain->brownian = false;
-	//	terrain->voronoi = false;
-	//	terrain->perlin = false;
-	//}
-
-	ImGui::Text("-------------------------");
-
 	ImGui::Text("Result:");
 
 	ImGui::Image((void*)(intptr_t)myApp->m_render->exportTexture, ImVec2(200, 200));
+
+	ImGui::PopFont();
 
 
 	ImGui::End();

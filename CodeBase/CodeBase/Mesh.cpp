@@ -101,6 +101,11 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 
 		Biome* biome = chunkParent->biome;
 
+		if (myApp->m_ui->generationWindow->showBiome && myApp->m_ui->generationWindow->selectedBiome)
+		{
+			biome = myApp->m_ui->generationWindow->selectedBiome;
+		}
+
 		// Render Info 
 		int modelMatrix = glGetUniformLocation(parent->terrainShader, "Model");
 		glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, *parent->transform->localMatrix.Transposed().v);
@@ -133,6 +138,13 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 
 			if (neighbour)
 			{
+				Biome* neighbourBiome = neighbour->biome;
+
+				if (myApp->m_ui->generationWindow->showBiome && myApp->m_ui->generationWindow->selectedBiome)
+				{
+					neighbourBiome = myApp->m_ui->generationWindow->selectedBiome;
+				}
+
 				string heightVar = "neighbours["+to_string(count)+"].height";
 				string octavesVar = "neighbours[" + to_string(count) + "].octaves";
 				string idVar = "neighbours[" + to_string(count) + "].neighbourID";
@@ -147,11 +159,11 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 				int neighFreq = glGetUniformLocation(parent->terrainShader, freqVar.c_str());
 				int neighPrim = glGetUniformLocation(parent->terrainShader, primVar.c_str());
 
-				glUniform1f(neighHeight, neighbour->biome->height);
-				glUniform1f(neighSeed, neighbour->biome->seed);
-				glUniform1f(neighFreq, neighbour->biome->frequency);
-				glUniform1i(neighOctaves, neighbour->biome->octaves);
-				glUniform1i(neighPrim, neighbour->biome->primitive);
+				glUniform1f(neighHeight, neighbourBiome->height);
+				glUniform1f(neighSeed, neighbourBiome->seed);
+				glUniform1f(neighFreq, neighbourBiome->frequency);
+				glUniform1i(neighOctaves, neighbourBiome->octaves);
+				glUniform1i(neighPrim, neighbourBiome->primitive);
 				glUniform1i(neighID, i);
 
 				count++;

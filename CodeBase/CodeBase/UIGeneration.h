@@ -49,7 +49,9 @@ public:
 
 	Chunk* selectedChunk = nullptr;
 	Biome* selectedBiome = nullptr;
+
 	bool canDrag = false;
+	bool showBiome = false;
 
 };
 
