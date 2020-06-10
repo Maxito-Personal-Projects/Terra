@@ -42,8 +42,9 @@ public:
 
 	Texture* heightmap = nullptr;
 
-	float2 layerRanges[6];
-	float3 layerColors[6];
+	float layerRanges[7];
+	float3 layerColors[8];
+	int layerTypes[6];
 
 	int numLayers = 1;
 

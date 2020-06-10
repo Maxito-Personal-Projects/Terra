@@ -17,9 +17,6 @@ uniform mat4 Projection;
 uniform mat4 Model;
 uniform float seed;
 uniform int gridSize;
-uniform float layerRanges[12];
-uniform float layerColors[18];
-uniform int numLayers;
 
 uniform Chunk neighbours[8];
 uniform int numNeighbours;
@@ -51,7 +48,6 @@ uniform float divisions;
 
 int mixType;
 ivec3 neighIDs;
-
 
 uniform int primitive;
 
@@ -639,7 +635,7 @@ void main()
 	
 	WorldPos_FS_in.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y);
 	
-	MapPos_FS_in=WorldPos_FS_in.y/chunkHeight;
+	MapPos_FS_in=WorldPos_FS_in.y/75.0;
 	
 	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
 	
@@ -650,16 +646,6 @@ void main()
 	if(selected==1)
 	{
 		Color_FS_in=vec3(1.0,1.0,0.5);
-	}
-	else
-	{
-		for(int i=0;i<numLayers;++i)
-		{
-			if(height >= layerRanges[i*2] && height < layerRanges[i*2+1])
-			{
-				Color_FS_in = vec3(layerColors[i*3],layerColors[i*3+1],layerColors[i*3+2]);
-			}
-		}
 	}
 		
 	texColor_FS_in = vec3(height);

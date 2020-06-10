@@ -187,9 +187,11 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		int numLayers = glGetUniformLocation(parent->terrainShader, "numLayers");
 		glUniform1i(numLayers, myApp->m_ui->generationWindow->numLayers);
 		int colorsRanges = glGetUniformLocation(parent->terrainShader, "layerRanges");
-		glUniform1fv(colorsRanges,12,myApp->m_ui->generationWindow->layerRanges->ptr());
+		glUniform1fv(colorsRanges,7,myApp->m_ui->generationWindow->layerRanges);
 		int colorsLayer = glGetUniformLocation(parent->terrainShader, "layerColors");
-		glUniform1fv(colorsLayer, 18, myApp->m_ui->generationWindow->layerColors->ptr());
+		glUniform1fv(colorsLayer, 24, myApp->m_ui->generationWindow->layerColors->ptr());
+		int typeLayer = glGetUniformLocation(parent->terrainShader, "layerType");
+		glUniform1iv(typeLayer, 6, myApp->m_ui->generationWindow->layerTypes);
 
 
 		if (divisions == 64.0f)
