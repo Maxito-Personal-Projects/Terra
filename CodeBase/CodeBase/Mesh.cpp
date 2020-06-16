@@ -42,6 +42,8 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
 	glDeleteBuffers(1, &TBO);
+	glDeleteBuffers(1, &TBO_mid);
+	glDeleteBuffers(1, &TBO_low);
 
 	if (vertices)
 	{
@@ -324,7 +326,6 @@ void Mesh::LoadToGPU()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float))); //Normals
 	glEnableVertexAttribArray(2); //layout loactaion = 2
 
-
 	//safely unbind
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -380,6 +381,31 @@ void Mesh::GenerateVertexBuffer()
 	{
 		glGetNamedBufferSubData(TBO_low, 0, sizeof(float)*buffSize16, vertexBuffer16);
 	}
+}
+
+void Mesh::DrawTextueToExport(string path)
+{
+	glViewport(0, 0, 256, 256);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, myApp->m_render->textureFramebuffer);
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	
+	glUseProgram(parent->textureShader);
+
+	glBindVertexArray(VAOrender);
+
+	int chunkPos = glGetUniformLocation(parent->textureShader, "chunkPos");
+	glUniform2f(chunkPos, chunkX, chunkY);
+	int chunkSize = glGetUniformLocation(parent->textureShader, "chunkSize");
+	glUniform2f(chunkSize, width,height);
+
+	glDrawArrays(GL_TRIANGLES, 0, 64 * 64 * 2 * 3);
+
+	myApp->fileSystem->ExportPNG(path);
+
+	glViewport(0,0,myApp->m_render->width, myApp->m_render->height);
+
 }
 
 void Mesh::GenerateFlatMesh_quads(int x, int y)

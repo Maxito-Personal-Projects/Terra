@@ -172,16 +172,17 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 	{
 		glGenFramebuffers(1, &frameBuffer);
 		glGenFramebuffers(1, &mouseClickFB);
+		glGenFramebuffers(1, &textureFramebuffer);
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
-	if (fbTexture != 0)
+	if (fbTexture >= 0)
 	{
 		glDeleteTextures(1, &fbTexture);
 	}
 	
-	if (renderBuffer != 0)
+	if (renderBuffer >= 0)
 	{
 		glDeleteRenderbuffers(1, &renderBuffer);
 	}
@@ -210,12 +211,12 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 	//Mouse click GPU -------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, mouseClickFB);
 
-	if (mouseClickTexture != 0)
+	if (mouseClickTexture >= 0)
 	{
 		glDeleteTextures(1, &mouseClickTexture);
 	}
 
-	if (renderBuffer != 0)
+	if (renderBuffer >= 0)
 	{
 		glDeleteRenderbuffers(1, &mouseClickRB);
 	}
@@ -238,6 +239,28 @@ void ModuleRenderer::GenerateFrameBuffer(int x, int y)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
 		LOG("Error Generating the mouse clicking framebuffer");
+	}
+
+
+	// Export Texture ------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, textureFramebuffer);
+
+	if (finalTexture >= 0)
+	{
+		glDeleteTextures(1, &finalTexture);
+	}
+
+	glGenTextures(1, &finalTexture);
+	glBindTexture(GL_TEXTURE_2D, finalTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalTexture, 0);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LOG("Error Generating the texture framebuffer");
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

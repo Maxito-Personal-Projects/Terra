@@ -10,7 +10,8 @@ using namespace std;
 
 class Texture;
 
-enum ExportFormat {
+enum ExportFormat 
+{
 	DAE = 0,
 	OBJ_MAT = 3,
 	OBJ = 4,
@@ -35,6 +36,7 @@ public:
 	string AddExtension(string folder, string name, ExportFormat extension);
 
 	bool Export(float* vertexBuffer, int sizeBuffer, string name, ExportFormat format, string& message);
+	bool ExportPNG(string path);
 
 	string GetFolderPath(string folder);
 	string GetFileNameFromPath(string path);

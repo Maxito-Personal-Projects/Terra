@@ -56,7 +56,7 @@ bool UITest::Draw()
 
 	ImGui::Text("Result:");
 
-	ImGui::Image((void*)(intptr_t)myApp->m_render->exportTexture, ImVec2(200, 200));
+	ImGui::Image((void*)(intptr_t)myApp->m_render->finalTexture, ImVec2(200, 200));
 
 	ImGui::PopFont();
 

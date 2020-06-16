@@ -27,6 +27,7 @@ bool ModuleShader::Start()
 	GenerateDefaultShaders();
 	GenerateDefaultRenderShaders();
 	GenerateMousePickingShaders();
+	GenerateTextureShaders();
 
 	return ret;
 }
@@ -190,6 +191,38 @@ void ModuleShader::GenerateMousePickingShaders()
 
 		shaders.push_back(mousePickingShader);
 		shadersNames.insert({ mousePickingShader->name, mousePickingShader->id });
+	}
+}
+
+void ModuleShader::GenerateTextureShaders()
+{
+
+	//Creating default Vertex Shader
+	_Shader*TextureVertexSahder = new _Shader("Default Vertex Shader", VERTEX);
+	TextureVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Texture_Vertex_Shader.txt");
+
+	if (CompileShader(TextureVertexSahder))
+	{
+		LOG("Texture Vertex Shader Compiled Successfully");
+	}
+
+	//Creating default Fragment Shader
+	_Shader* TextureFragmentSahder = new _Shader("Default Fragment Shader", FRAGMENT);
+	TextureFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Texture_Fragment_Shader.txt");
+
+	if (CompileShader(TextureFragmentSahder))
+	{
+		LOG("Texture Fragment Shader Compiled Successfully");
+	}
+
+	//Creating Default Shader Program
+	Shader* TextureShader = new Shader("Texture Shader", TextureVertexSahder, TextureFragmentSahder, nullptr, nullptr, nullptr);
+	if (CompileShaderProgram(TextureShader))
+	{
+		LOG("Texture Shader Program Compiled Successfully");
+
+		shaders.push_back(TextureShader);
+		shadersNames.insert({ TextureShader->name, TextureShader->id });
 	}
 }
 

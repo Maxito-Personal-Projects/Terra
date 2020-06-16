@@ -12,11 +12,9 @@ class Chunk
 public:
 	
 	Chunk(GameObject* _parent, int id, int _x, int _y, float height, float width,float _color, Biome* _biome);
-
 	~Chunk();
 
 	void SetNeighbours();
-	void SetBiome(Biome* biome);
 
 public:
 

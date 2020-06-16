@@ -10,6 +10,7 @@ class Biome;
 class Terrain
 {
 public:
+
 	Terrain(GameObject* _parent, int nChunks);
 	~Terrain();
 

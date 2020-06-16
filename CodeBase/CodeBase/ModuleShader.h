@@ -36,6 +36,7 @@ public:
 	void GenerateDefaultShaders();
 	void GenerateDefaultRenderShaders();
 	void GenerateMousePickingShaders();
+	void GenerateTextureShaders();
 
 	bool CompileShader(_Shader* shader);
 	bool CompileShaderProgram(Shader* shaderProgram, bool isDefault = false);

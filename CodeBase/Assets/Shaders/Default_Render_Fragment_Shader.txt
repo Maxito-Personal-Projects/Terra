@@ -232,5 +232,8 @@ void main()
 	vec3 specular = 0.2*spec*lightColor;
 	            
     vec3 result = (ambient + diffuse + specular) * vecColor;
+	
+	result=pow(result,vec3(1.0/(2.2)));
+	
     FragColor = vec4(result,1.0);
 } 

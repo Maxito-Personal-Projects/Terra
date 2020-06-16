@@ -12,7 +12,7 @@
 GameObject::GameObject()
 {
 	transform = new Transform();
-	terrain = new Terrain(this,2);
+	terrain = new Terrain(this,1);
 
 	if (terrain)
 	{
@@ -23,6 +23,7 @@ GameObject::GameObject()
 	terrainShader = myApp->m_shader->GetShader("Default Shader");
 	renderShader = myApp->m_shader->GetShader("Render Shader");
 	mousePickingShader = myApp->m_shader->GetShader("Mouse Picking Shader");
+	textureShader = myApp->m_shader->GetShader("Texture Shader");
 
 	updateTFB = true;
 }
@@ -63,8 +64,7 @@ bool GameObject::Draw()
 			glUseProgram(renderShader);
 			SendMatrixToGPU(renderShader);
 			terrain->DrawChunks(updateTFB);
-		}
-		
+		}		
 	}
 
 	return ret;
@@ -87,6 +87,8 @@ bool GameObject::SelectionDraw()
 
 void GameObject::SendMatrixToGPU(int shaderID)
 {
+	float4x4 identity = float4x4::identity;
+
 	//Getting uniform from shader
 	int projMatrix = glGetUniformLocation(shaderID, "Projection");
 	//Sending info to the GPU

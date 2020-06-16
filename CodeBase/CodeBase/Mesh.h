@@ -22,6 +22,8 @@ public:
 
 	void GenerateVertexBuffer();
 
+	void DrawTextueToExport(string path);
+
 public:
 
 	float* vertices = nullptr;
@@ -39,7 +41,6 @@ public:
 	uint TBO_low;	//Transform Feedback Buffer Object
 
 	uint VAOrender;	//Vertex Buffer Object
-
 
 	float* vertexBuffer64 = nullptr;
 	int buffSize64 = 0;

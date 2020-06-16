@@ -18,17 +18,14 @@ UIGeneration::UIGeneration(std::string name, bool active) : UIWindow(name, activ
 	currFunction = "None";
 	currNumLayer = "1";
 
-	for (int i = 0; i < 8; ++i)
-	{
-		layerColors[i] = { 0.25f,0.88f,0.82f };
-	}
-
 	layerTypes[0] = 0;
 
 	for (int i = 0; i < 7; ++i)
 	{
 		layerRanges[i] = 1.0f;
 	}
+
+	SetDefaultColors();
 }
 
 
@@ -53,7 +50,7 @@ bool UIGeneration::Draw()
 		int numWindows = 6;
 
 		ImVec2 mainWindowSize = ImGui::GetWindowSize();
-		ImVec2 windowSizes = { (mainWindowSize.x-30.0f) /* numWindows*/, /*mainWindowSize.y-*/250.0f };
+		ImVec2 windowSizes = { (mainWindowSize.x - 30.0f) /* numWindows*/, /*mainWindowSize.y-*/250.0f };
 		ImVec2 meshSize = { mainWindowSize.x - 30.0f,175 };
 		ImVec2 biomeSize = { mainWindowSize.x - 30.0f,270.0f };
 		if (heightWindow)
@@ -61,10 +58,12 @@ bool UIGeneration::Draw()
 			biomeSize.y *= 2.0f;
 			biomeSize.y += 25.0f;
 		}
-		ImVec2 layerSize = { mainWindowSize.x - 30.0f,400.0f };
-		ImVec2 chunkSize = { mainWindowSize.x - 30.0f,130.0f };
-		ImVec2 oceanSize = { mainWindowSize.x - 30.0f,100.0f };
 
+		float finalSize = (numLayers-1) * 72.0f;
+
+		ImVec2 layerSize = { mainWindowSize.x - 30.0f,170.0f+finalSize};
+		ImVec2 chunkSize = { mainWindowSize.x - 30.0f,130.0f };
+		ImVec2 oceanSize = { mainWindowSize.x - 30.0f,170.0f };
 
 		ImVec4 titleColor = ImVec4(1.0f, 1.0f, 1.0f, 0.8f);
 
@@ -73,10 +72,10 @@ bool UIGeneration::Draw()
 		ImGui::BeginChild("Mesh Editor", meshSize, true);
 		{
 			//Centered Title
-			std::string text = "Mesh Editor";
+			std::string text = "Terrain Editor";
 			ImGui::PushFont(myApp->m_ui->montserratBold);
-			ImGui::SetCursorPosX((ImGui::GetWindowSize().x-ImGui::CalcTextSize(text.c_str()).x)/2.f);
-			ImGui::TextColored(titleColor,text.c_str());
+			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
+			ImGui::TextColored(titleColor, text.c_str());
 			ImGui::PopFont();
 
 			//Window DrawList
@@ -84,8 +83,8 @@ bool UIGeneration::Draw()
 
 			//Title Underline 
 			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y};
-			drawList->AddLine(underLinePosL,underLinePosR,ImColor(0.1f, 0.1f, 0.8f, 1.0f));
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.1f, 0.1f, 0.8f, 1.0f));
 
 			ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
@@ -123,11 +122,11 @@ bool UIGeneration::Draw()
 
 			ImVec2 buttonSize = ImVec2(ImGui::CalcTextSize("Generate").x + 30.0, ImGui::CalcTextSize("Generate").y + 14.0f);
 
-			ImGui::SetCursorPos(ImVec2(windowSizes.x - buttonSize.x-10.0f, ImGui::GetCursorPosY()));
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+			ImGui::SetCursorPos(ImVec2(windowSizes.x - buttonSize.x - 10.0f, ImGui::GetCursorPosY()));
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
 			ImGui::PushFont(myApp->m_ui->montserrat);
-			if (ImGui::Button("Generate",buttonSize))
+			if (ImGui::Button("Generate", buttonSize))
 			{
 				selectedChunk = nullptr;
 				terrain->DeleteChunks();
@@ -137,12 +136,12 @@ bool UIGeneration::Draw()
 			}
 			ImGui::PopFont();
 			ImGui::PopStyleColor(2);
-			
+
 		}
 		ImGui::EndChild();
 
 		//ImGui::SameLine();
-		
+
 		//--------------------------- Biome Editor ------------------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.8f, 0.5f));
 		ImGui::BeginChild("BiomeSelector", biomeSize, true);
@@ -247,7 +246,6 @@ bool UIGeneration::Draw()
 							currPrimitive = primitives[i];
 							selectedBiome->primitive = i;
 
-							//TODO: implement Optimization!!!!
 							terrain->parent->updateTFB = true;
 						}
 					}
@@ -258,26 +256,41 @@ bool UIGeneration::Draw()
 				ImGui::PopID();
 
 				ImGui::PushID("Terr Height");
-				ImGui::DragFloat("", &selectedBiome->height, 1.0f, 0.0f);
+				if (ImGui::DragFloat("", &selectedBiome->height, 1.0f, 0.0f))
+				{
+					terrain->parent->updateTFB = true;
+				}
 				ImGui::PopID();
 
 				ImGui::PushID("Seed");
-				ImGui::DragFloat("", &selectedBiome->seed, 0.01f);
+				if (ImGui::DragFloat("", &selectedBiome->seed, 0.01f))
+				{
+					terrain->parent->updateTFB = true;
+				}
 				ImGui::PopID();
 
 				ImGui::PushID("Octaves");
-				ImGui::DragInt("", &selectedBiome->octaves, 0.1f, 1, 8, "%.0f");
+				if (ImGui::DragInt("", &selectedBiome->octaves, 0.1f, 1, 8, "%.0f"))
+				{
+					terrain->parent->updateTFB = true;
+				}
 				ImGui::PopID();
 
 				if (currPrimitive != primitives[4])
 				{
 					ImGui::PushID("Frequency");
-					ImGui::DragFloat("", &selectedBiome->frequency, 0.1, 0.1f, 1000.0f, "%.1f");
+					if (ImGui::DragFloat("", &selectedBiome->frequency, 0.1, 0.1f, 1000.0f, "%.1f"))
+					{
+						terrain->parent->updateTFB = true;
+					}
 					ImGui::PopID();
 				}
 
 				ImGui::PushID("showBiome");
-				ImGui::Checkbox("",&showBiome);
+				if (ImGui::Checkbox("", &showBiome))
+				{
+					terrain->parent->updateTFB = true;
+				}
 				ImGui::PopID();
 
 				ImGui::EndGroup();
@@ -299,7 +312,7 @@ bool UIGeneration::Draw()
 					ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 					//Title Underline 
-					ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y +ImGui::GetWindowPos().y };
+					ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
 					ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
 					drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
 
@@ -352,7 +365,7 @@ bool UIGeneration::Draw()
 			}
 			else
 			{
-				if (currBiome=="New Biome")
+				if (currBiome == "New Biome")
 				{
 					char buff[256];
 					strcpy_s(buff, 256, biomeName.c_str());
@@ -387,15 +400,13 @@ bool UIGeneration::Draw()
 				}
 			}
 		}
-		ImGui::EndChild();		
-
-		//ImGui::SameLine();
+		ImGui::EndChild();
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, .8f, 0.1f, 0.5f));
 		ImGui::BeginChild("ChunkInfo", chunkSize, true);
 		{
 			//Centered Title
-			std::string text = "Chunk Info";
+			std::string text = "Selected Chunk";
 			ImGui::PushFont(myApp->m_ui->montserratBold);
 			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
 			ImGui::TextColored(titleColor, text.c_str());
@@ -449,7 +460,109 @@ bool UIGeneration::Draw()
 		}
 		ImGui::EndChild();
 
-		//ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.8f, 0.8f, 0.5f));
+		ImGui::BeginChild("TextureEditor", oceanSize, true);
+		{
+			//Centered Title
+			std::string text = "Texture Editor";
+			ImGui::PushFont(myApp->m_ui->montserratBold);
+			ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
+			ImGui::TextColored(titleColor, text.c_str());
+			ImGui::PopFont();
+
+			//Window DrawList
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			//Title Underline 
+			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.0f, 0.7f, 0.7f, 1.0f));
+
+			ImGui::PushFont(myApp->m_ui->arial);
+
+			ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+			ImGui::BeginGroup();
+
+			ImGui::Dummy(ImVec2(0.0f, 1.0f));
+			ImGui::Text("Sand Texture:");
+
+			ImGui::Dummy(ImVec2(0.0f, 1.0f));
+			ImGui::Text("Grass Texture:");
+
+			ImGui::Dummy(ImVec2(0.0f, 1.0f));
+			ImGui::Text("Snow Texture:");
+
+			ImGui::Dummy(ImVec2(0.0f, 1.0f));
+			ImGui::Text("Rocks Texture:");
+
+			ImGui::EndGroup();
+
+			ImGui::SameLine();
+
+			ImGui::BeginGroup();
+
+			ImGui::PushID("Texture_1_A");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[0].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::SameLine();
+
+			ImGui::PushID("Texture_1_B");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[1].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::PushID("Texture_2_A");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[2].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::SameLine();
+
+			ImGui::PushID("Texture_2_B");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[3].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::PushID("Texture_3_A");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[6].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::SameLine();
+
+			ImGui::PushID("Texture_3_B");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[7].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::PushID("Texture_4_A");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[4].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::SameLine();
+
+			ImGui::PushID("Texture_4_B");
+			ImGui::PushItemWidth(200.0f);
+			ImGui::ColorEdit3("", layerColors[5].ptr(), ImGuiColorEditFlags_NoInputs);
+			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			ImGui::EndGroup();
+
+			ImGui::PopFont();
+		}
+		ImGui::EndChild();
 
 		//----------------------- Layer Editor -----------------------------------------
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.8f, 0.1f, 0.5f));
@@ -470,77 +583,9 @@ bool UIGeneration::Draw()
 			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.6f, 0.0f, 1.0f));
 
-			ImGui::Dummy(ImVec2(0.0f,10.0f));
+			ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 			ImGui::PushFont(myApp->m_ui->arial);
-
-			ImGui::Text("Low Texture:");
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_1_A");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[0].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
-
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_1_B");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[1].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
-
-			ImGui::Text("Mid Texture:");
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_2_A");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[2].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
-
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_2_B");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[3].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
-
-			ImGui::Text("Top Texture:");
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_3_A");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[6].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
-
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_3_B");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[7].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
-
-			ImGui::Text("Interpolation Texture:");
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_4_A");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[4].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
-
-			ImGui::SameLine();
-
-			ImGui::PushID("Texture_4_B");
-			ImGui::PushItemWidth(200.0f);
-			ImGui::ColorEdit3("", layerColors[5].ptr(), ImGuiColorEditFlags_NoInputs);
-			ImGui::PopItemWidth();
-			ImGui::PopID();
 
 			ImGui::BeginGroup();
 			ImGui::Dummy(ImVec2(0.0f, 0.25f));
@@ -549,9 +594,9 @@ bool UIGeneration::Draw()
 
 			ImGui::SameLine();
 
-			ImGui::PushItemWidth(windowSizes.x - ImGui::CalcTextSize("Number of Layers:").x-25.0f);
+			ImGui::PushItemWidth(windowSizes.x - ImGui::CalcTextSize("Number of Layers:").x - 25.0f);
 			ImGui::PushID("NumLayers");
-			ImGui::SliderInt("",&numLayers,1,6);
+			ImGui::SliderInt("", &numLayers, 1, 6);
 			ImGui::PopID();
 
 			ImGui::PopItemWidth();
@@ -590,12 +635,12 @@ bool UIGeneration::Draw()
 						ImGui::PopItemWidth();
 						ImGui::PopID();
 
-						if (numLayers==1)
+						if (numLayers == 1)
 						{
 							layerRanges[i] = 1.0f;
 						}
 					}
-					else if(i>0 && i<numLayers-1)
+					else if (i > 0 && i < numLayers - 1)
 					{
 						string layerID = layer + "ID";
 
@@ -631,7 +676,7 @@ bool UIGeneration::Draw()
 
 						ImGui::PushID("Show last");
 						ImGui::PushItemWidth(75.0f);
-						ImGui::DragFloat("", &layerRanges[i+1], 0.01f, 1.0, 1.0, "%.2f");
+						ImGui::DragFloat("", &layerRanges[i + 1], 0.01f, 1.0, 1.0, "%.2f");
 						ImGui::PopItemWidth();
 						ImGui::PopID();
 					}
@@ -639,38 +684,15 @@ bool UIGeneration::Draw()
 					string type = layer + "type";
 
 					ImGui::Text("Type: ");
+					ImGui::SameLine();
 					ImGui::PushID(type.c_str());
 					ImGui::DragInt("", &layerTypes[i], 0.1f, 0, 3);
 					ImGui::PopID();
-
-
-					/*ImGui::Text("Color: ");
-
-					ImGui::SameLine();
-
-					string Color_1 = layer + "color_1";
-					string Color_2 = layer + "color_2";
-					
-					ImGui::PushID(Color_1.c_str());
-					ImGui::PushItemWidth(200.0f);
-					ImGui::ColorEdit3("", layerColors[i*2].ptr(), ImGuiColorEditFlags_NoInputs);
-					ImGui::PopItemWidth();
-					ImGui::PopID();
-
-					ImGui::SameLine();
-					
-					ImGui::PushID(Color_2.c_str());
-					ImGui::PushItemWidth(200.0f);
-					ImGui::ColorEdit3("", layerColors[i*2+1].ptr(), ImGuiColorEditFlags_NoInputs);
-					ImGui::PopItemWidth();
-					ImGui::PopID();*/
 				}
 				else
 				{
 					layerTypes[i] = 0;
 					layerRanges[i] = 1.0;
-					/*layerColors[i*2] = { 0.0f,0.0f,0.0f };
-					layerColors[i*2+1] = { 0.0f,0.0f,0.0f };*/
 				}
 
 			}
@@ -680,39 +702,14 @@ bool UIGeneration::Draw()
 			layerRanges[6] = 1.0f;
 
 		}
-		ImGui::EndChild();		
+		ImGui::EndChild();
 
-		//ImGui::SameLine();
-
-		//ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.8f, 0.8f, 0.5f));
-		//ImGui::BeginChild("Ocean Editor", windowSizes, true);
-		//{
-		//	//Centered Title
-		//	std::string text = "Ocean Editor";
-		//	ImGui::PushFont(myApp->m_ui->montserratBold);
-		//	ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize(text.c_str()).x) / 2.f);
-		//	ImGui::TextColored(titleColor, text.c_str());
-		//	ImGui::PopFont();
-		//
-		//	//Window DrawList
-		//	ImDrawList* drawList = ImGui::GetWindowDrawList();
-		//
-		//	//Title Underline 
-		//	ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-		//	ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
-		//	drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.0f, 0.7f, 0.7f, 1.0f));
-		//
-		//	ImGui::Spacing();
-		//}
-		//ImGui::EndChild();
-
-		ImGui::PopStyleColor(4);
+		ImGui::PopStyleColor(5);
 	}
 	ImGui::End();
 
 	return ret;
 }
-
 
 void UIGeneration::LoadHeightMap(string path)
 {
@@ -727,5 +724,19 @@ void UIGeneration::LoadHeightMap(string path)
 
 		imageName = myApp->fileSystem->GetFileNameFromPath(path);
 		heightmap = myApp->fileSystem->LoadImagePNG(path);
+
+		terrain->parent->updateTFB = true;
 	}
+}
+
+void UIGeneration::SetDefaultColors()
+{
+	layerColors[0] = { 1.0f,1.0f,1.0f };
+	layerColors[1] = { 1.0f,0.68f,0.06f };
+	layerColors[2] = { 0.0f,0.3f,0.0f };
+	layerColors[3] = { 0.24f,0.0f,0.0f };
+	layerColors[4] = { 1.0f,1.0f,1.0f };
+	layerColors[5] = { 0.0f,0.0f,0.0f };
+	layerColors[6] = { 1.0f,1.0f,1.0f };
+	layerColors[7] = { 0.02f,0.56f,0.51f };
 }

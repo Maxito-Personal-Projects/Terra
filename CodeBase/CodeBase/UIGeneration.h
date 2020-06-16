@@ -16,6 +16,7 @@ public:
 	~UIGeneration();
 
 	void LoadHeightMap(string path);
+	void SetDefaultColors();
 
 	bool Draw();
 

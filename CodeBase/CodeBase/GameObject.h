@@ -22,6 +22,7 @@ public:
 	int terrainShader = 0;
 	int renderShader = 0;
 	int mousePickingShader = 0;
+	int textureShader = 0;
 
 	bool updateTFB = false;
 	

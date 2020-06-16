@@ -179,19 +179,17 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	scene->mRootNode = new aiNode();
 	scene->mRootNode->mName = "Terrain";
 
-	//Initializing Material
-	scene->mMaterials = new aiMaterial*[1];
-	scene->mMaterials[0] = nullptr;
-	scene->mNumMaterials = 1;
-		 
-	scene->mMaterials[0] = new aiMaterial();
-
 	//Initializing Mesh
-	scene->mMeshes = new aiMesh*[1];		//Adding one mesh poiter
-	scene->mMeshes[0] = nullptr;			//Initializing to null
-	scene->mNumMeshes = 1;					//Setting number of meshes
+	scene->mMeshes = new aiMesh*[1];		  //Adding one mesh pointer
+	scene->mMeshes[0] = new aiMesh();		  //setting mesh
+	scene->mNumMeshes = 1;					  //Setting number of meshes
 
-	scene->mMeshes[0] = new aiMesh();		//setting mesh info
+	//Initializing Material
+	scene->mMaterials = new aiMaterial*[1];   //Adding one material pointer
+	scene->mMaterials[0] = new aiMaterial();  //setting material
+	scene->mNumMaterials = 1;				  //Setting number of materials
+
+	//Setting mesh material
 	scene->mMeshes[0]->mMaterialIndex = 0;
 	
 	//Setting mesh to rootNode
@@ -199,20 +197,20 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	scene->mRootNode->mMeshes[0] = 0;
 	scene->mRootNode->mNumMeshes = 1;
 
-	aiMesh* mesh = scene->mMeshes[0];		//Getting mesh pointer
+	aiMesh* mesh = scene->mMeshes[0];		 
 	mesh->mName = "Terrain";
 	
-	//Now we are taking the vertex, normals & UV info so the size is:
+	//Now we are taking the vertex, normals
+	
 	int numVertices = sizeBuffer / 9;
 
 	//Setting mesh info
 	mesh->mVertices = new aiVector3D[numVertices];
-	mesh->mNumVertices = numVertices;
-
 	mesh->mNormals = new aiVector3D[numVertices];
-	
 	mesh->mTextureCoords[0] = new aiVector3D[numVertices];
-	mesh->mNumUVComponents[0] = numVertices;
+
+	mesh->mNumVertices = numVertices;
+	mesh->mNumUVComponents[0] = 3;
 
 	int buffIndx = 0;
 
@@ -221,13 +219,6 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 		mesh->mVertices[i] = aiVector3D(vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
 		mesh->mNormals[i] = aiVector3D(vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], vertexBuffer[buffIndx + 5]);
 		mesh->mTextureCoords[0][i] = aiVector3D(vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], 0.0f);
-
-		if (i < 20)
-		{
-			LOG("%f,%f,%f", mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-			LOG("%f,%f,%f", mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-			LOG("%f,%f,%f", mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y, mesh->mTextureCoords[0][i].z);
-		}
 		
 		buffIndx += 9;
 	}
@@ -252,6 +243,8 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	}
 
 	const aiExportFormatDesc* formatDescription = aiGetExportFormatDescription(int(format));
+	
+	
 	LOG("%s", formatDescription->description);
 
 	int flags = aiProcess_MakeLeftHanded;
@@ -269,6 +262,88 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 		message = "Error exporting Terrarin: " + error;
 		LOG("%s", message.c_str());
 	}
+	
+	for (int i = 0; i < fSize; ++i)
+	{
+		aiFace &face = mesh->mFaces[i];
+		delete[] face.mIndices;
+		face.mIndices = nullptr;
+	}
+
+	delete[] mesh->mFaces;
+	mesh->mFaces = nullptr;
+
+	delete[] mesh->mVertices;
+	delete[] mesh->mNormals;
+	delete[] mesh->mTextureCoords[0];
+
+	mesh->mVertices = nullptr;
+	mesh->mNormals = nullptr;
+	mesh->mTextureCoords[0] = nullptr;
+
+	delete scene->mMaterials[0];
+	scene->mMaterials = nullptr;
+
+	delete[] scene->mMaterials;
+	scene->mMaterials = nullptr;
+
+	delete scene->mMeshes[0];
+	scene->mMeshes[0] = nullptr;
+	
+	delete[] scene->mMeshes;		
+	scene->mMeshes = nullptr;
+
+	delete scene->mRootNode;
+	scene->mRootNode = nullptr;
+
+	delete scene;
+	scene = nullptr;
+
+	delete exporter;
+	exporter = nullptr;
+
+
+	return ret;
+}
+
+bool FileSystem::ExportPNG(string path)
+{
+	bool ret = true;
+
+	string finalpath = "Exports/" + path + "_Texture.png";
+
+	int w = 256;
+	int h = 256;
+	int size = h * w * 4;
+
+	uint* bytes = new uint[size];
+
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
+
+	ilEnable(IL_FILE_OVERWRITE);
+	
+	ILuint texture = 0;
+
+	ilGenImages(1, &texture);
+	ilBindImage(texture);
+
+	ilTexImage(w, h, 1, 4, IL_RGBA, IL_UNSIGNED_BYTE, bytes);
+
+	ilSave(IL_PNG, finalpath.c_str());
+
+	ILenum PossibleError = ilGetError();
+
+	if (PossibleError != IL_NO_ERROR)
+	{
+		LOG("Error Exporting image");
+		LOG("%d: %s/n", PossibleError, iluErrorString(PossibleError));
+	}
+
+	ilDeleteImages(1, &texture);
+
+	delete[] bytes;
 
 	return ret;
 }

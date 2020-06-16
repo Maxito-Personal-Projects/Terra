@@ -15,13 +15,12 @@ Terrain::Terrain(GameObject* _parent, int nChunks)
 	biomes.push_back(defaultBiome);
 
 	GenerateChunks(nChunks, height, width);
-	
+
 }
 
 Terrain::~Terrain()
 {
 	void DeleteChunks();
-	//TODO delete biomes!
 
 	parent = nullptr;
 }

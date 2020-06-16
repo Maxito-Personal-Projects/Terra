@@ -34,6 +34,7 @@ Chunk::~Chunk()
 	}
 
 	parent = nullptr;
+	biome = nullptr;
 }
 
 void Chunk::SetNeighbours()
@@ -52,6 +53,3 @@ void Chunk::SetNeighbours()
 	neighbours[7] = terrain->GetChunkFromCoords(x - 1, y, numNeighbours);
 }
 
-void Chunk::SetBiome(Biome * biome)
-{
-}

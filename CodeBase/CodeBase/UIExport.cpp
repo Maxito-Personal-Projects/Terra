@@ -123,6 +123,7 @@ bool UIExport::Draw()
 				{
 					if (mesh->vertexBuffer64)
 					{
+						mesh->DrawTextueToExport(fileName + std::to_string(i));
 						mesh->GenerateVertexBuffer();
 						myApp->fileSystem->Export(mesh->vertexBuffer64, mesh->buffSize64, fileName + std::to_string(i), format, exportMessage);
 					}
