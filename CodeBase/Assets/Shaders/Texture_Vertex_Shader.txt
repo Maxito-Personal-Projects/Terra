@@ -16,8 +16,10 @@ void main()
 	UVs = aUV;
 	fragPos=aPos;
 	
-	float realX = (aPos.x/((chunkSize.x/2.0)*(chunkPos.x+1.0)))-1.0;
-	float realZ = (aPos.z/((chunkSize.y/2.0)*(chunkPos.y+1.0)))-1.0;
+	vec2 prePos = vec2(aPos.x-(chunkSize.x*chunkPos.x),aPos.z-(chunkSize.y*chunkPos.y));
+	
+	float realX = (prePos.x/(chunkSize.x/2.0))-1.0;
+	float realZ = (prePos.y/(chunkSize.y/2.0))-1.0;
 	
 	vec3 realPos = vec3(realX,realZ,0.0);
 	
