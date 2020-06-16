@@ -83,6 +83,15 @@ bool ModuleRenderer::PreUpdate()
 	{
 		optim = !optim;
 		firstGO->updateTFB = true;
+
+		if (optim)
+		{
+			LOG("Optimization changed: Activated");
+		}
+		else
+		{
+			LOG("Optimization changed: Deactivated");
+		}
 	}
 
 	return ret;

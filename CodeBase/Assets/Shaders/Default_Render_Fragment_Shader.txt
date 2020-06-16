@@ -9,6 +9,14 @@ in vec3 Color_FS_in;
 uniform vec3 lDirection;
 uniform vec3 camPos;
 
+uniform vec2 chunkCoords;
+uniform int selected;
+
+uniform float layerRanges[7];
+uniform float layerColors[24];
+uniform int layerType[6];
+uniform int numLayers;
+
 float rand(vec2 n) 
 { 
 	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
@@ -98,10 +106,12 @@ float mixColor(vec2 uv,float size)
     float col =0.0;
     float a =0.5;
     float f=1.0;
+	
+	vec2 coords = uv+chunkCoords;
     
    	for(int i=0; i<5;i++)
    	{
-    	col += a*Noise(f*(uv), size);
+    	col += a*Noise(f*(coords), size);
         a*=0.5;
         f*=2.0;
     }
@@ -114,8 +124,8 @@ vec3 Grass(vec2 pos)
 	vec3 color = vec3(0.0);
 	
 	float rand_1 = mixColor(pos,200.0);
-	vec3 col1 = vec3(0.0,rand_1,0.0);
-    vec3 col2 = vec3((1.0-rand_1),(1.0-rand_1)*0.5,0.0);
+	vec3 col1 = vec3(layerColors[6],layerColors[7],layerColors[8]);
+    vec3 col2 = vec3(layerColors[9],layerColors[10],layerColors[11]);
 	color = mix(col1,col2,(1.0-rand_1)*0.9);
 	
 	return color;
@@ -125,9 +135,9 @@ vec3 Rock(vec2 pos)
 {
 	vec3 color = vec3(0.0);
 	
-	float rand_1 = mixColor(pos,50.0);
-	vec3 col3 = vec3(rand_1,rand_1,rand_1);
-    vec3 col4 = vec3(rand_1,rand_1*0.8,rand_1);
+	float rand_1 = mixColor(pos,100.0);
+	vec3 col3 = vec3(layerColors[12],layerColors[13],layerColors[14]);
+    vec3 col4 = vec3(layerColors[15],layerColors[16],layerColors[17]);
 	color = mix(col3,col4,(1.0-rand_1)*0.9);
 	
 	return color;
@@ -137,9 +147,9 @@ vec3 Beach(vec2 pos)
 {
 	vec3 color = vec3(0.0);
 	
-	float rand_1 = mixColor(pos,50.0);
-	vec3 col3 = vec3(rand_1,rand_1,0.0);
-    vec3 col4 = vec3(1.0,1.0,1.0);
+	float rand_1 = mixColor(pos,200.0);
+	vec3 col3 = vec3(layerColors[0],layerColors[1],layerColors[2]);
+    vec3 col4 = vec3(layerColors[3],layerColors[4],layerColors[5]);
 	color = mix(col3,col4,(1.0-rand_1)*0.9);
 	
 	return color;
@@ -150,20 +160,18 @@ vec3 Snow(vec2 pos)
 	vec3 color = vec3(0.0);
 	
 	float rand_1 = mixColor(pos,200.0);
-	vec3 col3 = vec3(rand_1,rand_1,rand_1);
-    vec3 col4 = vec3(1.0,1.0,1.0);
+	vec3 col3 = vec3(layerColors[18],layerColors[19],layerColors[20]);
+    vec3 col4 = vec3(layerColors[21],layerColors[22],layerColors[23]);
 	color = mix(col3,col4,(1.0-rand_1));
 	
 	return color;
 }
 
-void main()
+vec3 ComputeLayerColor(vec3 normal, int type,vec2 uv)
 {
-	vec3 vecColor = Grass(Color_FS_in.xy);
-	vec3 normal = Normal_FS_in;
-	vec3 fragPos = WorldPos_FS_in;
+	vec3 ret = vec3(0.0);
 	
-	vec3 blending = abs( normal );
+	vec3 blending = abs(normal);
 	blending = normalize(max(blending, 0.00001));
 	// Force weights to sum to 1.0
 	float b = (blending.x + blending.y + blending.z);
@@ -171,46 +179,50 @@ void main()
 	
 	vec3 xaxis;
 	vec3 yaxis;
-	vec3 zaxis;
 	
-	float MapPos_FS_in = fragPos.y/75.0;
-	vec2 uvCoords = Color_FS_in.xy;
+	xaxis = Rock(uv);
 	
-	if(MapPos_FS_in<=0.1)
+	if(type == 0)
 	{
-		xaxis = Rock(uvCoords);
-		yaxis = Beach(uvCoords);
-		zaxis = xaxis;
+		yaxis = Beach(uv);
 	}
-	else if(MapPos_FS_in>0.1 && MapPos_FS_in<0.2)
+	else if(type == 1)
 	{
-		float mixFactor = (0.2-MapPos_FS_in)*10.0;
-		xaxis = Rock(uvCoords);
-		yaxis = mix(Beach(uvCoords),Grass(uvCoords),1.-mixFactor);
-		zaxis = xaxis;
+		yaxis = Grass(uv);
 	}
-	else if(MapPos_FS_in>0.2 && MapPos_FS_in<0.4)
+	else if(type == 2)
 	{
-		xaxis = Rock(uvCoords);
-		yaxis = Grass(uvCoords);
-		zaxis = xaxis;
-	}
-	else if(MapPos_FS_in>0.4 && MapPos_FS_in<=0.6)
-	{
-		float mixFactor = (0.6-MapPos_FS_in)/0.2;
-		xaxis = Rock(uvCoords);
-		yaxis = mix(Grass(uvCoords),Snow(uvCoords),1.-mixFactor);
-		zaxis = xaxis;
+		yaxis = Rock(uv);
 	}
 	else
 	{
-		xaxis = Rock(uvCoords);
-		yaxis = Snow(uvCoords);
-		zaxis = xaxis;
+		yaxis = Snow(uv);
 	}
 	
-	vecColor = xaxis * blending.x + yaxis * blending.y + zaxis * blending.z;
+	ret = xaxis * blending.x + yaxis * blending.y + xaxis * blending.z;
+	
+	return ret;
+}
 
+void main()
+{
+	vec3 normal = Normal_FS_in;
+	vec3 fragPos = WorldPos_FS_in;
+	vec2 uvCoords = Color_FS_in.xy;
+	
+	float MapPos_FS_in = fragPos.y/75.0;
+	
+	vec3 vecColor = ComputeLayerColor(normal,layerType[0],uvCoords);
+	
+	for(int i=0; i<numLayers; ++i)
+	{
+		vec3 layerColor = ComputeLayerColor(normal,layerType[i],uvCoords);
+		
+		float margin = (layerRanges[i+1] - layerRanges[i])/4.0;
+		float mixFactor = smoothstep(layerRanges[i]-margin,layerRanges[i]+margin,MapPos_FS_in);
+		vecColor=mix(vecColor,layerColor,mixFactor);
+	}
+	
     vec3 lightColor = vec3(1.0);
 
     // ambient
@@ -224,14 +236,19 @@ void main()
     vec3 diffuse = diff * lightColor;
 	
 	// specular
-	float spec = 0.0;
-	vec3 viewDir = normalize(camPos-fragPos);
-	vec3 reflectDir = reflect(-lightDir,norm);
-	vec3 halfwayDir = normalize(lightDir + viewDir);
-	spec = pow(max(dot(normal,halfwayDir),0.0),256.0);
-	vec3 specular = 0.2*spec*lightColor;
+	// float spec = 0.0;
+	// vec3 viewDir = normalize(camPos-fragPos);
+	// vec3 reflectDir = reflect(-lightDir,norm);
+	// vec3 halfwayDir = normalize(lightDir + viewDir);
+	// spec = pow(max(dot(normal,halfwayDir),0.0),256.0);
+	// vec3 specular = 0.2*spec*lightColor;
 	            
-    vec3 result = (ambient + diffuse + specular) * vecColor;
+    vec3 result = (ambient + diffuse) * vecColor;
+	
+	if(selected==1)
+	{
+		result=mix(result,vec3(1.0,1.0,0.5),0.3);
+	}
 	
 	result=pow(result,vec3(1.0/(2.2)));
 	

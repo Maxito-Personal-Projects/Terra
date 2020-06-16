@@ -119,7 +119,7 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
 
 		// Biome info 
-		int seed = glGetUniformLocation(parent->terrainShader, "seed");
+		int seed = glGetUniformLocation(parent->terrainShader, "chunkSeed");
 		glUniform1f(seed, biome->seed);
 		int frequency = glGetUniformLocation(parent->terrainShader, "chunkFreq");
 		glUniform1f(frequency, biome->frequency);
@@ -231,6 +231,20 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		int cam = glGetUniformLocation(parent->renderShader, "camPos");
 		glUniform3f(cam, myApp->m_camera->mainCamera->GetPos().x, myApp->m_camera->mainCamera->GetPos().y, myApp->m_camera->mainCamera->GetPos().z);
 
+		int chunkCoords = glGetUniformLocation(parent->renderShader, "chunkCoords");
+		glUniform2f(chunkCoords, chunkX, chunkY);
+		int select = glGetUniformLocation(parent->renderShader, "selected");
+		glUniform1i(select, (int)selected);
+
+		//Color info
+		int numLayers = glGetUniformLocation(parent->renderShader, "numLayers");
+		glUniform1i(numLayers, myApp->m_ui->generationWindow->numLayers);
+		int colorsRanges = glGetUniformLocation(parent->renderShader, "layerRanges");
+		glUniform1fv(colorsRanges, 7, myApp->m_ui->generationWindow->layerRanges);
+		int colorsLayer = glGetUniformLocation(parent->renderShader, "layerColors");
+		glUniform1fv(colorsLayer, 24, myApp->m_ui->generationWindow->layerColors->ptr());
+		int typeLayer = glGetUniformLocation(parent->renderShader, "layerType");
+		glUniform1iv(typeLayer, 6, myApp->m_ui->generationWindow->layerTypes);
 
 		glDrawArrays(GL_TRIANGLES,0,64*64*2*3);
 	}
@@ -399,6 +413,15 @@ void Mesh::DrawTextueToExport(string path)
 	glUniform2f(chunkPos, chunkX, chunkY);
 	int chunkSize = glGetUniformLocation(parent->textureShader, "chunkSize");
 	glUniform2f(chunkSize, width,height);
+
+	int numLayers = glGetUniformLocation(parent->textureShader, "numLayers");
+	glUniform1i(numLayers, myApp->m_ui->generationWindow->numLayers);
+	int colorsRanges = glGetUniformLocation(parent->textureShader, "layerRanges");
+	glUniform1fv(colorsRanges, 7, myApp->m_ui->generationWindow->layerRanges);
+	int colorsLayer = glGetUniformLocation(parent->textureShader, "layerColors");
+	glUniform1fv(colorsLayer, 24, myApp->m_ui->generationWindow->layerColors->ptr());
+	int typeLayer = glGetUniformLocation(parent->textureShader, "layerType");
+	glUniform1iv(typeLayer, 6, myApp->m_ui->generationWindow->layerTypes);
 
 	glDrawArrays(GL_TRIANGLES, 0, 64 * 64 * 2 * 3);
 
