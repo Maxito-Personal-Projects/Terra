@@ -50,9 +50,21 @@ bool UIGeneration::Draw()
 		int numWindows = 6;
 
 		ImVec2 mainWindowSize = ImGui::GetWindowSize();
-		ImVec2 windowSizes = { (mainWindowSize.x - 30.0f) /* numWindows*/, /*mainWindowSize.y-*/250.0f };
-		ImVec2 meshSize = { mainWindowSize.x - 30.0f,175 };
-		ImVec2 biomeSize = { mainWindowSize.x - 30.0f,270.0f };
+
+		float margin = 15.0f;
+
+		float fill = (mainWindowSize.y-(175 + 270 + 170 + 130 + 170+50))/5.0f;
+
+		char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
+
+		if (ImGui::GetScrollMaxY() > 0.0f)
+		{
+			margin = 30.0f;
+		}
+
+		ImVec2 windowSizes = { (mainWindowSize.x - margin) /* numWindows*/, /*mainWindowSize.y-*/250.0f };
+		ImVec2 meshSize = { mainWindowSize.x - margin,175 + fill};
+		ImVec2 biomeSize = { mainWindowSize.x - margin,270.0f + fill };
 		if (heightWindow)
 		{
 			biomeSize.y *= 2.0f;
@@ -61,14 +73,17 @@ bool UIGeneration::Draw()
 
 		float finalSize = (numLayers-1) * 72.0f;
 
-		ImVec2 layerSize = { mainWindowSize.x - 30.0f,170.0f+finalSize};
-		ImVec2 chunkSize = { mainWindowSize.x - 30.0f,130.0f };
-		ImVec2 oceanSize = { mainWindowSize.x - 30.0f,170.0f };
+		ImVec2 layerSize = { mainWindowSize.x - margin,170.0f + fill + finalSize};
+		ImVec2 chunkSize = { mainWindowSize.x - margin,130.0f +fill };
+		ImVec2 oceanSize = { mainWindowSize.x - margin,170.0f + fill };
 
 		ImVec4 titleColor = ImVec4(1.0f, 1.0f, 1.0f, 0.8f);
 
 		//--------------------------- Mesh Editor ------------------------------------------------
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.8f, 0.5f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize,2.0f);
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.5f, 0.5f, 1.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(1.f, 1.f, 1.f, 1.0f));
 		ImGui::BeginChild("Mesh Editor", meshSize, true);
 		{
 			//Centered Title
@@ -83,7 +98,7 @@ bool UIGeneration::Draw()
 
 			//Title Underline 
 			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x - 18.0f, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.1f, 0.1f, 0.8f, 1.0f));
 
 			ImGui::Dummy(ImVec2(0.0f, 10.0f));
@@ -143,7 +158,8 @@ bool UIGeneration::Draw()
 		//ImGui::SameLine();
 
 		//--------------------------- Biome Editor ------------------------------------------------
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.1f, 0.8f, 0.5f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 2.0f);
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.1f, 0.8f, 1.0f));
 		ImGui::BeginChild("BiomeSelector", biomeSize, true);
 		{
 			heightWindow = false;
@@ -160,7 +176,7 @@ bool UIGeneration::Draw()
 
 			//Title Underline 
 			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x - 18.0f, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.8f, 0.1f, 0.8f, 1.0f));
 
 			ImGui::Dummy(ImVec2(0.0f, 10.0f));
@@ -191,6 +207,7 @@ bool UIGeneration::Draw()
 						{
 							currBiome = terrain->biomes[i]->name;
 							selectedBiome = terrain->biomes[i];
+							currPrimitive = primitives[selectedBiome->primitive];
 						}
 					}
 				}
@@ -203,7 +220,7 @@ bool UIGeneration::Draw()
 			if (selectedBiome)
 			{
 				//type of primitives
-				char* primitives[] = { "Flat","Random","Perlin","Voronoi","Heightmap" };
+				
 
 				ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
@@ -313,7 +330,7 @@ bool UIGeneration::Draw()
 
 					//Title Underline 
 					ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-					ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+					ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x - 20.0f, underLinePosL.y };
 					drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.1f, 0.1f, 1.0f));
 
 
@@ -321,9 +338,10 @@ bool UIGeneration::Draw()
 					char buff[256];
 					strcpy_s(buff, 256, imageName.c_str());
 
+					ImVec2 imageSize = { windowSizes.x - 75.0f,windowSizes.x - 75.0f };
+
 					if (heightmap)
 					{
-						ImVec2 imageSize = { windowSizes.x - 100.0f,windowSizes.x - 100.0f };
 						ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
 						ImGui::Image((void*)(intptr_t)heightmap->imageID, ImVec2(imageSize));
 
@@ -338,7 +356,6 @@ bool UIGeneration::Draw()
 					}
 					else
 					{
-						ImVec2 imageSize = { windowSizes.x - 100.0f,windowSizes.x - 100.0f };
 						ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
 						ImGui::Image((void*)(intptr_t)myApp->m_ui->dragImage->imageID, ImVec2(imageSize));
 
@@ -359,7 +376,10 @@ bool UIGeneration::Draw()
 					ImGui::SameLine();
 
 					ImGui::PushID("Heightmapfile");
+					ImGui::SetCursorPosX((ImGui::GetWindowSize().x - imageSize.x) / 2.f);
+					ImGui::PushItemWidth(imageSize.x);
 					ImGui::InputText("", buff, 256, ImGuiInputTextFlags_ReadOnly);
+					ImGui::PopItemWidth();
 					ImGui::PopID();
 				}
 			}
@@ -395,6 +415,7 @@ bool UIGeneration::Draw()
 						selectedBiome = terrain->biomes[terrain->biomes.size() - 1];
 						currBiome = biomeName;
 						biomeName = "";
+						currPrimitive = primitives[0];
 					}
 					ImGui::PopFont();
 				}
@@ -402,7 +423,8 @@ bool UIGeneration::Draw()
 		}
 		ImGui::EndChild();
 
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, .8f, 0.1f, 0.5f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 2.0f);
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.1f, .8f, 0.1f, 1.0f));
 		ImGui::BeginChild("ChunkInfo", chunkSize, true);
 		{
 			//Centered Title
@@ -417,7 +439,7 @@ bool UIGeneration::Draw()
 
 			//Title Underline 
 			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x - 18.0f, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.0f, 0.7f, 0.0f, 1.0f));
 
 			if (selectedChunk)
@@ -444,6 +466,7 @@ bool UIGeneration::Draw()
 						if (ImGui::Selectable(terrain->biomes[i]->name.c_str(), isSelected))
 						{
 							selectedChunk->biome = terrain->biomes[i];
+							terrain->parent->updateTFB=true;
 						}
 					}
 
@@ -460,7 +483,8 @@ bool UIGeneration::Draw()
 		}
 		ImGui::EndChild();
 
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.8f, 0.8f, 0.5f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 2.0f);
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.1f, 0.8f, 0.8f, 1.0f));
 		ImGui::BeginChild("TextureEditor", oceanSize, true);
 		{
 			//Centered Title
@@ -475,7 +499,7 @@ bool UIGeneration::Draw()
 
 			//Title Underline 
 			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x - 18.0f, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.0f, 0.7f, 0.7f, 1.0f));
 
 			ImGui::PushFont(myApp->m_ui->arial);
@@ -565,7 +589,8 @@ bool UIGeneration::Draw()
 		ImGui::EndChild();
 
 		//----------------------- Layer Editor -----------------------------------------
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.8f, 0.1f, 0.5f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 2.0f);
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.8f, 0.1f, 1.0f));
 		ImGui::BeginChild("Layer Editor", layerSize, true);
 		{
 			//Centered Title
@@ -580,7 +605,7 @@ bool UIGeneration::Draw()
 
 			//Title Underline 
 			ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
-			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x, underLinePosL.y };
+			ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x - 18.0f, underLinePosL.y };
 			drawList->AddLine(underLinePosL, underLinePosR, ImColor(0.6f, 0.6f, 0.0f, 1.0f));
 
 			ImGui::Dummy(ImVec2(0.0f, 10.0f));
@@ -704,7 +729,8 @@ bool UIGeneration::Draw()
 		}
 		ImGui::EndChild();
 
-		ImGui::PopStyleColor(5);
+		ImGui::PopStyleColor(7);
+		ImGui::PopStyleVar(5);
 	}
 	ImGui::End();
 
