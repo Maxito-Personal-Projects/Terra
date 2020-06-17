@@ -48,6 +48,7 @@ bool UIGeneration::Draw()
 	ImGui::Begin(name.c_str(), &active);
 	{
 		int numWindows = 6;
+		canDrag = false;
 
 		ImVec2 mainWindowSize = ImGui::GetWindowSize();
 
@@ -349,10 +350,6 @@ bool UIGeneration::Draw()
 						{
 							canDrag = true;
 						}
-						else
-						{
-							canDrag = false;
-						}
 					}
 					else
 					{
@@ -362,10 +359,6 @@ bool UIGeneration::Draw()
 						if (ImGui::IsItemHovered())
 						{
 							canDrag = true;
-						}
-						else
-						{
-							canDrag = false;
 						}
 					}
 
