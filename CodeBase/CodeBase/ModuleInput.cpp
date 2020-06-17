@@ -159,8 +159,10 @@ bool ModuleInput::PreUpdate()
 			break;
 
 		case SDL_DROPFILE:
-			path = myEvent.drop.file;
-			myApp->m_ui->generationWindow->LoadHeightMap(path);
+
+			SDL_RaiseWindow(myApp->m_window->window);
+			myApp->m_ui->generationWindow->askForDrag = true;
+			myApp->m_ui->generationWindow->pathToDrag = myEvent.drop.file;
 		
 		default:
 			break;

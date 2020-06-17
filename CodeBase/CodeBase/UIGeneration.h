@@ -52,6 +52,9 @@ public:
 	Chunk* selectedChunk = nullptr;
 	Biome* selectedBiome = nullptr;
 
+	string pathToDrag = "";
+
+	bool askForDrag = false;
 	bool canDrag = false;
 	bool showBiome = false;
 

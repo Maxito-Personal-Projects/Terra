@@ -708,6 +708,13 @@ bool UIGeneration::Draw()
 	}
 	ImGui::End();
 
+	if (askForDrag)
+	{
+		LoadHeightMap(pathToDrag);
+		askForDrag = false;
+		pathToDrag = "";
+	}
+
 	return ret;
 }
 
