@@ -228,7 +228,7 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 			}
 
 			LOG("Position: %f, %f, %f", vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
-			LOG("Normals: %f, %f, %f", vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], -vertexBuffer[buffIndx + 5]);
+			LOG("Normals: %f, %f, %f", vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], vertexBuffer[buffIndx + 5]);
 			LOG("UV: %f, %f, %f", vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], 0.0f);
 		}
 		
