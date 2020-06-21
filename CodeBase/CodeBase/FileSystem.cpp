@@ -216,9 +216,21 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 
 	for (int i = 0; i < numVertices; ++i)
 	{
-		mesh->mVertices[i] = aiVector3D(vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
+		mesh->mVertices[i] = aiVector3D(-vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], -vertexBuffer[buffIndx + 2]);
 		mesh->mNormals[i] = aiVector3D(vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], vertexBuffer[buffIndx + 5]);
 		mesh->mTextureCoords[0][i] = aiVector3D(vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], 0.0f);
+
+		if (i < 20)
+		{
+			if (i % 3 == 0)
+			{
+				LOG("---------------");
+			}
+
+			LOG("Position: %f, %f, %f", vertexBuffer[buffIndx], vertexBuffer[buffIndx + 1], vertexBuffer[buffIndx + 2]);
+			LOG("Normals: %f, %f, %f", vertexBuffer[buffIndx + 3], vertexBuffer[buffIndx + 4], -vertexBuffer[buffIndx + 5]);
+			LOG("UV: %f, %f, %f", vertexBuffer[buffIndx + 6], vertexBuffer[buffIndx + 7], 0.0f);
+		}
 		
 		buffIndx += 9;
 	}
@@ -248,6 +260,8 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	LOG("%s", formatDescription->description);
 
 	int flags = aiProcess_MakeLeftHanded;
+	flags |= aiProcess_JoinIdenticalVertices;
+	flags |= aiProcess_GenSmoothNormals;
 
 	if (exporter->Export(scene,formatDescription->id, AddExtension("Exports",name,format).c_str(), flags) == AI_SUCCESS)
 	{
