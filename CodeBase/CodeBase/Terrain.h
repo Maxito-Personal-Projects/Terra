@@ -22,6 +22,7 @@ public:
 	void DeleteBiome();
 
 	Chunk* GetChunkFromCoords(int x, int y, int &num);
+	void CalculateMaxBiomeHeight();
 	void SetNeighbours();
 
 public:
@@ -43,6 +44,8 @@ public:
 	float height = 64.0f;
 
 	int primitive = 0;
+
+	float maxBiomeHeight = 0.0f;
 
 };
 

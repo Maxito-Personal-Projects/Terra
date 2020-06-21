@@ -92,6 +92,19 @@ Chunk * Terrain::GetChunkFromCoords(int x, int y, int &num)
 	return ret;
 }
 
+void Terrain::CalculateMaxBiomeHeight()
+{
+	maxBiomeHeight = 0.0f;
+
+	for (int i = 0; i < biomes.size(); ++i)
+	{
+		if (maxBiomeHeight < biomes[i]->height)
+		{
+			maxBiomeHeight = biomes[i]->height;
+		}
+	}
+}
+
 void Terrain::SetNeighbours()
 {
 	for (int i = 0; i < totalkChunks; ++i)

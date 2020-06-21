@@ -51,10 +51,10 @@ ivec3 neighIDs;
 
 uniform int primitive;
 
-float maxHeight;
-
 uniform vec2 chunkCoords;
 uniform int selected;
+uniform float maxHeight;
+
 
 vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2,vec3 v3)
 {
@@ -521,7 +521,7 @@ void main()
 	
 	WorldPos_FS_in.y = GetInterpolatedHeight(gl_TessCoord.x,gl_TessCoord.y);
 	
-	MapPos_FS_in=WorldPos_FS_in.y/75.0;
+	MapPos_FS_in=WorldPos_FS_in.y/maxHeight;
 	
 	WorldPos_FS_in = (Model * vec4(WorldPos_FS_in,1.0)).xyz;
 	

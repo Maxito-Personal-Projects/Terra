@@ -12,6 +12,7 @@ uniform float layerRanges[7];
 uniform float layerColors[24];
 uniform int layerType[6];
 uniform int numLayers;
+uniform float maxHeight;
 
 float rand(vec2 n) 
 { 
@@ -203,7 +204,7 @@ vec3 ComputeLayerColor(vec3 normal, int type,vec2 uv)
 void main()
 {
 	vec3 normal = normalize(Normal);	
-	float MapPos_FS_in = fragPos.y/75.0;
+	float MapPos_FS_in = fragPos.y/maxHeight;
 	vec2 uvCoords = UVs.xy;
 	
 	vec3 vecColor = ComputeLayerColor(normal,layerType[0],uvCoords);

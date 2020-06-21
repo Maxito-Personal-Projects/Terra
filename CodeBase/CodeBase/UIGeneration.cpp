@@ -282,6 +282,7 @@ bool UIGeneration::Draw()
 				if (ImGui::DragFloat("", &selectedBiome->height, 1.0f, 0.0f))
 				{
 					terrain->parent->updateTFB = true;
+					terrain->CalculateMaxBiomeHeight();
 				}
 				ImGui::PopID();
 

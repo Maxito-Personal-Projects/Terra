@@ -194,6 +194,8 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		glUniform1fv(colorsLayer, 24, myApp->m_ui->generationWindow->layerColors->ptr());
 		int typeLayer = glGetUniformLocation(parent->terrainShader, "layerType");
 		glUniform1iv(typeLayer, 6, myApp->m_ui->generationWindow->layerTypes);
+		int maxBiome = glGetUniformLocation(parent->terrainShader, "maxHeight");
+		glUniform1f(maxBiome, parent->terrain->maxBiomeHeight);
 
 
 		if (divisions == 64.0f)
@@ -245,6 +247,8 @@ void Mesh::DrawMesh(bool updateTFB,bool selected)
 		glUniform1fv(colorsLayer, 24, myApp->m_ui->generationWindow->layerColors->ptr());
 		int typeLayer = glGetUniformLocation(parent->renderShader, "layerType");
 		glUniform1iv(typeLayer, 6, myApp->m_ui->generationWindow->layerTypes);
+		int maxBiome = glGetUniformLocation(parent->renderShader, "maxHeight");
+		glUniform1f(maxBiome, parent->terrain->maxBiomeHeight);
 
 		glDrawArrays(GL_TRIANGLES,0,64*64*2*3);
 	}
@@ -422,6 +426,8 @@ void Mesh::DrawTextueToExport(string path)
 	glUniform1fv(colorsLayer, 24, myApp->m_ui->generationWindow->layerColors->ptr());
 	int typeLayer = glGetUniformLocation(parent->textureShader, "layerType");
 	glUniform1iv(typeLayer, 6, myApp->m_ui->generationWindow->layerTypes);
+	int maxBiome = glGetUniformLocation(parent->textureShader, "maxHeight");
+	glUniform1f(maxBiome, parent->terrain->maxBiomeHeight);
 
 	glDrawArrays(GL_TRIANGLES, 0, 64 * 64 * 2 * 3);
 
