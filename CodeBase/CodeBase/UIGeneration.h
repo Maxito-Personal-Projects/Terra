@@ -25,6 +25,7 @@ private:
 	char* currPrimitive = nullptr;
 	char* currFunction = nullptr;
 	char* currNumLayer = nullptr;
+	char* currTexture[6];
 	string currBiome = "";
 
 	float terrainHeight = 0;

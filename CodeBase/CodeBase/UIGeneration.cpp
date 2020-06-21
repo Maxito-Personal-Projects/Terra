@@ -25,6 +25,11 @@ UIGeneration::UIGeneration(std::string name, bool active) : UIWindow(name, activ
 		layerRanges[i] = 1.0f;
 	}
 
+	for (int i = 0; i < 6; ++i)
+	{
+		currTexture[i] = nullptr;
+	}
+
 	SetDefaultColors();
 }
 
@@ -622,6 +627,13 @@ bool UIGeneration::Draw()
 			layerRanges[0] = 0.0f;
 			layerRanges[6] = 1.0f;
 
+			char* textures[] = { "Sand","Grass","Rock","Snow" };
+
+			if (currTexture[0] == nullptr)
+			{
+				currTexture[0] = textures[0];
+			}
+
 			for (int i = 0; i < 6; i++)
 			{
 				if (i < numLayers)
@@ -703,14 +715,31 @@ bool UIGeneration::Draw()
 
 					ImGui::Text("Type: ");
 					ImGui::SameLine();
+
 					ImGui::PushID(type.c_str());
-					ImGui::DragInt("", &layerTypes[i], 0.1f, 0, 3);
+					if (ImGui::BeginCombo("", textures[layerTypes[i]]))
+					{
+						for (int j = 0; j < 4; ++j)
+						{
+							bool isSelected = (currTexture[i] == textures[j]);
+							if (ImGui::Selectable(textures[j], isSelected))
+							{
+								currTexture[i] = textures[j];
+								layerTypes[i] = j;
+							}
+						}
+
+						ImGui::EndCombo();
+					}
+
+					//ImGui::DragInt("", &layerTypes[i], 0.1f, 0, 3);
 					ImGui::PopID();
 				}
 				else
 				{
 					layerTypes[i] = 0;
 					layerRanges[i] = 1.0;
+					currTexture[i] = textures[0];
 				}
 
 			}

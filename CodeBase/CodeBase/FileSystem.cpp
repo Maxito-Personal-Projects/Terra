@@ -312,25 +312,24 @@ bool FileSystem::ExportPNG(string path)
 
 	string finalpath = "Exports/" + path + "_Texture.png";
 
-	int w = 256;
-	int h = 256;
-	int size = h * w * 4;
-
-	uint* bytes = new uint[size];
-
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-	glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
+	int w = 1024;
+	int h = 1024;
+	int textureSize = h * w * 4;
 
 	ilEnable(IL_FILE_OVERWRITE);
-	
+
 	ILuint texture = 0;
 
+	uint* bytes = new uint[textureSize];
+
+	//From framebuffer to Array
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, bytes);
+
+	//From Array to PNG
 	ilGenImages(1, &texture);
 	ilBindImage(texture);
-
 	ilTexImage(w, h, 1, 4, IL_RGBA, IL_UNSIGNED_BYTE, bytes);
-
 	ilSave(IL_PNG, finalpath.c_str());
 
 	ILenum PossibleError = ilGetError();

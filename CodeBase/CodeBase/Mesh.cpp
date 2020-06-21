@@ -399,7 +399,7 @@ void Mesh::GenerateVertexBuffer()
 
 void Mesh::DrawTextueToExport(string path)
 {
-	glViewport(0, 0, 256, 256);
+	glViewport(0, 0, 1024, 1024);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, myApp->m_render->textureFramebuffer);
 
