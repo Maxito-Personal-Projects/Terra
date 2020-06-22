@@ -29,37 +29,68 @@ bool UITest::Draw()
 
 	ImGui::Begin(name.c_str(), &active);
 
-	// Render setting
 	ImGui::PushFont(myApp->m_ui->arial);
-	ImGui::Text("Render Settings:");
+
+	ImGui::Text("Global Settings:");
+
+	//Window DrawList
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+	//Title Underline 
+	ImVec2 underLinePosL = { ImGui::GetCursorPos().x + ImGui::GetWindowPos().x, ImGui::GetCursorPos().y + ImGui::GetWindowPos().y };
+	ImVec2 underLinePosR = { underLinePosL.x + ImGui::GetWindowSize().x - 18.0f, underLinePosL.y };
+	drawList->AddLine(underLinePosL, underLinePosR, ImColor(1.0f, 1.0f, 1.0f, 1.0f));
+	
+	ImGui::Dummy(ImVec2(0.0, 5.0));
+
+	ImGui::BeginGroup();
+	ImGui::Dummy(ImVec2(0.0f, -2.0f));
 	ImGui::Text("Light Direction:");
+	ImGui::Dummy(ImVec2(0.0f, 1.0f));
+	ImGui::Text("Cam Boost:");
+	ImGui::Dummy(ImVec2(0.0f, 1.0f));
+	ImGui::Text("RotationSpeed:");
+	ImGui::Dummy(ImVec2(0.0f, 1.0f));
+	ImGui::Text("Reset Camera");
+
+	ImGui::EndGroup();
+
 	ImGui::SameLine();
+
+	// Render setting
+	ImGui::BeginGroup();
+	
 	ImGui::PushID("Light Dir");
-	ImGui::PushItemWidth(100.0f);
+	ImGui::PushItemWidth(200.0f);
 	ImGui::DragFloat3("", myApp->m_render->lightDirection, 0.01f, -1.0f, 1.0f, "%.1f");
 	ImGui::PopItemWidth();
 	ImGui::PopID();
 
-	ImGui::Text("-------------------------");
 	
-	// Cam setting
-	ImGui::Text("Cam Settings:");
-	ImGui::Text("Cam Boost:");
-	ImGui::SameLine();
 	ImGui::PushID("Speed Boost");
-	ImGui::PushItemWidth(100.0f);
+	ImGui::PushItemWidth(200.0f);
 	ImGui::InputFloat("", &myApp->m_camera->camBoost, 0.1f,NULL,"%0.1f");
 	ImGui::PopItemWidth();
 	ImGui::PopID();
 
-	ImGui::Text("-------------------------");
+	
+	ImGui::PushID("SpeedRotationBoost");
+	ImGui::PushItemWidth(200.0f);
+	ImGui::InputFloat("", &myApp->m_camera->rotationSpeed, 0.1f, NULL, "%0.1f");
+	ImGui::PopItemWidth();
+	ImGui::PopID();
 
-	ImGui::Text("Result:");
+	
+	ImGui::PushID("ResetPos");
+	if (ImGui::Button("Reset"))
+	{
+		myApp->m_camera->ResetCameraPosition();
+	}
+	ImGui::PopID();
 
-	ImGui::Image((void*)(intptr_t)myApp->m_render->finalTexture, ImVec2(200, 200));
+	ImGui::EndGroup();
 
 	ImGui::PopFont();
-
 
 	ImGui::End();
 

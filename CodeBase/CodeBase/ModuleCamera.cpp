@@ -81,7 +81,7 @@ bool ModuleCamera::Update()
 	{
 		if (myApp->m_input->motionX != 0)
 		{
-			Quat rotation = Quat::RotateY(myApp->m_input->motionX*0.016f);
+			Quat rotation = Quat::RotateY(myApp->m_input->motionX*0.016f*rotationSpeed);
 			camFront = rotation.Mul(camFront).Normalized();
 			camUp = rotation.Mul(camUp).Normalized();
 		}
@@ -89,7 +89,7 @@ bool ModuleCamera::Update()
 		if (myApp->m_input->motionY != 0)
 		{
 			vec ortoCamYcamZ = camUp.Cross(camFront);
-			Quat rotation = Quat::RotateAxisAngle(ortoCamYcamZ,myApp->m_input->motionY*0.016f);
+			Quat rotation = Quat::RotateAxisAngle(ortoCamYcamZ,myApp->m_input->motionY*0.016f*rotationSpeed);
 			
 			if (rotation.Mul(mainCamera->frustum.Up()).Normalized().y > 0.0f)
 			{
@@ -117,4 +117,15 @@ bool ModuleCamera::CleanUp()
 	}
 
 	return ret;
+}
+
+void ModuleCamera::ResetCameraPosition()
+{
+	vec origin = { 32.0f, 5.0f, -2.0f };
+	vec front = { 0.0f,0.0f,1.0f };
+	vec up = { 0.0f,1.0f,0.0f };
+
+	mainCamera->SetPos(origin);
+	mainCamera->frustum.SetFront(front);
+	mainCamera->frustum.SetUp(up);
 }

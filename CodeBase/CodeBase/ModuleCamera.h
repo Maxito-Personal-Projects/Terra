@@ -30,10 +30,13 @@ public:
 	//Clean Module
 	bool CleanUp();
 
+	void ResetCameraPosition();
+
 public:
 
 	Camera* mainCamera = nullptr;
 	float camBoost = 1.0f;
+	float rotationSpeed = 0.5f;
 };
 
 #endif // !__MODULECAMERA_H__

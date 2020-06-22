@@ -276,6 +276,8 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 		message = "Error exporting Terrarin: " + error;
 		LOG("%s", message.c_str());
 	}
+
+	aiReleaseExportFormatDescription(formatDescription);
 	
 	for (int i = 0; i < fSize; ++i)
 	{
@@ -306,16 +308,6 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	
 	delete[] scene->mMeshes;		
 	scene->mMeshes = nullptr;
-
-	delete scene->mRootNode;
-	scene->mRootNode = nullptr;
-
-	delete scene;
-	scene = nullptr;
-
-	delete exporter;
-	exporter = nullptr;
-
 
 	return ret;
 }
