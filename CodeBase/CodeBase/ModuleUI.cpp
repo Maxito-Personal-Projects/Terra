@@ -105,7 +105,7 @@ bool ModuleUI::PreUpdate()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("DockSpace", 0, window_flags);
+	ImGui::Begin("D", 0, window_flags);
 	ImGui::PopStyleVar(3);
 
 	if (ImGui::BeginMainMenuBar())
@@ -135,7 +135,7 @@ bool ModuleUI::PreUpdate()
 		{
 			if (ImGui::MenuItem("Tutorial"))
 			{
-				ShellExecuteA(NULL,"open","https://github.com/Maxito-Personal-Projects/CodeBase/wiki/Welcome", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL,"open","https://github.com/Maxito-Personal-Projects/CodeBase/wiki/Tutorial", NULL, NULL, SW_SHOWNORMAL);
 			}
 			ImGui::EndMenu();
 		}
