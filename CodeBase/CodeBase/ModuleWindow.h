@@ -37,7 +37,7 @@ public:
 	int width = 1800;
 	int height = 1000;
 
-	string title = "CodeBase v";
+	string title = "NodeTerrain v";
 
 };
 

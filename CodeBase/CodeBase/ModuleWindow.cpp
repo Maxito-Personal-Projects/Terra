@@ -19,6 +19,7 @@ bool ModuleWindow::Init()
 	char test[24] = "";
 	sprintf(test, "%.1f", CODEBASE_VERSION);
 	title += test;
+	title += "     By: MaxitoSama";
 
 	//Use OpenGL 3.1
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);

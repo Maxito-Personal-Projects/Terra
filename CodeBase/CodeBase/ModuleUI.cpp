@@ -131,6 +131,14 @@ bool ModuleUI::PreUpdate()
 			}
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Help"))
+		{
+			if (ImGui::MenuItem("Tutorial"))
+			{
+				ShellExecuteA(NULL,"open","https://github.com/Maxito-Personal-Projects/CodeBase/wiki/Welcome", NULL, NULL, SW_SHOWNORMAL);
+			}
+			ImGui::EndMenu();
+		}
 
 		ImGui::EndMainMenuBar();
 	}
