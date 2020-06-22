@@ -121,7 +121,7 @@ bool ModuleCamera::CleanUp()
 
 void ModuleCamera::ResetCameraPosition()
 {
-	vec origin = { 32.0f, 5.0f, -2.0f };
+	vec origin = { 32.0f, 20.0f, -25.0f };
 	vec front = { 0.0f,0.0f,1.0f };
 	vec up = { 0.0f,1.0f,0.0f };
 

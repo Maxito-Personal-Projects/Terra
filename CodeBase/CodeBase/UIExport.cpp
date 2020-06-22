@@ -9,6 +9,7 @@
 #include "Chunk.h"
 #include "Mesh.h"
 
+#include <direct.h>
 
 
 UIExport::UIExport(std::string name, bool active) :UIWindow(name, active)
@@ -115,6 +116,9 @@ bool UIExport::Draw()
 	{
 		if (fileName.length() > 0)
 		{
+			string path = "Exports\\" + fileName;
+			_mkdir(path.c_str());
+
 			for (int i = 0; i < terrain->totalkChunks; ++i)
 			{
 				Mesh* mesh = terrain->chunks[i]->mesh;
@@ -123,9 +127,9 @@ bool UIExport::Draw()
 				{
 					if (mesh->vertexBuffer64)
 					{
-						mesh->DrawTextueToExport(fileName + std::to_string(i));
+						mesh->DrawTextueToExport(fileName + "\\" + fileName + std::to_string(i));
 						mesh->GenerateVertexBuffer();
-						myApp->fileSystem->Export(mesh->vertexBuffer64, mesh->buffSize64, fileName + std::to_string(i), format, exportMessage);
+						myApp->fileSystem->Export(mesh->vertexBuffer64, mesh->buffSize64, fileName + "\\" + fileName + "_" + std::to_string(i)+"_64", format, exportMessage);
 					}
 				}
 				else if (currResolution == "32")
@@ -136,7 +140,7 @@ bool UIExport::Draw()
 					if (mesh->vertexBuffer32)
 					{
 						mesh->GenerateVertexBuffer();
-						myApp->fileSystem->Export(mesh->vertexBuffer32, mesh->buffSize32, fileName + std::to_string(i), format, exportMessage);
+						myApp->fileSystem->Export(mesh->vertexBuffer32, mesh->buffSize32, fileName + "\\" + fileName + "_" + std::to_string(i) + "_32", format, exportMessage);
 					}
 				}
 				else
@@ -147,7 +151,7 @@ bool UIExport::Draw()
 					if (mesh->vertexBuffer16)
 					{
 						mesh->GenerateVertexBuffer();
-						myApp->fileSystem->Export(mesh->vertexBuffer16, mesh->buffSize16, fileName + std::to_string(i), format, exportMessage);
+						myApp->fileSystem->Export(mesh->vertexBuffer16, mesh->buffSize16, fileName + "\\" + fileName + "_" + std::to_string(i) + "_16", format, exportMessage);
 					}
 				}
 

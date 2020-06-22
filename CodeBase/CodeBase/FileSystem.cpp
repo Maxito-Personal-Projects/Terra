@@ -133,7 +133,7 @@ string FileSystem::AddExtension(string folder, string name, ExportFormat extensi
 	switch (extension)
 	{
 	case DAE:
-		file = path +"\\" + name + (".dae");
+		file = path +"\\"  + name + (".dae");
 		break;
 	case OBJ_MAT:
 		file = path + "\\" + name + (".obj");

@@ -126,15 +126,15 @@ bool UIGeneration::Draw()
 			ImGui::BeginGroup();
 
 			ImGui::PushID("MeshHeight");
-			ImGui::DragFloat("", &terrainHeight);
+			ImGui::DragFloat("", &terrainHeight, 0.1f, 0.1f,400.0f);
 			ImGui::PopID();
 
 			ImGui::PushID("MeshWidth");
-			ImGui::DragFloat("", &terrainWidth);
+			ImGui::DragFloat("", &terrainWidth, 0.1f, 0.1f,400.0f);
 			ImGui::PopID();
 
 			ImGui::PushID("ChunkNum");
-			ImGui::DragInt("", &terrainChunks);
+			ImGui::DragInt("", &terrainChunks,0.1f,1,100);
 			ImGui::PopID();
 
 			ImGui::EndGroup();
@@ -408,7 +408,7 @@ bool UIGeneration::Draw()
 					ImGui::PopID();
 					ImGui::EndGroup();
 
-					if (ImGui::Button("Add Biome"))
+					if (ImGui::Button("Add Biome") && biomeName != "")
 					{
 						terrain->AddBiome(biomeName);
 						selectedBiome = terrain->biomes[terrain->biomes.size() - 1];
@@ -688,8 +688,9 @@ bool UIGeneration::Draw()
 						ImGui::PopItemWidth();
 						ImGui::PopID();
 
-						if (layerRanges[i] == 1.0f)
+						if (layerRanges[i] >= 1.0f)
 						{
+							layerRanges[i] = 1.0f;
 							layerRanges[i + 1] = 1.0;
 						}
 					}
@@ -733,7 +734,6 @@ bool UIGeneration::Draw()
 						ImGui::EndCombo();
 					}
 
-					//ImGui::DragInt("", &layerTypes[i], 0.1f, 0, 3);
 					ImGui::PopID();
 				}
 				else

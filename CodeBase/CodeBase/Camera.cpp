@@ -10,7 +10,7 @@ Camera::Camera()
 	frustum.SetKind(FrustumSpaceGL, FrustumLeftHanded);
 
 	frustum.SetViewPlaneDistances(nearPlane, farPlane);
-	frustum.SetPos(float3(32.0f, 5.0f, -2.0f));
+	frustum.SetPos(float3(32.0f, 20.0f, -25.0f));
 	frustum.SetUp(float3::unitY);
 	frustum.SetFront(float3::unitZ);
 
