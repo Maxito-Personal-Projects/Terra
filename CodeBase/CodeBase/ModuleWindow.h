@@ -37,7 +37,7 @@ public:
 	int width = 1800;
 	int height = 1000;
 
-	string title = "NodeTerrain v";
+	string title = "Terra v";
 
 };
 

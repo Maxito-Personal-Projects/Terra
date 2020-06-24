@@ -8,7 +8,7 @@
 void log(const char file[], int line, const char* format, ...);
 
 
-#define CODEBASE_VERSION 0.9f
+#define CODEBASE_VERSION 1.0f
 
 #define uint unsigned int
 
