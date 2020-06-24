@@ -5,6 +5,8 @@
 #include "Chunk.h"
 #include "Mesh.h"
 #include "Biome.h"
+#include "ModuleUI.h"
+#include "UIGeneration.h"
 
 #include <iostream>
 #include <fstream>
@@ -77,8 +79,15 @@ void Terrain::AddBiome(string name)
 	biomes.push_back(newBiome);
 }
 
-void Terrain::DeleteBiome()
+void Terrain::DeleteBiomes()
 {
+	for (int i = 0; i < biomes.size(); ++i)
+	{
+		delete biomes[i];
+		biomes[i] = nullptr;
+	}
+
+	biomes.clear();
 }
 
 Chunk * Terrain::GetChunkFromCoords(int x, int y, int &num)
@@ -126,7 +135,7 @@ void Terrain::Save()
 
 	for (int i = 0; i < biomes.size(); ++i)
 	{
-		bSize += sizeof(char) * biomes[i]->name.length() + sizeof(int) * 2 + sizeof(float) * 3;
+		bSize += sizeof(char) * biomes[i]->name.length() + sizeof(int) * 3 + sizeof(float) * 3;
 	}
 
 	//Chunk info
@@ -167,6 +176,11 @@ void Terrain::Save()
 
 	for (int i = 0; i < biomesSize; ++i)
 	{
+		bytes = sizeof(int);
+		int biomeNameLength = biomes[i]->name.length();
+		memcpy(cursor, &biomeNameLength, bytes);
+		cursor += bytes;
+
 		bytes = sizeof(char)*biomes[i]->name.length();
 		memcpy(cursor, biomes[i]->name.c_str(), bytes);
 		cursor += bytes;
@@ -200,9 +214,76 @@ void Terrain::Save()
 	}
 
 	ofstream file;
-	file.open("Text.trg", ios::out | ios::app | ios::binary);
+	file.open("Text.trg", ios::out | ios::trunc | ios::binary);
 	file.write(buffer, totalSize);
 
 	file.close();
+	delete[] buffer;
+}
+
+void Terrain::Load()
+{
+	myApp->m_ui->generationWindow->selectedBiome = nullptr;
+	myApp->m_ui->generationWindow->selectedChunk = nullptr;
+	DeleteBiomes();
+	DeleteChunks();
+	
+	char* buffer;
+	streampos size;
+	ifstream file;
+
+	file.open("Text.trg", ios::in | ios::binary | ios::ate);
+	
+	size = file.tellg();
+	buffer = new char[54];
+	file.seekg(0, ios::beg);
+	file.read(buffer, 54);
+	
+	file.close();
+
+	char* cursor = buffer;
+
+	uint bytes = sizeof(numChunks);
+	memcpy(&numChunks, cursor, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(height);
+	memcpy(&height, cursor, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(width);
+	memcpy(&width, cursor, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(maxBiomeHeight);
+	memcpy(&maxBiomeHeight, cursor, bytes);
+	cursor += bytes;
+
+	//Loading biome info
+	uint biomesSize = 0;
+	bytes = sizeof(int);
+	memcpy(&biomesSize, cursor, bytes);
+	cursor += bytes;
+
+	for (int i = 0; i < biomesSize; ++i)
+	{
+		int biomeNameSize = 0;
+		bytes = sizeof(int);
+		memcpy(&biomeNameSize, cursor, bytes);
+		cursor += bytes;
+
+		bytes = sizeof(char) * biomeNameSize;
+		string biomeName(cursor, cursor + bytes);
+		cursor += bytes;
+
+		Biome* newBiome = new Biome(biomeName);
+		//memcpy()
+	}
+
+	/*terrain->GenerateChunks(terrainChunks, terrainHeight, terrainWidth);
+	terrain->SetNeighbours();
+	terrain->parent->updateTFB = true;*/
+
+
 }
 

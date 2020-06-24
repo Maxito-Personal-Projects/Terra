@@ -19,7 +19,7 @@ public:
 	void GenerateChunks(int nChunks, float height, float width);
 	void DeleteChunks();
 	void AddBiome(string name);
-	void DeleteBiome();
+	void DeleteBiomes();
 
 	Chunk* GetChunkFromCoords(int x, int y, int &num);
 	void CalculateMaxBiomeHeight();

@@ -127,6 +127,10 @@ bool ModuleUI::PreUpdate()
 			{
 				myApp->m_render->firstGO->terrain->Save();
 			}
+			if (ImGui::MenuItem("Load"))
+			{
+				myApp->m_render->firstGO->isLoading=true;
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Settings"))
