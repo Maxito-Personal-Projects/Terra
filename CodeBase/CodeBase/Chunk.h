@@ -23,9 +23,6 @@ public:
 	Chunk* neighbours[8];
 	Biome* biome = nullptr;
 
-	float maxHeight = 0.0f;
-	int octaves = 8;
-
 	int chunkID = 0;
 	int x=0;
 	int y=0;

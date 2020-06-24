@@ -6,6 +6,9 @@
 #include "Mesh.h"
 #include "Biome.h"
 
+#include <iostream>
+#include <fstream>
+
 
 Terrain::Terrain(GameObject* _parent, int nChunks)
 {
@@ -111,5 +114,95 @@ void Terrain::SetNeighbours()
 	{
 		chunks[i]->SetNeighbours();
 	}
+}
+
+void Terrain::Save()
+{
+	//Terrain info size: numChunks, height, width, maxBiomeHeight
+	uint tSize = sizeof(int) + sizeof(float) * 3;
+
+	//Biome info size: numBiomes
+	uint bSize = sizeof(int) * biomes.size();
+
+	for (int i = 0; i < biomes.size(); ++i)
+	{
+		bSize += sizeof(char) * biomes[i]->name.length() + sizeof(int) * 2 + sizeof(float) * 3;
+	}
+
+	//Chunk info
+	uint cSize = 0;
+
+	for (int i = 0; i < chunks.size(); ++i)
+	{
+		cSize += sizeof(char) * chunks[i]->biome->name.length();
+	}
+
+	uint totalSize = tSize + bSize + cSize;
+
+	char* buffer = new char[totalSize];
+	char* cursor = buffer;
+
+	//Saving Terrain info
+	uint bytes = sizeof(numChunks);
+	memcpy(cursor, &numChunks, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(height);
+	memcpy(cursor, &height, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(width);
+	memcpy(cursor, &width, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(maxBiomeHeight);
+	memcpy(cursor, &maxBiomeHeight, bytes);
+	cursor += bytes;
+
+	//Saving biome info
+	uint biomesSize = biomes.size();
+	bytes = sizeof(biomes.size());
+	memcpy(cursor, &biomesSize, bytes);
+	cursor += bytes;
+
+	for (int i = 0; i < biomesSize; ++i)
+	{
+		bytes = sizeof(char)*biomes[i]->name.length();
+		memcpy(cursor, biomes[i]->name.c_str(), bytes);
+		cursor += bytes;
+
+		bytes = sizeof(biomes[i]->frequency);
+		memcpy(cursor, &(biomes[i]->frequency), bytes);
+		cursor += bytes;
+
+		bytes = sizeof(biomes[i]->height);
+		memcpy(cursor, &(biomes[i]->height), bytes);
+		cursor += bytes;
+
+		bytes = sizeof(biomes[i]->octaves);
+		memcpy(cursor, &(biomes[i]->octaves), bytes);
+		cursor += bytes;
+
+		bytes = sizeof(biomes[i]->primitive);
+		memcpy(cursor, &(biomes[i]->primitive), bytes);
+		cursor += bytes;
+
+		bytes = sizeof(biomes[i]->seed);
+		memcpy(cursor, &(biomes[i]->seed), bytes);
+		cursor += bytes;
+	}
+	
+	for (int i = 0; i < chunks.size(); ++i)
+	{
+		bytes = sizeof(char)*chunks[i]->biome->name.length();
+		memcpy(cursor, chunks[i]->biome->name.c_str(), bytes);
+		cursor += bytes;
+	}
+
+	ofstream file;
+	file.open("Text.trg", ios::out | ios::app | ios::binary);
+	file.write(buffer, totalSize);
+
+	file.close();
 }
 

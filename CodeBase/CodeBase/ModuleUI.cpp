@@ -4,6 +4,8 @@
 #include "ModuleRenderer.h"
 #include "Texture.h"
 #include "FileSystem.h"
+#include "GameObject.h"
+#include "Terrain.h"
 
 #include "UIWindow.h"
 #include "UITest.h"
@@ -120,6 +122,10 @@ bool ModuleUI::PreUpdate()
 			if (ImGui::MenuItem("Exit", "ESC"))
 			{
 				myApp->exit = true;
+			}
+			if (ImGui::MenuItem("Save"))
+			{
+				myApp->m_render->firstGO->terrain->Save();
 			}
 			ImGui::EndMenu();
 		}
