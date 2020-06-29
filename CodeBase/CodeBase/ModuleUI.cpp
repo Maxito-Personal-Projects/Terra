@@ -125,9 +125,13 @@ bool ModuleUI::PreUpdate()
 		}
 		if (ImGui::BeginMenu("Settings"))
 		{
-			if (ImGui::MenuItem("Configuration"))
+			if (ImGui::MenuItem("Settings"))
 			{
 				testWindow->active=true;
+			}
+			if (ImGui::MenuItem("Generation"))
+			{
+				generationWindow->active = true;
 			}
 			ImGui::EndMenu();
 		}

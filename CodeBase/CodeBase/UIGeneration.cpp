@@ -719,6 +719,7 @@ bool UIGeneration::Draw()
 					ImGui::SameLine();
 
 					ImGui::PushID(type.c_str());
+					ImGui::PushItemWidth(100.0f);
 					if (ImGui::BeginCombo("", textures[layerTypes[i]]))
 					{
 						for (int j = 0; j < 4; ++j)
@@ -733,7 +734,7 @@ bool UIGeneration::Draw()
 
 						ImGui::EndCombo();
 					}
-
+					ImGui::PopItemWidth();
 					ImGui::PopID();
 				}
 				else
