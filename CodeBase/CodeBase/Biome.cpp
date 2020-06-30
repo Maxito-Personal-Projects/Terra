@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "Chunk.h"
 
-Biome::Biome(std::string _name)
+Biome::Biome(std::string _name, int id)
 {
 	name = _name;
 
@@ -13,6 +13,8 @@ Biome::Biome(std::string _name)
 
 	octaves = 8;
 	primitive = 0;
+
+	ID = id;
 }
 
 

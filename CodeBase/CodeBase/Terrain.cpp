@@ -16,7 +16,7 @@ Terrain::Terrain(GameObject* _parent, int nChunks)
 {
 	parent = _parent;
 
-	Biome* defaultBiome = new Biome("Default");
+	Biome* defaultBiome = new Biome("Default",biomes.size());
 	biomes.push_back(defaultBiome);
 
 	GenerateChunks(nChunks, height, width);
@@ -75,7 +75,7 @@ void Terrain::DeleteChunks()
 
 void Terrain::AddBiome(string name)
 {
-	Biome* newBiome = new Biome(name);
+	Biome* newBiome = new Biome(name, biomes.size());
 	biomes.push_back(newBiome);
 }
 
@@ -140,11 +140,7 @@ void Terrain::Save()
 
 	//Chunk info
 	uint cSize = 0;
-
-	for (int i = 0; i < chunks.size(); ++i)
-	{
-		cSize += sizeof(char) * chunks[i]->biome->name.length();
-	}
+	cSize += chunks.size()*sizeof(int);
 
 	uint totalSize = tSize + bSize + cSize;
 
@@ -208,8 +204,9 @@ void Terrain::Save()
 	
 	for (int i = 0; i < chunks.size(); ++i)
 	{
-		bytes = sizeof(char)*chunks[i]->biome->name.length();
-		memcpy(cursor, chunks[i]->biome->name.c_str(), bytes);
+		bytes = sizeof(int);
+		int biomeID = chunks[i]->biome->ID;
+		memcpy(cursor, &biomeID, bytes);
 		cursor += bytes;
 	}
 
@@ -225,6 +222,7 @@ void Terrain::Load()
 {
 	myApp->m_ui->generationWindow->selectedBiome = nullptr;
 	myApp->m_ui->generationWindow->selectedChunk = nullptr;
+	myApp->m_ui->generationWindow->currBiome = "";
 	DeleteBiomes();
 	DeleteChunks();
 	
@@ -235,9 +233,9 @@ void Terrain::Load()
 	file.open("Text.trg", ios::in | ios::binary | ios::ate);
 	
 	size = file.tellg();
-	buffer = new char[54];
+	buffer = new char[size];
 	file.seekg(0, ios::beg);
-	file.read(buffer, 54);
+	file.read(buffer, size);
 	
 	file.close();
 
@@ -276,9 +274,43 @@ void Terrain::Load()
 		string biomeName(cursor, cursor + bytes);
 		cursor += bytes;
 
-		Biome* newBiome = new Biome(biomeName);
-		//memcpy()
+		Biome* newBiome = new Biome(biomeName,i);
+
+		bytes = sizeof(float);
+		memcpy(&(newBiome->frequency), cursor, bytes);
+		cursor += bytes;
+
+		bytes = sizeof(float);
+		memcpy(&(newBiome->height), cursor, bytes);
+		cursor += bytes;
+
+		bytes = sizeof(int);
+		memcpy(&(newBiome->octaves), cursor, bytes);
+		cursor += bytes;
+
+		bytes = sizeof(int);
+		memcpy(&(newBiome->primitive), cursor, bytes);
+		cursor += bytes;
+
+		bytes = sizeof(float);
+		memcpy(&(newBiome->seed), cursor, bytes);
+		cursor += bytes;
+
+		biomes.push_back(newBiome);
 	}
+
+	GenerateChunks(numChunks, height, width);
+
+	for (int i = 0; i < chunks.size(); ++i)
+	{
+		bytes = sizeof(int);
+		int biomeID;
+		memcpy(&biomeID, cursor, bytes);
+		cursor += bytes;
+		chunks[i]->biome = biomes[biomeID];
+	}
+
+	SetNeighbours();
 
 	/*terrain->GenerateChunks(terrainChunks, terrainHeight, terrainWidth);
 	terrain->SetNeighbours();

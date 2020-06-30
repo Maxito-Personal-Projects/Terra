@@ -11,7 +11,7 @@ class Biome
 {
 public:
 
-	Biome(std::string _name);
+	Biome(std::string _name, int id);
 	~Biome();
 
 public:
@@ -22,6 +22,8 @@ public:
 
 	int octaves = 8;
 	int primitive = 0;
+
+	int ID = -1;
 
 	std::string name = "";
 };
