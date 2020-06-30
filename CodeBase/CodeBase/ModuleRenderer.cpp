@@ -126,12 +126,6 @@ bool ModuleRenderer::PosUpdate()
 	//Unbinding all buffers
 	glBindVertexArray(0);
 
-	//Test!
-	if (myApp->m_input->GetKey(SDL_SCANCODE_SPACE) == DOWN)
-	{
-		glClearColor(0, 1, 1, 1);
-	}
-
 	if (myApp->m_input->GetMouseButton(3) == DOWN && myApp->m_ui->sceneWindow->focused)
 	{
 		SelectChunk();
