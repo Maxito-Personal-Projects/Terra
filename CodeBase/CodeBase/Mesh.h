@@ -22,7 +22,7 @@ public:
 
 	void GenerateVertexBuffer();
 
-	void DrawTextueToExport(string path);
+	void DrawTextureToExport(string path);
 
 public:
 

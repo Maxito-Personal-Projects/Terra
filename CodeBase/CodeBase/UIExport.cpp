@@ -16,6 +16,8 @@ UIExport::UIExport(std::string name, bool active) :UIWindow(name, active)
 {
 	dae = true;
 	format = DAE;
+
+	currResolution = "High";
 }
 
 UIExport::~UIExport()
@@ -95,7 +97,7 @@ bool UIExport::Draw()
 
 	ImGui::SameLine();
 
-	char* resolutions[] = { "64","32","16"};
+	char* resolutions[] = { "High","Mid","Low"};
 
 	ImGui::PushID("None Function");
 	if (ImGui::BeginCombo("", currResolution))
@@ -112,8 +114,18 @@ bool UIExport::Draw()
 	}
 	ImGui::PopID();
 
+	ImGui::Text("Export Texture:");
+
+	ImGui::SameLine();
+
+	ImGui::PushID("ExportTexture");
+	ImGui::Checkbox("", &texture);
+	ImGui::PopID();
+
 	if (ImGui::Button("Export", ImVec2(50, 50)))
 	{
+		exportMessage = "";
+
 		if (fileName.length() > 0)
 		{
 			string path = "Exports\\" + fileName;
@@ -123,33 +135,41 @@ bool UIExport::Draw()
 			{
 				Mesh* mesh = terrain->chunks[i]->mesh;
 
-				if (currResolution == "64")
+				if (currResolution == "High")
 				{
 					if (mesh->vertexBuffer64)
 					{
-						mesh->DrawTextueToExport(fileName + "\\" + fileName + std::to_string(i));
+						if(texture)
+							mesh->DrawTextureToExport(fileName + "\\" + fileName + std::to_string(i));
+
 						mesh->GenerateVertexBuffer();
 						myApp->fileSystem->Export(mesh->vertexBuffer64, mesh->buffSize64, fileName + "\\" + fileName + "_" + std::to_string(i)+"_64", format, exportMessage);
 					}
 				}
-				else if (currResolution == "32")
+				else if (currResolution == "Mid")
 				{
 					terrain->chunks[i]->mesh->divisions = 32.0f;
 					terrain->chunks[i]->mesh->DrawMesh(true, false);
 
 					if (mesh->vertexBuffer32)
 					{
+						if (texture)
+							mesh->DrawTextureToExport(fileName + "\\" + fileName + std::to_string(i));
+
 						mesh->GenerateVertexBuffer();
 						myApp->fileSystem->Export(mesh->vertexBuffer32, mesh->buffSize32, fileName + "\\" + fileName + "_" + std::to_string(i) + "_32", format, exportMessage);
 					}
 				}
-				else
+				else if(currResolution=="Low")
 				{
 					terrain->chunks[i]->mesh->divisions = 16.0f;
 					terrain->chunks[i]->mesh->DrawMesh(true, false);
 
 					if (mesh->vertexBuffer16)
 					{
+						if (texture)
+							mesh->DrawTextureToExport(fileName + "\\" + fileName + std::to_string(i));
+
 						mesh->GenerateVertexBuffer();
 						myApp->fileSystem->Export(mesh->vertexBuffer16, mesh->buffSize16, fileName + "\\" + fileName + "_" + std::to_string(i) + "_16", format, exportMessage);
 					}

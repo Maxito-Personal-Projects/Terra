@@ -401,7 +401,7 @@ void Mesh::GenerateVertexBuffer()
 	}
 }
 
-void Mesh::DrawTextueToExport(string path)
+void Mesh::DrawTextureToExport(string path)
 {
 	glViewport(0, 0, 1024, 1024);
 

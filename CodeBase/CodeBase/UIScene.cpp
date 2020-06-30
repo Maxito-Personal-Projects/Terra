@@ -17,7 +17,7 @@ bool UIScene::Draw()
 {
 	bool ret = true;
 
-	ImGui::Begin(name.c_str(), &active, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse );
+	ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse );
 	{
 		if (ImGui::GetWindowSize().x != width || ImGui::GetWindowSize().y != height)
 		{

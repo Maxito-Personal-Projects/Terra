@@ -24,6 +24,7 @@ private:
 	bool obj_m = false;
 	bool obj = false;
 	bool fbx = false;
+	bool texture = false;
 
 	ExportFormat format;
 
