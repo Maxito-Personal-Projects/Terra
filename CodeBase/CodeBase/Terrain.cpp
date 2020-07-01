@@ -140,9 +140,13 @@ void Terrain::Save()
 
 	//Chunk info
 	uint cSize = 0;
-	cSize += chunks.size()*sizeof(int);
+	cSize = chunks.size()*sizeof(int);
 
-	uint totalSize = tSize + bSize + cSize;
+	//Layer info
+	uint lSize = 0;
+	lSize = sizeof(int) + sizeof(float) * 7 + sizeof(float) * 8 * 3 + sizeof(int) * 8;
+
+	uint totalSize = tSize + bSize + cSize + lSize;
 
 	char* buffer = new char[totalSize];
 	char* cursor = buffer;
@@ -209,6 +213,22 @@ void Terrain::Save()
 		memcpy(cursor, &biomeID, bytes);
 		cursor += bytes;
 	}
+
+	bytes = sizeof(int);
+	memcpy(cursor, &(myApp->m_ui->generationWindow->numLayers), bytes);
+	cursor += bytes;
+
+	bytes = sizeof(float) * 7;
+	memcpy(cursor, &(myApp->m_ui->generationWindow->layerRanges), bytes);
+	cursor += bytes;
+
+	bytes = sizeof(float) * 8 * 3;
+	memcpy(cursor, &(myApp->m_ui->generationWindow->layerColors), bytes);
+	cursor += bytes;
+
+	bytes = sizeof(int) * 6;
+	memcpy(cursor, &(myApp->m_ui->generationWindow->layerTypes), bytes);
+	cursor += bytes;
 
 	ofstream file;
 	file.open("Text.trg", ios::out | ios::trunc | ios::binary);
@@ -312,10 +332,21 @@ void Terrain::Load()
 
 	SetNeighbours();
 
-	/*terrain->GenerateChunks(terrainChunks, terrainHeight, terrainWidth);
-	terrain->SetNeighbours();
-	terrain->parent->updateTFB = true;*/
+	bytes = sizeof(int);
+	memcpy(&(myApp->m_ui->generationWindow->numLayers), cursor, bytes);
+	cursor += bytes;
 
+	bytes = sizeof(float) * 7;
+	memcpy(&(myApp->m_ui->generationWindow->layerRanges), cursor, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(float) * 8 * 3;
+	memcpy(&(myApp->m_ui->generationWindow->layerColors), cursor, bytes);
+	cursor += bytes;
+
+	bytes = sizeof(int) * 6;
+	memcpy(&(myApp->m_ui->generationWindow->layerTypes), cursor, bytes);
+	cursor += bytes;
 
 }
 
