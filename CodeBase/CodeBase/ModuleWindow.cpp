@@ -38,6 +38,9 @@ bool ModuleWindow::Init()
 		LOG("There was an error creating the window!");
 	}
 
+	icon = SDL_LoadBMP("Images/icon.bmp");
+	SDL_SetWindowIcon(window, icon);
+
 	return ret;
 }
 

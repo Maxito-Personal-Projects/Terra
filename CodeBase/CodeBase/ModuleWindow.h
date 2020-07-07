@@ -5,6 +5,7 @@
 #include "Module.h"
 
 class SDL_Window;
+class SDL_Surface;
 
 class ModuleWindow: public Module
 {
@@ -33,6 +34,7 @@ public:
 public:
 
 	SDL_Window* window = nullptr;
+	SDL_Surface* icon = nullptr;
 
 	int width = 1800;
 	int height = 1000;
