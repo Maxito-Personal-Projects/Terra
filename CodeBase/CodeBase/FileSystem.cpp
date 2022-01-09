@@ -116,6 +116,7 @@ Texture* FileSystem::LoadImagePNG(string path)
 	{
 		//Generating the new Texture
 		ret = new Texture("test", textureID, ImageInfo.Width, ImageInfo.Height, PNG);
+		ret->path = path;
 	}
 
 	//Unbinding and deleting the DevIL name

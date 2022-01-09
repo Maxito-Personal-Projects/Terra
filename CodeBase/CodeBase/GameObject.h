@@ -28,6 +28,8 @@ public:
 	
 	Transform* transform = nullptr;
 	Terrain* terrain = nullptr;
+
+	bool isLoading = false;
 	
 };
 

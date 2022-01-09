@@ -11,13 +11,10 @@ class Biome
 {
 public:
 
-	Biome(std::string _name);
+	Biome(std::string _name, int id);
 	~Biome();
 
 public:
-
-	GameObject* parent = nullptr;
-	std::list<Chunk*> chunks;
 
 	float height = 0.0f;
 	float frequency = 1.0f;
@@ -25,6 +22,8 @@ public:
 
 	int octaves = 8;
 	int primitive = 0;
+
+	int ID = -1;
 
 	std::string name = "";
 };

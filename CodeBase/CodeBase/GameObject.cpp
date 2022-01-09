@@ -49,22 +49,30 @@ bool GameObject::Draw()
 
 	if (terrain)
 	{
-		if (updateTFB)
+		if (isLoading)
 		{
-			glUseProgram(terrainShader);
-			SendMatrixToGPU(terrainShader);
-			terrain->DrawChunks(updateTFB);
-			if (myApp->m_render->optim)
-			{
-				updateTFB = false;
-			}
+			isLoading = false;
+			terrain->Load();
 		}
 		else
 		{
-			glUseProgram(renderShader);
-			SendMatrixToGPU(renderShader);
-			terrain->DrawChunks(updateTFB);
-		}		
+			if (updateTFB)
+			{
+				glUseProgram(terrainShader);
+				SendMatrixToGPU(terrainShader);
+				terrain->DrawChunks(updateTFB);
+				if (myApp->m_render->optim)
+				{
+					updateTFB = false;
+				}
+			}
+			else
+			{
+				glUseProgram(renderShader);
+				SendMatrixToGPU(renderShader);
+				terrain->DrawChunks(updateTFB);
+			}
+		}
 	}
 
 	return ret;

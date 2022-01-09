@@ -26,7 +26,6 @@ private:
 	char* currFunction = nullptr;
 	char* currNumLayer = nullptr;
 	char* currTexture[6];
-	string currBiome = "";
 
 	float terrainHeight = 0;
 	float terrainWidth = 0;
@@ -52,6 +51,7 @@ public:
 
 	Chunk* selectedChunk = nullptr;
 	Biome* selectedBiome = nullptr;
+	string currBiome = "";
 
 	string pathToDrag = "";
 

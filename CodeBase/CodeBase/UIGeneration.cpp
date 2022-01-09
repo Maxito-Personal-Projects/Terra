@@ -226,8 +226,6 @@ bool UIGeneration::Draw()
 			if (selectedBiome)
 			{
 				//type of primitives
-				
-
 				ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 				ImGui::BeginGroup();

@@ -19,6 +19,7 @@ public:
 public:
 
 	std::string name = "";
+	std::string path = "";
 	int width = 0;
 	int height = 0;
 
