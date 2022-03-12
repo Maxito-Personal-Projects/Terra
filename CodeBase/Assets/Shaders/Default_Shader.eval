@@ -33,6 +33,7 @@ out vec3 Blend_Normal_FS_in;
 out vec3 Normal_FS_in;
 out vec3 Color_FS_in;
 vec3 texColor_FS_in;
+
 out vec3 TFPosition;
 out vec3 TFNormal;
 out vec3 TFColor;

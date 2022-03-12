@@ -20,10 +20,10 @@ GameObject::GameObject()
 	}
 
 	//Default Shader
-	terrainShader = myApp->m_shader->GetShader("Default Shader");
-	renderShader = myApp->m_shader->GetShader("Render Shader");
-	mousePickingShader = myApp->m_shader->GetShader("Mouse Picking Shader");
-	textureShader = myApp->m_shader->GetShader("Texture Shader");
+	terrainShader = myApp->m_shader->GetShader("Default_Shader");
+	renderShader = myApp->m_shader->GetShader("Default_Render_Shader");
+	mousePickingShader = myApp->m_shader->GetShader("Mouse_Picking_Shader");
+	textureShader = myApp->m_shader->GetShader("Texture_Shader");
 
 	updateTFB = true;
 }

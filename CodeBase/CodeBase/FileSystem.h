@@ -5,6 +5,7 @@
 #include <streambuf>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -42,6 +43,14 @@ public:
 	string GetFileNameFromPath(string path);
 
 	string GetFileNameAt(const char* path);
+
+	string GetFileExtension(string file);
+
+	string RemoveExtension(string file);
+
+	// Get all files in a directory
+	void GetAllFilesInDirectory(string path, vector<string> &FilesOut, bool bRemoveExtensions = false);
+
 };
 
 #endif //!__FILESYSTEM_H__

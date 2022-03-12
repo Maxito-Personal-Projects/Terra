@@ -30,6 +30,7 @@ FileSystem::~FileSystem()
 {
 }
 
+
 void FileSystem::InitDevIL()
 {
 	// Initialize IL
@@ -61,6 +62,7 @@ void FileSystem::InitDevIL()
 	LOG("Assimp export formats: %s", exports.c_str());
 }
 
+
 string FileSystem::FileToString(string path)
 {
 	ifstream t(path.c_str());
@@ -69,6 +71,7 @@ string FileSystem::FileToString(string path)
 
 	return buffer.str();
 }
+
 
 Texture* FileSystem::LoadImagePNG(string path)
 {
@@ -126,6 +129,7 @@ Texture* FileSystem::LoadImagePNG(string path)
 	return ret;
 }
 
+
 string FileSystem::AddExtension(string folder, string name, ExportFormat extension)
 {
 	string file = "";
@@ -150,6 +154,7 @@ string FileSystem::AddExtension(string folder, string name, ExportFormat extensi
 	}
 	return file;
 }
+
 
 bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, ExportFormat format, string& message)
 {
@@ -313,6 +318,7 @@ bool FileSystem::Export(float* vertexBuffer, int sizeBuffer, string name, Export
 	return ret;
 }
 
+
 bool FileSystem::ExportPNG(string path)
 {
 	bool ret = true;
@@ -354,15 +360,17 @@ bool FileSystem::ExportPNG(string path)
 	return ret;
 }
 
+
 string FileSystem::GetFolderPath(string folder)
 {
 	char buffer[MAX_PATH];
-	getcwd(buffer, MAX_PATH);
+	_getcwd(buffer, MAX_PATH);
 	string path = buffer;
 	path += "\\"+folder;
 
 	return path;
 }
+
 
 string FileSystem::GetFileNameFromPath(string path)
 {
@@ -372,6 +380,7 @@ string FileSystem::GetFileNameFromPath(string path)
 
 	return ret;
 }
+
 
 string FileSystem::GetFileNameAt(const char * path)
 {
@@ -400,4 +409,42 @@ string FileSystem::GetFileNameAt(const char * path)
 	}
 
 	return ret;
+}
+
+
+string FileSystem::GetFileExtension(string file)
+{
+	return file.substr(file.find_last_of(".")+1, file.size());
+}
+
+
+string FileSystem::RemoveExtension(string file)
+{
+	return file.substr(0, file.find_last_of("."));
+}
+
+
+void FileSystem::GetAllFilesInDirectory(string path, vector<string> &FilesOut, bool bRemoveExtensions)
+{ 
+	string search_path = path + "/*.*";
+	WIN32_FIND_DATA fd;
+	HANDLE hFind = ::FindFirstFile(search_path.c_str(), &fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			// read all (real) files in current folder
+			// , delete '!' read other 2 default folder . and ..
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				FilesOut.push_back(fd.cFileName);
+			}
+		} while (::FindNextFile(hFind, &fd));
+		::FindClose(hFind);
+	}
+
+	if (bRemoveExtensions)
+	{
+		for (size_t i = 0; i < FilesOut.size(); ++i)
+		{
+			FilesOut[i] = RemoveExtension(FilesOut[i]);
+		}
+	}
 }

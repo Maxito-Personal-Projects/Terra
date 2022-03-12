@@ -4,21 +4,22 @@
 #include "Globals.h"
 #include <vector>
 #include <string>
+#include <queue>
 
 enum ShaderType
 {
-	VERTEX,
-	FRAGMENT,
-	GEOMETRY,
-	TESSELLATION_CS,
-	TESSELLATION_ES,
-	NONE
+	VERTEX = 0,
+	GEOMETRY = 1,
+	TESSELLATION_CS = 2,
+	TESSELLATION_ES = 3,
+	FRAGMENT = 4,
+	NONE = 255
 };
 
 //Shader struct
-struct _Shader
+struct ShaderResource
 {
-	_Shader(std::string _name, ShaderType _type)
+	ShaderResource(std::string _name, ShaderType _type)
 	{
 		name = _name;
 		type = _type;
@@ -35,14 +36,13 @@ class Shader
 {
 public:
 
-	Shader(std::string _name,_Shader* vertex, _Shader* fragment, _Shader* geometry=nullptr, 
-		_Shader* tessControl = nullptr, _Shader* tessEvaluation = nullptr);
+	Shader();
 	~Shader();
 
 public:
 
 	std::string name = "";
-	std::vector<_Shader*> shaders;
+	std::vector<ShaderResource*> shaders;
 	uint id = 0;
 
 };

@@ -24,11 +24,8 @@ bool ModuleShader::Start()
 {
 	bool ret = true;
 
-	GenerateDefaultShaders();
-	GenerateDefaultRenderShaders();
-	GenerateMousePickingShaders();
-	GenerateTextureShaders();
-
+	CompileAllShaders();
+	
 	return ret;
 }
 
@@ -63,170 +60,158 @@ bool ModuleShader::CleanUp()
 	return ret;
 }
 
-void ModuleShader::GenerateDefaultShaders()
+void ModuleShader::CompileAllShaders()
 {
-	//Creating default Vertex Shader
-	_Shader* defaultVertexSahder = new _Shader("Default Vertex Shader", VERTEX);
-	defaultVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Vertex_Shader.txt");
+	vector<string> DefaultShaders;
+	vector<string> CompiledShaders;
+
+	myApp->fileSystem->GetAllFilesInDirectory("Shaders", DefaultShaders, true);
 	
-	if (CompileShader(defaultVertexSahder))
+	for (size_t i = 0; i < DefaultShaders.size(); ++i)
 	{
-		LOG("Default Vertex Shader Compiled Successfully");
+		// Cheking if the shader is already compiled
+		if (find(begin(CompiledShaders), end(CompiledShaders), DefaultShaders[i]) != end(CompiledShaders))
+		{
+			continue;
+		}
+
+		CompiledShaders.push_back(DefaultShaders[i]);
+
+		if (Shader* NewShader = CompileShader(DefaultShaders[i]))
+		{
+			shaders.push_back(NewShader);
+			shadersNames.insert({ NewShader->name, NewShader->id });
+		}
+	}
+}
+
+enum ShaderType ModuleShader::FromExtensionToType(const string extension) const
+{
+	ShaderType Type = ShaderType::NONE;
+
+	if (extension == "vrt")
+	{
+		Type = ShaderType::VERTEX;
+	}
+	else if (extension == "frg")
+	{
+		Type = ShaderType::FRAGMENT;
+	}
+	else if (extension == "ctrl")
+	{
+		Type = ShaderType::TESSELLATION_CS;
+	}
+	else if (extension == "eval")
+	{
+		Type = ShaderType::TESSELLATION_ES;
+	}
+	else
+	{
+		Type = ShaderType::GEOMETRY;
 	}
 
-	//Creating default Geometry Shader
-	_Shader* defaultGeometrySahder = new _Shader("Default Geometry Shader", GEOMETRY);
-	defaultGeometrySahder->code = myApp->fileSystem->FileToString("Shaders/Default_Geometry_Shader.txt");
+	return Type;
+}
 
-	if (CompileShader(defaultGeometrySahder))
+string ModuleShader::FromTypeToString(const ShaderType Type) const
+{
+	switch (Type)
 	{
-		LOG("Default Geometry Shader Compiled Successfully");
+	case ShaderType::FRAGMENT:
+		return "Fragment Shader";
+	case ShaderType::VERTEX:
+		return "Vertex Shader";
+	case ShaderType::GEOMETRY:
+		return "Geometry Shader";
+	case ShaderType::TESSELLATION_CS:
+		return "Tessellation Control Shader";
+	case ShaderType::TESSELLATION_ES:
+		return "Tessellation Evaluation Shader";
+	case ShaderType::NONE:
+		return "None Type Shader";
+	default:
+		return "Unknown Shader";
 	}
+}
 
-	//Creating default Tessellation Control Shader
-	_Shader* defaultTCSahder = new _Shader("Default Tessellation Control Shader", TESSELLATION_CS);
-	defaultTCSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Control_Shader.txt");
+// Shader order: Vertex, Geometry, Control, Evaluation, Fragment
 
-	if (CompileShader(defaultTCSahder))
-	{
-		LOG("Default Tessellation Control Shader Compiled Successfully");
-	}
-
-	//Creating default Tessellation Evaluation Shader
-	_Shader* defaultTESahder = new _Shader("Default Tessellation Evaluation Shader", TESSELLATION_ES);
-	defaultTESahder->code = myApp->fileSystem->FileToString("Shaders/Default_Evaluation_Shader.txt");
-
-	if (CompileShader(defaultTESahder))
-	{
-		LOG("Default Tessellation Evaluation Shader Compiled Successfully");
-	}
-
-	//Creating default Fragment Shader
-	_Shader* defaultFragmentSahder = new _Shader("Default Fragment Shader", FRAGMENT);
-	defaultFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Fragment_Shader.txt");
+Shader* ModuleShader::CompileShader(string Name)
+{
+	Shader* ShaderProgram = new Shader();
+	ShaderProgram->name = Name;
 	
-	if(CompileShader(defaultFragmentSahder))
+	vector<string> AllShaders;
+	myApp->fileSystem->GetAllFilesInDirectory("Shaders", AllShaders);
+
+	// Ordering lambda
+	auto cmp = [](ShaderResource* A, ShaderResource* B)
 	{
-		LOG("Default Fragment Shader Compiled Successfully");
+		return A->type > B->type;
+	};
+
+	std::priority_queue<ShaderResource*, std::vector<ShaderResource*>, decltype(cmp)> OrderedShaders(cmp);
+
+	//Compile shader Resources
+	for (size_t i = 0; i < AllShaders.size(); ++i)
+	{
+		string FileName = myApp->fileSystem->RemoveExtension(AllShaders[i]);
+		if (FileName == Name)
+		{
+			ShaderType Type = FromExtensionToType(myApp->fileSystem->GetFileExtension(AllShaders[i]));
+			ShaderResource* ShaderRes = new ShaderResource(Name, Type);
+			ShaderRes->code = myApp->fileSystem->FileToString("Shaders/" + AllShaders[i]);
+
+			if (CompileShaderResource(ShaderRes))
+			{
+				LOG("%s - %s Compiled Successfully", Name.c_str(), FromTypeToString(Type).c_str());
+				OrderedShaders.push(ShaderRes);
+			}
+			else
+			{
+				LOG("Something went wrong compiling %s program", Name.c_str());
+				delete ShaderProgram;
+				ShaderProgram = nullptr;
+				break;
+			}
+		}
 	}
 
-	////Creating Default Shader Program
-	//Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder, defaultGeometrySahder);
-	//if (CompileShaderProgram(defaultShader))
-	//{
-	//	LOG("Default Shader Program Compiled Successfully");
-
-	//	shaders.push_back(defaultShader);
-	//	shadersNames.insert({ defaultShader->name, defaultShader->id });
-	//}
-
-	//Creating Default Shader Program
-	Shader* defaultShader = new Shader("Default Shader", defaultVertexSahder, defaultFragmentSahder, nullptr, defaultTCSahder,defaultTESahder);
-	if (CompileShaderProgram(defaultShader,true))
+	//Compile Shader Program
+	if (ShaderProgram)
 	{
-		LOG("Default Shader Program Compiled Successfully");
+		bool CaptureVars = false;
 
-		shaders.push_back(defaultShader);
-		shadersNames.insert({ defaultShader->name, defaultShader->id });
+		//Fill shader vector in order
+		while(!OrderedShaders.empty())
+		{
+			ShaderProgram->shaders.push_back(OrderedShaders.top());
+			OrderedShaders.pop();
+
+			if(ShaderProgram->shaders.back()->type == ShaderType::TESSELLATION_CS ||
+				ShaderProgram->shaders.back()->type == ShaderType::TESSELLATION_ES)
+			{
+				CaptureVars = true;
+			}
+		}
+
+		if (CompileShaderProgram(ShaderProgram, CaptureVars))
+		{
+			LOG("%s Program Compiled Successfully", Name.c_str());
+		}
+		else
+		{
+			LOG("Error compiling %s program", Name.c_str());
+			delete ShaderProgram;
+			ShaderProgram = nullptr;
+		}
 	}
 
+	return ShaderProgram;
 }
 
-void ModuleShader::GenerateDefaultRenderShaders()
-{
-	//Creating default Vertex Shader
-	_Shader* renderVertexSahder = new _Shader("Default Render Vertex Shader", VERTEX);
-	renderVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Render_Vertex_Shader.txt");
 
-	if (CompileShader(renderVertexSahder))
-	{
-		LOG("Render Vertex Shader Compiled Successfully");
-	}
-
-	//Creating default Fragment Shader
-	_Shader* renderFragmentSahder = new _Shader("Default RenderFragment Shader", FRAGMENT);
-	renderFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Default_Render_Fragment_Shader.txt");
-
-	if (CompileShader(renderFragmentSahder))
-	{
-		LOG("Render Fragment Shader Compiled Successfully");
-	}
-
-	//Creating Default Shader Program
-	Shader* renderShader = new Shader("Render Shader", renderVertexSahder, renderFragmentSahder, nullptr, nullptr, nullptr);
-	if (CompileShaderProgram(renderShader))
-	{
-		LOG("Render Shader Program Compiled Successfully");
-
-		shaders.push_back(renderShader);
-		shadersNames.insert({ renderShader->name, renderShader->id });
-	}
-}
-
-void ModuleShader::GenerateMousePickingShaders()
-{
-	//Creating default Vertex Shader
-	_Shader* mousePickingVertexSahder = new _Shader("Default Vertex Shader", VERTEX);
-	mousePickingVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Mouse_Picking_Vertex_Shader.txt");
-
-	if (CompileShader(mousePickingVertexSahder))
-	{
-		LOG("Mouse Picking Vertex Shader Compiled Successfully");
-	}
-
-	//Creating default Fragment Shader
-	_Shader* mousePickingFragmentSahder = new _Shader("Default Fragment Shader", FRAGMENT);
-	mousePickingFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Mouse_Picking_Fragment_Shader.txt");
-
-	if (CompileShader(mousePickingFragmentSahder))
-	{
-		LOG("Mouse Picking Fragment Shader Compiled Successfully");
-	}
-
-	//Creating Default Shader Program
-	Shader* mousePickingShader = new Shader("Mouse Picking Shader", mousePickingVertexSahder, mousePickingFragmentSahder, nullptr, nullptr, nullptr);
-	if (CompileShaderProgram(mousePickingShader))
-	{
-		LOG("Mouse Picking Shader Program Compiled Successfully");
-
-		shaders.push_back(mousePickingShader);
-		shadersNames.insert({ mousePickingShader->name, mousePickingShader->id });
-	}
-}
-
-void ModuleShader::GenerateTextureShaders()
-{
-
-	//Creating default Vertex Shader
-	_Shader*TextureVertexSahder = new _Shader("Default Vertex Shader", VERTEX);
-	TextureVertexSahder->code = myApp->fileSystem->FileToString("Shaders/Texture_Vertex_Shader.txt");
-
-	if (CompileShader(TextureVertexSahder))
-	{
-		LOG("Texture Vertex Shader Compiled Successfully");
-	}
-
-	//Creating default Fragment Shader
-	_Shader* TextureFragmentSahder = new _Shader("Default Fragment Shader", FRAGMENT);
-	TextureFragmentSahder->code = myApp->fileSystem->FileToString("Shaders/Texture_Fragment_Shader.txt");
-
-	if (CompileShader(TextureFragmentSahder))
-	{
-		LOG("Texture Fragment Shader Compiled Successfully");
-	}
-
-	//Creating Default Shader Program
-	Shader* TextureShader = new Shader("Texture Shader", TextureVertexSahder, TextureFragmentSahder, nullptr, nullptr, nullptr);
-	if (CompileShaderProgram(TextureShader))
-	{
-		LOG("Texture Shader Program Compiled Successfully");
-
-		shaders.push_back(TextureShader);
-		shadersNames.insert({ TextureShader->name, TextureShader->id });
-	}
-}
-
-bool ModuleShader::CompileShader(_Shader* shader)
+bool ModuleShader::CompileShaderResource(ShaderResource* shader)
 {
 	bool ret = true;
 
@@ -264,7 +249,7 @@ bool ModuleShader::CompileShader(_Shader* shader)
 	return ret;
 }
 
-bool ModuleShader::CompileShaderProgram(Shader * shaderProgram, bool isDefault)
+bool ModuleShader::CompileShaderProgram(Shader* shaderProgram, bool isDefault)
 {
 	bool ret = true;
 
@@ -280,8 +265,8 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram, bool isDefault)
 	//Telling the program which var/s we want to capture
 	if (isDefault)
 	{
-		const GLchar* captureVars[] = { "TFPosition","TFNormal","TFColor" };
-
+		const char* captureVars[] = { "TFPosition","TFNormal","TFColor" };
+	
 		//We want everything in the same buffer!
 		glTransformFeedbackVaryings(shaderProgram->id, 3, captureVars, GL_INTERLEAVED_ATTRIBS);
 	}
@@ -289,15 +274,21 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram, bool isDefault)
 	//Compiling Shader Program
 	glLinkProgram(shaderProgram->id);
 
-	//Chacking Compile Errors
-	int success;
+	//Chacking Linking Errors
+	int LinkSuccess, ValidProgram;
 	char infoLog[512];
-	glGetProgramiv(shaderProgram->id, GL_COMPILE_STATUS, &success);
+	glGetProgramiv(shaderProgram->id, GL_LINK_STATUS, &LinkSuccess);
+	glGetProgramiv(shaderProgram->id, GL_VALIDATE_STATUS, &ValidProgram);
 
-	if (!success)
+	if (!LinkSuccess || !ValidProgram)
 	{
-		glGetShaderInfoLog(shaderProgram->id, 512, NULL, infoLog);
+		int infoLogLength = 0;
+		glGetProgramiv(shaderProgram->id, GL_INFO_LOG_LENGTH, &infoLogLength);
+		char* infoLog = new char[infoLogLength];
+		glGetProgramInfoLog(shaderProgram->id, infoLogLength, NULL, infoLog);
 		LOG("Compilation Shader Program Error: %s", infoLog);
+		delete[] infoLog;
+
 		ret = false;
 	}
 
@@ -312,5 +303,10 @@ bool ModuleShader::CompileShaderProgram(Shader * shaderProgram, bool isDefault)
 
 int ModuleShader::GetShader(string name)
 {
+	if (shadersNames.find(name) == shadersNames.end())
+	{
+		LOG("Culdn't find shader %s", name.c_str());
+	}
+
 	return shadersNames[name];
 }

@@ -7,7 +7,6 @@ uniform mat4 Model;
 
 uniform vec3 color;
 
-
 out vec3 Color_FS_in;
 
 void main()

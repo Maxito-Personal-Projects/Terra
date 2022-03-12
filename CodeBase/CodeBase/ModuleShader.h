@@ -6,7 +6,7 @@
 #include <map>
 
 class Shader;
-struct _Shader;
+struct ShaderResource;
 
 class ModuleShader : public Module
 {
@@ -33,15 +33,15 @@ public:
 	//Clean Module
 	bool CleanUp();
 
-	void GenerateDefaultShaders();
-	void GenerateDefaultRenderShaders();
-	void GenerateMousePickingShaders();
-	void GenerateTextureShaders();
-
-	bool CompileShader(_Shader* shader);
+	void CompileAllShaders();
+	bool CompileShaderResource(ShaderResource* shader);
 	bool CompileShaderProgram(Shader* shaderProgram, bool isDefault = false);
+	Shader* CompileShader(string Name);
 
 	int GetShader(string name);
+
+	enum ShaderType FromExtensionToType(const string extension) const;
+	string FromTypeToString(const ShaderType Type) const;
 
 public:
 
