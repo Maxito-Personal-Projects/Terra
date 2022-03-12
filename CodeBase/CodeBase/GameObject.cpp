@@ -19,12 +19,6 @@ GameObject::GameObject()
 		terrain->SetNeighbours();
 	}
 
-	//Default Shader
-	terrainShader = myApp->m_shader->GetShader("Default_Shader");
-	renderShader = myApp->m_shader->GetShader("Default_Render_Shader");
-	mousePickingShader = myApp->m_shader->GetShader("Mouse_Picking_Shader");
-	textureShader = myApp->m_shader->GetShader("Texture_Shader");
-
 	updateTFB = true;
 }
 
@@ -58,6 +52,8 @@ bool GameObject::Draw()
 		{
 			if (updateTFB)
 			{
+				terrainShader = myApp->m_shader->GetShader("Default_Shader");
+
 				glUseProgram(terrainShader);
 				SendMatrixToGPU(terrainShader);
 				terrain->DrawChunks(updateTFB);
@@ -68,6 +64,8 @@ bool GameObject::Draw()
 			}
 			else
 			{
+				renderShader = myApp->m_shader->GetShader("Default_Render_Shader");
+
 				glUseProgram(renderShader);
 				SendMatrixToGPU(renderShader);
 				terrain->DrawChunks(updateTFB);
@@ -84,6 +82,8 @@ bool GameObject::SelectionDraw()
 
 	if (terrain)
 	{
+		mousePickingShader = myApp->m_shader->GetShader("Mouse_Picking_Shader");
+
 		//Using object shader
 		glUseProgram(mousePickingShader);
 		SendMatrixToGPU(mousePickingShader);

@@ -33,9 +33,8 @@ public:
 	//Clean Module
 	bool CleanUp();
 
-	void CompileAllShaders();
-	bool CompileShaderResource(ShaderResource* shader);
-	bool CompileShaderProgram(Shader* shaderProgram, bool isDefault = false);
+	void CompileFolderShaders();
+	void RecompileAllShaders();
 	Shader* CompileShader(string Name);
 
 	int GetShader(string name);
@@ -45,9 +44,10 @@ public:
 
 public:
 
-	map<string, int> shadersNames;
-	list<Shader*> shaders;
+	map<string, int> ShadersNames;
 	
+	list<Shader*> Shaders;
+
 };
 
 #endif // !__MODULESHADER_H__

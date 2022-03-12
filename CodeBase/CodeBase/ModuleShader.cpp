@@ -1,6 +1,8 @@
 #include "Application.h"
 #include "ModuleShader.h"
+#include "ModuleInput.h"
 #include "FileSystem.h"
+
 #include "Shader.h"
 
 
@@ -24,14 +26,21 @@ bool ModuleShader::Start()
 {
 	bool ret = true;
 
-	CompileAllShaders();
-	
+	CompileFolderShaders();
+
 	return ret;
 }
 
 bool ModuleShader::PreUpdate()
 {
 	bool ret = true;
+
+	if(myApp->m_input->GetKey(SDL_SCANCODE_F1)==DOWN)
+	{
+		LOG("Recompiling All Shaders!");
+		RecompileAllShaders();
+	}
+
 	return ret;
 }
 
@@ -45,7 +54,7 @@ bool ModuleShader::CleanUp()
 {
 	bool ret = true;
 
-	for (list<Shader*>::iterator s_it = shaders.begin(); s_it != shaders.end(); ++s_it)
+	for (list<Shader*>::iterator s_it = Shaders.begin(); s_it != Shaders.end(); ++s_it)
 	{
 		if ((*s_it) != nullptr)
 		{
@@ -54,13 +63,13 @@ bool ModuleShader::CleanUp()
 		}
 	}
 
-	shaders.clear();
-	shadersNames.clear();
+	Shaders.clear();
+	ShadersNames.clear();
 
 	return ret;
 }
 
-void ModuleShader::CompileAllShaders()
+void ModuleShader::CompileFolderShaders()
 {
 	vector<string> DefaultShaders;
 	vector<string> CompiledShaders;
@@ -79,8 +88,8 @@ void ModuleShader::CompileAllShaders()
 
 		if (Shader* NewShader = CompileShader(DefaultShaders[i]))
 		{
-			shaders.push_back(NewShader);
-			shadersNames.insert({ NewShader->name, NewShader->id });
+			Shaders.push_back(NewShader);
+			ShadersNames.insert({ NewShader->Name, NewShader->Id });
 		}
 	}
 }
@@ -138,19 +147,10 @@ string ModuleShader::FromTypeToString(const ShaderType Type) const
 
 Shader* ModuleShader::CompileShader(string Name)
 {
-	Shader* ShaderProgram = new Shader();
-	ShaderProgram->name = Name;
+	Shader* ShaderProgram = new Shader(Name);
 	
 	vector<string> AllShaders;
 	myApp->fileSystem->GetAllFilesInDirectory("Shaders", AllShaders);
-
-	// Ordering lambda
-	auto cmp = [](ShaderResource* A, ShaderResource* B)
-	{
-		return A->type > B->type;
-	};
-
-	std::priority_queue<ShaderResource*, std::vector<ShaderResource*>, decltype(cmp)> OrderedShaders(cmp);
 
 	//Compile shader Resources
 	for (size_t i = 0; i < AllShaders.size(); ++i)
@@ -160,12 +160,12 @@ Shader* ModuleShader::CompileShader(string Name)
 		{
 			ShaderType Type = FromExtensionToType(myApp->fileSystem->GetFileExtension(AllShaders[i]));
 			ShaderResource* ShaderRes = new ShaderResource(Name, Type);
-			ShaderRes->code = myApp->fileSystem->FileToString("Shaders/" + AllShaders[i]);
+			ShaderRes->Code = myApp->fileSystem->FileToString("Shaders/" + AllShaders[i]);
 
-			if (CompileShaderResource(ShaderRes))
+			if (ShaderRes->CompileShaderResource())
 			{
 				LOG("%s - %s Compiled Successfully", Name.c_str(), FromTypeToString(Type).c_str());
-				OrderedShaders.push(ShaderRes);
+				ShaderProgram->Shaders.push_back(ShaderRes);
 			}
 			else
 			{
@@ -180,22 +180,7 @@ Shader* ModuleShader::CompileShader(string Name)
 	//Compile Shader Program
 	if (ShaderProgram)
 	{
-		bool CaptureVars = false;
-
-		//Fill shader vector in order
-		while(!OrderedShaders.empty())
-		{
-			ShaderProgram->shaders.push_back(OrderedShaders.top());
-			OrderedShaders.pop();
-
-			if(ShaderProgram->shaders.back()->type == ShaderType::TESSELLATION_CS ||
-				ShaderProgram->shaders.back()->type == ShaderType::TESSELLATION_ES)
-			{
-				CaptureVars = true;
-			}
-		}
-
-		if (CompileShaderProgram(ShaderProgram, CaptureVars))
+		if (ShaderProgram->CompileShaderProgram())
 		{
 			LOG("%s Program Compiled Successfully", Name.c_str());
 		}
@@ -211,102 +196,46 @@ Shader* ModuleShader::CompileShader(string Name)
 }
 
 
-bool ModuleShader::CompileShaderResource(ShaderResource* shader)
-{
-	bool ret = true;
-
-	//Generating Shader object
-	if(shader->type== VERTEX)
-		shader->id = glCreateShader(GL_VERTEX_SHADER);
-	else if(shader->type==FRAGMENT)
-		shader->id = glCreateShader(GL_FRAGMENT_SHADER);
-	else if (shader->type == TESSELLATION_CS)
-		shader->id = glCreateShader(GL_TESS_CONTROL_SHADER);
-	else if (shader->type == TESSELLATION_ES)
-		shader->id = glCreateShader(GL_TESS_EVALUATION_SHADER);
-	else
-		shader->id = glCreateShader(GL_GEOMETRY_SHADER);
-
-	//Attaching the shader source code to the shader object
-	const char *shaderCode = shader->code.c_str();
-	glShaderSource(shader->id, 1, &shaderCode, NULL);
-
-	//Compiling Shader
-	glCompileShader(shader->id);
-
-	//Chacking Compile Errors
-	int success;
-	char infoLog[512];
-	glGetShaderiv(shader->id, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(shader->id, 512, NULL, infoLog);
-		LOG("Compilation Shader Error: %s", infoLog);
-		ret = false;
-	}
-
-	return ret;
-}
-
-bool ModuleShader::CompileShaderProgram(Shader* shaderProgram, bool isDefault)
-{
-	bool ret = true;
-
-	//Generating Shader Program object
-	shaderProgram->id = glCreateProgram();
-
-	//Attaching compiled shaders
-	for (int i = 0; i < shaderProgram->shaders.size(); ++i)
-	{
-		glAttachShader(shaderProgram->id, shaderProgram->shaders[i]->id);
-	}
-
-	//Telling the program which var/s we want to capture
-	if (isDefault)
-	{
-		const char* captureVars[] = { "TFPosition","TFNormal","TFColor" };
-	
-		//We want everything in the same buffer!
-		glTransformFeedbackVaryings(shaderProgram->id, 3, captureVars, GL_INTERLEAVED_ATTRIBS);
-	}
-
-	//Compiling Shader Program
-	glLinkProgram(shaderProgram->id);
-
-	//Chacking Linking Errors
-	int LinkSuccess, ValidProgram;
-	char infoLog[512];
-	glGetProgramiv(shaderProgram->id, GL_LINK_STATUS, &LinkSuccess);
-	glGetProgramiv(shaderProgram->id, GL_VALIDATE_STATUS, &ValidProgram);
-
-	if (!LinkSuccess || !ValidProgram)
-	{
-		int infoLogLength = 0;
-		glGetProgramiv(shaderProgram->id, GL_INFO_LOG_LENGTH, &infoLogLength);
-		char* infoLog = new char[infoLogLength];
-		glGetProgramInfoLog(shaderProgram->id, infoLogLength, NULL, infoLog);
-		LOG("Compilation Shader Program Error: %s", infoLog);
-		delete[] infoLog;
-
-		ret = false;
-	}
-
-	//Deleting Shaders
-	for (int i = 0; i < shaderProgram->shaders.size(); ++i)
-	{
-		glDeleteShader(shaderProgram->shaders[i]->id);
-	}
-
-	return ret;
-}
-
 int ModuleShader::GetShader(string name)
 {
-	if (shadersNames.find(name) == shadersNames.end())
+	if (ShadersNames.find(name) == ShadersNames.end())
 	{
 		LOG("Culdn't find shader %s", name.c_str());
 	}
 
-	return shadersNames[name];
+	return ShadersNames[name];
+}
+
+
+void ModuleShader::RecompileAllShaders()
+{
+	for (Shader* CurrentShader : Shaders)
+	{
+		int OldId = CurrentShader->Id;
+		bool Recompile = true;
+
+		for(ShaderResource* CurrentShaderResource : CurrentShader->Shaders)
+		{
+			if (!CurrentShaderResource->CompileShaderResource())
+			{
+				LOG("Error Recompiling %s program, using old version", CurrentShader->Name.c_str());
+				Recompile = false;
+				break;
+			}
+		}
+
+		if(Recompile)
+		{
+			glDeleteProgram(OldId);
+			
+			if (CurrentShader->CompileShaderProgram())
+			{
+				ShadersNames[CurrentShader->Name] = CurrentShader->Id;
+			}
+			else
+			{
+				LOG("Error Recompiling %s program", CurrentShader->Name.c_str());
+			}
+		}
+	}
 }

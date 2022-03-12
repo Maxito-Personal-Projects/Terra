@@ -16,34 +16,40 @@ enum ShaderType
 	NONE = 255
 };
 
-//Shader struct
-struct ShaderResource
-{
-	ShaderResource(std::string _name, ShaderType _type)
-	{
-		name = _name;
-		type = _type;
-	}
 
-	std::string name = "";
-	std::string code = "";
-	ShaderType type = NONE;
-	uint id = 0;
+//Shader struct
+class ShaderResource
+{
+public:
+	
+	ShaderResource(std::string Name, ShaderType Type) : Name(Name),Type(Type){}
+
+	bool CompileShaderResource();
+
+public:
+
+	std::string Name = "";
+	std::string Code = "";
+	ShaderType Type = NONE;
+	uint Id = 0;
 };
+
 
 //Shader Program main class
 class Shader
 {
 public:
 
-	Shader();
+	Shader(std::string Name) :Name(Name) {}
 	~Shader();
+
+	bool CompileShaderProgram();
 
 public:
 
-	std::string name = "";
-	std::vector<ShaderResource*> shaders;
-	uint id = 0;
+	std::string Name = "";
+	std::vector<ShaderResource*> Shaders;
+	uint Id = 0;
 
 };
 

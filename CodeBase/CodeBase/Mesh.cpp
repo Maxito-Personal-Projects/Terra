@@ -409,6 +409,7 @@ void Mesh::DrawTextureToExport(string path)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	
+	parent->textureShader = myApp->m_shader->GetShader("Texture_Shader");
 	glUseProgram(parent->textureShader);
 
 	glBindVertexArray(VAOrender);
